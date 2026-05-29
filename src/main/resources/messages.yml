@@ -1,0 +1,22 @@
+####################################################
+#         Eligius Nametag - messages.yml           #
+####################################################
+# This file contains all in-game messages used by the plugin.
+# You can use MiniMessage formatting and Minecraft color codes.
+#
+# ⚠️ Do NOT remove any keys — the plugin depends on them.
+# You are free to customize the text and formatting.
+####################################################
+
+################
+# Message Prefix
+################
+prefix: <dark_aqua><bold>Eligius<aqua><bold>Nametag<reset> <dark_gray>- <gray>
+
+##########################
+# Generic Error Messages #
+##########################
+no_permission: <red>You do not have permission to do that!
+player_not_found: <dark_red>Player not found
+must_be_player: <red>You must be a player to use this command!
+message_not_found: <red>Oh... I can't react to that. (Contact the Administrators)

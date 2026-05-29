@@ -1,0 +1,72 @@
+config_version: 6
+
+# ==========================================
+# EligiusNametag - Configuración Global
+# ==========================================
+
+# Intervalo en segundos para actualizar todos los nametags.
+interval: 0.5
+
+# Distancia de visión máxima en bloques para los Nametags.
+view_distance: 64
+
+# Espaciado entre las líneas del holograma
+line_spacing: 0.275
+
+# Altura base de los hologramas (0.35 = cerca a la cabeza)
+y_offset: 0.35
+
+# Alias para el comando principal
+command_aliases:
+  - "eltag"
+  - "enametag"
+  - "eligiusnametag"
+
+# Textos de los mensajes al ejecutar comandos
+messages:
+  toggled_self_on: "<green>Ahora puedes ver tu propio nametag."
+  toggled_self_off: "<red>Ya no puedes ver tu propio nametag."
+  no_permission: "<red>No tienes permisos para usar este comando."
+
+# ==========================================
+# Configuración de Jugadores
+# ==========================================
+players:
+  # Formato por defecto para todos los jugadores.
+  # Cada línea de la lista es una línea del holograma.
+  default_format:
+    - "<yellow>Jugador</yellow>"
+    - "<white><PLAYER></white>"
+  
+  # Sobreescritura basada en el grupo primario de Vault.
+  # Cada grupo puede tener múltiples líneas.
+  groups:
+    admin:
+      - "<red>:rank_dev: Administrador</red>"
+      - "<white><PLAYER></white>"
+    vip:
+      - "<gold>Usuario VIP</gold>"
+      - "<white><PLAYER></white>"
+
+# ==========================================
+# Configuración de Mascotas / Entidades Domadas
+# ==========================================
+pets:
+  # ¿Habilitar NameTags flotantes sobre las mascotas?
+  enabled: true
+  
+  # Si está en 'false', las mascotas salvajes o domesticadas que NO tengan una Etiqueta de Nombre 
+  # (Name Tag de yunque) puesta no tendrán holograma. 
+  # Si está en 'true', mostrarán su especie por defecto (Ej: "Lobo").
+  show_unnamed: false
+  
+  # Formato por defecto para cualquier mascota de un usuario normal.
+  default_format:
+    - "<gray>Mascota de <PLAYER></gray>"
+    - "<white><DISPLAYNAME></white>"
+  
+  # Sobreescritura basada en el grupo primario de Vault del DUEÑO de la mascota.
+  groups:
+    admin:
+      - "<red>Mascota Guardiana de <PLAYER></red>"
+      - "<white><DISPLAYNAME></white>"

@@ -1,0 +1,144 @@
+name: Release & Publish Packages (Release & Alpha Branches)
+
+on:
+  push:
+    branches:
+      - main
+      - alpha
+
+jobs:
+  publish-github:
+    if: github.repository_owner == 'Lyttle-Development'
+    runs-on: ubuntu-22.04
+    env:
+      GPR_USER: ${{ secrets.GPR_USER }}
+      GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
+      CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # Checks out your code so the workflow can access it
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+        # Ensures the checked-in Gradle wrapper is valid and secure
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 21
+          check-latest: true
+        # Sets up Java 21 for building and publishing
+
+      - name: Build project
+        run: |
+          ./gradlew build shadowJar --stacktrace
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-jar
+          path: build/libs/*.jar
+
+      - name: Extract plugin version from gradle.properties
+        id: get_version
+        run: |
+          VERSION=$(grep '^pluginVersion=' gradle.properties | cut -d'=' -f2)
+          if [ "${{ env.CHANNEL }}" = "Release" ]; then
+            TAG="v$VERSION"
+          else
+            TAG="v${VERSION}-ALPHA.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create git tag for release
+        id: tag_release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.get_version.outputs.tag }} -m "Release ${{ steps.get_version.outputs.tag }}"
+          git push origin ${{ steps.get_version.outputs.tag }}
+
+      - name: Create GitHub Release and Upload JAR
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          files: build/libs/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-hangar:
+    if: github.repository_owner == 'Lyttle-Development'
+    runs-on: ubuntu-22.04
+    env:
+      HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+      CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+      GPR_USER: ${{ secrets.GPR_USER }}
+      GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # Checks out your code so the workflow can access it
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+        # Ensures the checked-in Gradle wrapper is valid and secure
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 21
+          check-latest: true
+        # Sets up Java 21 for building and publishing
+
+      - name: Build project
+        run: |
+          ./gradlew build shadowJar --stacktrace
+
+      - name: Publish to Hangar
+        env:
+          HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+          CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+        run: |
+          # Uploads the plugin to Hangar platform
+          ./gradlew publishPluginPublicationToHangar --stacktrace
+
+  publish-modrinth:
+    if: github.repository_owner == 'Lyttle-Development'
+    runs-on: ubuntu-22.04
+    env:
+      MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
+      CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+      GPR_USER: ${{ secrets.GPR_USER }}
+      GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # Checks out your code so the workflow can access it
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+        # Ensures the checked-in Gradle wrapper is valid and secure
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 21
+          check-latest: true
+        # Sets up Java 21 for building and publishing
+
+      - name: Build project
+        run: |
+          ./gradlew build shadowJar --stacktrace
+
+      - name: Publish to Modrinth
+        env:
+          MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
+          CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+        run: |
+          # Publishes to Modrinth (ensure your build.gradle is configured for this)
+          ./gradlew modrinth --stacktrace
