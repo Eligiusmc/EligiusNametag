@@ -5,7 +5,7 @@ import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;

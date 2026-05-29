@@ -1,7 +1,7 @@
 package com.makrozai.eligiusnametag.adapter.platform;
 
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
-import com.makrozai.eligiusnametag.adapter.config.YamlConfigAdapter;
+
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
@@ -94,6 +94,7 @@ public class PaperPlatformAdapter implements PlatformPort {
         return player != null && player.hasPermission(permission);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasCustomName(UUID targetId) {
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
@@ -108,6 +109,7 @@ public class PaperPlatformAdapter implements PlatformPort {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String parsePlaceholders(UUID targetId, String text) {
         org.bukkit.entity.Entity target = Bukkit.getEntity(targetId);
