@@ -1,8 +1,9 @@
 # EligiusNametag
 
-Un plugin avanzado para servidores **Paper 1.21+** que reemplaza los "nametags" aburridos de Vanilla por hologramas de texto flotantes totalmente configurables usando entidades virtuales `TEXT_DISPLAY`. 
+Este es el núcleo de **EligiusNametag**, un plugin holográfico ultra-eficiente diseñado para Paper y Folia 1.21+.
+Usamos `TextDisplays` de Minecraft (vía ProtocolLib) para renderizar los nametags sin generar lag ni entidades físicas en el servidor.
 
-Este plugin ha sido diseñado buscando la máxima eficiencia (usando ProtocolLib), garantizando compatibilidad con rangos de Vault, fuentes e íconos de ItemsAdder, y cientos de variables mediante PlaceholderAPI. ¡Funciona tanto para jugadores como para mascotas domadas!
+> 📖 **[Leer la Wiki Oficial Completa](https://Eligiusmc.github.io/EligiusNametag)**
 
 ---
 
