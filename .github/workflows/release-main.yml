@@ -3,7 +3,7 @@ name: Release Official Build
 on:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: write
