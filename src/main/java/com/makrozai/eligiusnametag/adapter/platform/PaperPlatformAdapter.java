@@ -68,7 +68,15 @@ public class PaperPlatformAdapter implements PlatformPort {
             }
             return viewer.canSee(target);
         }
-        return true; // For tamed mobs, assume visible if in same world.
+        org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
+        if (entity != null) {
+            // Utilizar una comprobación de distancia segura en lugar de getTrackedBy()
+            // 64 bloques de distancia es el límite estándar de tracking.
+            if (entity.getWorld().equals(viewer.getWorld())) {
+                return entity.getLocation().distanceSquared(viewer.getLocation()) <= (64.0 * 64.0);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -94,11 +102,10 @@ public class PaperPlatformAdapter implements PlatformPort {
         return player != null && player.hasPermission(permission);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean hasCustomName(UUID targetId) {
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
-        return entity != null && entity.getCustomName() != null;
+        return entity != null && entity.customName() != null;
     }
 
     @Override

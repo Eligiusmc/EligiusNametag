@@ -27,9 +27,7 @@ public class YamlConfigAdapter implements ConfigPort {
         }
         if (!configFile.exists()) {
             plugin.saveResource("config.yml", false);
-            plugin.saveResource("#defaults/config.yml", true);
             plugin.saveResource("messages.yml", false);
-            plugin.saveResource("#defaults/messages.yml", true);
         }
         config = YamlConfiguration.loadConfiguration(configFile);
         
