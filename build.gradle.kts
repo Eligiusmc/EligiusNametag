@@ -26,7 +26,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
     testImplementation("org.mockito:mockito-core:5.11.0")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.93.1")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.24.2")
 }
 
 group = "com.makrozai"
@@ -51,39 +51,10 @@ tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
 
-// --- Resources folder handling ---
-val folderToDelete = project.file("src/main/resources/#defaults")
-val sourceFolder = project.file("src/main/resources")
-val destinationFolder = project.file("src/main/resources/#defaults")
-
-val deleteFolder by tasks.registering(Delete::class) {
-    delete(folderToDelete)
-}
-
-val copyContents by tasks.registering(Copy::class) {
-    dependsOn(deleteFolder)
-    doFirst {
-        destinationFolder.mkdirs()
-    }
-    from(sourceFolder) {
-        exclude("#defaults/**")
-        exclude("plugin.yml")
-    }
-    into(destinationFolder)
-}
-
-tasks.named("processResources") {
-    dependsOn(copyContents)
-}
-
 tasks.processResources {
     filesMatching("paper-plugin.yml") {
         expand(project.properties)
     }
-}
-
-tasks.named("build") {
-    dependsOn(copyContents)
 }
 
 val versionString: String = "${version}"

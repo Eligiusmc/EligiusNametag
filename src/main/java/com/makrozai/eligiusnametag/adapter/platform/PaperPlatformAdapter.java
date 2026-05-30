@@ -1,7 +1,7 @@
 package com.makrozai.eligiusnametag.adapter.platform;
 
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
-import com.makrozai.eligiusnametag.adapter.config.YamlConfigAdapter;
+
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
@@ -68,7 +68,15 @@ public class PaperPlatformAdapter implements PlatformPort {
             }
             return viewer.canSee(target);
         }
-        return true; // For tamed mobs, assume visible if in same world.
+        org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
+        if (entity != null) {
+            // Utilizar una comprobación de distancia segura en lugar de getTrackedBy()
+            // 64 bloques de distancia es el límite estándar de tracking.
+            if (entity.getWorld().equals(viewer.getWorld())) {
+                return entity.getLocation().distanceSquared(viewer.getLocation()) <= (64.0 * 64.0);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -97,7 +105,7 @@ public class PaperPlatformAdapter implements PlatformPort {
     @Override
     public boolean hasCustomName(UUID targetId) {
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
-        return entity != null && entity.getCustomName() != null;
+        return entity != null && entity.customName() != null;
     }
 
     @Override
@@ -108,6 +116,7 @@ public class PaperPlatformAdapter implements PlatformPort {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String parsePlaceholders(UUID targetId, String text) {
         org.bukkit.entity.Entity target = Bukkit.getEntity(targetId);

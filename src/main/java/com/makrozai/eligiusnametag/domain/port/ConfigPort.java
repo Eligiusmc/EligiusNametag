@@ -1,7 +1,7 @@
 package com.makrozai.eligiusnametag.domain.port;
 
 import java.util.List;
-import java.util.UUID;
+
 
 public interface ConfigPort {
     List<String> getPlayerNametagTemplate(String group);

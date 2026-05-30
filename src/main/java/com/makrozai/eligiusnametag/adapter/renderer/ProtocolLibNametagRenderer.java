@@ -11,7 +11,7 @@ import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -75,35 +75,38 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
                         spawnPacket.getIntegers().write(0, lineEntityId);
                         spawnPacket.getUUIDs().write(0, UUID.randomUUID());
                         spawnPacket.getEntityTypeModifier().write(0, org.bukkit.entity.EntityType.TEXT_DISPLAY);
+                        
+                        // Set location to the parent so it spawns in a loaded chunk immediately
+                        spawnPacket.getDoubles().write(0, target.getLocation().getX());
+                        spawnPacket.getDoubles().write(1, target.getLocation().getY());
+                        spawnPacket.getDoubles().write(2, target.getLocation().getZ());
+
                         protocolManager.sendServerPacket(viewer, spawnPacket);
+
+                        // 2. Metadata Packet
+                        PacketContainer metaPacket = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+                        metaPacket.getIntegers().write(0, lineEntityId);
+
+                        List<WrappedDataValue> dataValues = new ArrayList<>();
+                        // Text Display Flags: billboard (0x03 - center)
+                        dataValues.add(new WrappedDataValue(15, WrappedDataWatcher.Registry.get(Byte.class), (byte) 0x03));
+                        // View Distance
+                        dataValues.add(new WrappedDataValue(17, WrappedDataWatcher.Registry.get(Float.class), viewDistance));
+                        
+                        // Translation Offset
+                        float calculatedYOffset = yOffset + ((lines.size() - 1 - i) * (float) lineSpacing);
+                        org.joml.Vector3f offset = new org.joml.Vector3f(0f, calculatedYOffset, 0f);
+                        dataValues.add(new WrappedDataValue(11, WrappedDataWatcher.Registry.get(org.joml.Vector3f.class), offset));
+                        
+                        // Text Component
+                        Object compHandle = WrappedChatComponent.fromJson(jsonComp).getHandle();
+                        dataValues.add(new WrappedDataValue(23, WrappedDataWatcher.Registry.getChatComponentSerializer(false), compHandle));
+
+                        metaPacket.getDataValueCollectionModifier().write(0, dataValues);
+                        protocolManager.sendServerPacket(viewer, metaPacket);
                     }
 
-                    // 2. Metadata Packet
-                    PacketContainer metaPacket = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-                    metaPacket.getIntegers().write(0, lineEntityId);
-
-                    List<WrappedDataValue> dataValues = new ArrayList<>();
-                    // Text Display Flags: billboard (0x03 - center)
-                    dataValues.add(new WrappedDataValue(15, WrappedDataWatcher.Registry.get(Byte.class), (byte) 0x03));
-                    // View Distance
-                    dataValues.add(new WrappedDataValue(17, WrappedDataWatcher.Registry.get(Float.class), viewDistance));
-                    
-                    // Translation Offset
-                    // All chained text displays share the same physical position (because text display passenger offset is 0).
-                    // So we must assign the highest visual translation to the FIRST line (top), and decrement for subsequent lines.
-                    float calculatedYOffset = yOffset + ((lines.size() - 1 - i) * (float) lineSpacing);
-                    org.joml.Vector3f offset = new org.joml.Vector3f(0f, calculatedYOffset, 0f);
-                    dataValues.add(new WrappedDataValue(11, WrappedDataWatcher.Registry.get(org.joml.Vector3f.class), offset));
-                    
-                    // Text Component
-                    Object compHandle = WrappedChatComponent.fromJson(jsonComp).getHandle();
-                    dataValues.add(new WrappedDataValue(23, WrappedDataWatcher.Registry.getChatComponentSerializer(false), compHandle));
-
-                    metaPacket.getDataValueCollectionModifier().write(0, dataValues);
-                    protocolManager.sendServerPacket(viewer, metaPacket);
-
-                    // 3. Mount Packet - always sent to ensure mounting works
-                    // even when the client loads the target entity after the first spawn.
+                    // 3. Mount Packet - continually sent to ensure it attaches when the pet finally loads
                     PacketContainer mountPacket = protocolManager.createPacket(PacketType.Play.Server.MOUNT);
                     mountPacket.getIntegers().write(0, parentId);
                     

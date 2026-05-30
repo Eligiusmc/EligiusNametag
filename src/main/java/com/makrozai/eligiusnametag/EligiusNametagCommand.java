@@ -52,7 +52,7 @@ public class EligiusNametagCommand {
 
     private static int rootNode(CommandContext<CommandSourceStack> context) {
         CommandSender sender = context.getSource().getSender();
-        Component msg = Component.text("EligiusNametag v" + plugin.getDescription().getVersion(), NamedTextColor.GREEN);
+        Component msg = Component.text("EligiusNametag v" + plugin.getPluginMeta().getVersion(), NamedTextColor.GREEN);
         sender.sendMessage(msg);
         return Command.SINGLE_SUCCESS;
     }
