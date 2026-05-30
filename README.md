@@ -44,15 +44,15 @@ Usamos `TextDisplays` de Minecraft (vía ProtocolLib) para renderizar los nameta
 
 ## 🎮 Comandos y Permisos
 
-Todos los comandos por defecto se basan en `/eltag` (o sus alias personalizables `/enametag` y `/eligiusnametag`).
+Todos los comandos por defecto se basan en `/enametag` (o sus alias personalizables `/eltag` y `/eligiusnametag`).
 
 | Comando | Descripción | Permiso Requerido |
 |---|---|---|
-| `/eltag` | Muestra la versión del plugin instalada. | *Ninguno* |
-| `/eltag reload` | Recarga toda la configuración (formatos, alturas, etc.) en tiempo real. | `eligiusnametag.admin` |
-| `/eltag lang <idioma>` | Cambia el idioma global del plugin dinámicamente. | `eligiusnametag.admin` |
-| `/eltag pets` | Habilita o deshabilita los hologramas en las mascotas globalmente. | `eligiusnametag.admin` |
-| `/eltag me` | Activa o desactiva la visualización de tu propio nametag. | `eligiusnametag.viewself` |
+| `/enametag` | Muestra la versión del plugin instalada. | *Ninguno* |
+| `/enametag reload` | Recarga toda la configuración (formatos, alturas, etc.) en tiempo real. | `eligiusnametag.admin` |
+| `/enametag lang <idioma>` | Cambia el idioma global del plugin dinámicamente. | `eligiusnametag.admin` |
+| `/enametag pets` | Habilita o deshabilita los hologramas en las mascotas globalmente. | `eligiusnametag.admin` |
+| `/enametag me` | Activa o desactiva la visualización de tu propio nametag. | `eligiusnametag.viewself` |
 
 ---
 

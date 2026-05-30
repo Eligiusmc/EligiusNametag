@@ -97,7 +97,7 @@ El `YamlConfigAdapter` carga concurrentemente múltiples `FileConfiguration`.
 Al inyectar el prefijo, el método `getMessage` simplemente concatena el string del nodo `prefix` de `config.yml` con el mensaje encontrado en el archivo cargado en memoria de `lang/`.
 
 ### 4.3 Comandos Mutables (Hot-swapping)
-El comando `/eltag lang <idioma>` usa un argumento de tipo `word()`. Al validarse la existencia del nuevo archivo en disco (`YamlConfigAdapter#hasLanguage`), muta la propiedad `language` en memoria, la guarda y obliga al plugin a recargar (`reloadPlugin`), reestructurando todos los mensajes al instante sin reiniciar el servidor. El mismo principio aplica para `/eltag pets enable`.
+El comando `/enametag lang <idioma>` usa un argumento de tipo `word()`. Al validarse la existencia del nuevo archivo en disco (`YamlConfigAdapter#hasLanguage`), muta la propiedad `language` en memoria, la guarda y obliga al plugin a recargar (`reloadPlugin`), reestructurando todos los mensajes al instante sin reiniciar el servidor. El mismo principio aplica para `/enametag pets enable`.
 
 ---
 

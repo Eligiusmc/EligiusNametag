@@ -49,3 +49,5 @@ skills-lock.json
 
 # Test server directory
 run/
+docs-site/node_modules/
+
