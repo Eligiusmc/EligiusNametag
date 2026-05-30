@@ -89,8 +89,15 @@ El adaptador `YamlConfigAdapter` fue diseñado con retrocompatibilidad para pars
 - **Modo Lista (Nuevo):** `- "<red>Texto 1</red>"`
 - **Modo Cadena (Antiguo):** `"<red>Texto 1</red>\n<white>Texto 2</white>"`
 
-### 4.2 Eliminación de la carpeta `#defaults`
-En versiones tempranas de este proyecto, se utilizaba un hack en `build.gradle.kts` que copiaba los archivos de configuración estáticos a una carpeta interna `#defaults` en la carpeta `src/`. Esto ensuciaba el control de versiones y fue removido intencionalmente en favor de que las versiones modernas de PaperMC/Spigot logren mantener y actualizar los comentarios del archivo `config.yml` original nativamente sin necesidad de carpetas de backups ruidosas.
+### 4.2 Modularización (players.yml, pets.yml, lang/)
+El `YamlConfigAdapter` carga concurrentemente múltiples `FileConfiguration`. 
+- `config.yml` maneja las bases del entorno.
+- `players.yml` y `pets.yml` abstraen las listas de formatos y rangos Vault.
+- `lang/` contiene las traducciones dinámicas.
+Al inyectar el prefijo, el método `getMessage` simplemente concatena el string del nodo `prefix` de `config.yml` con el mensaje encontrado en el archivo cargado en memoria de `lang/`.
+
+### 4.3 Comandos Mutables (Hot-swapping)
+El comando `/eltag lang <idioma>` usa un argumento de tipo `word()`. Al validarse la existencia del nuevo archivo en disco (`YamlConfigAdapter#hasLanguage`), muta la propiedad `language` en memoria, la guarda y obliga al plugin a recargar (`reloadPlugin`), reestructurando todos los mensajes al instante sin reiniciar el servidor. El mismo principio aplica para `/eltag pets enable`.
 
 ---
 
@@ -106,3 +113,26 @@ El plugin está diseñado para apuntar exclusivamente a la API de **Paper 1.21+*
 ```bash
 ./gradlew build
 ```
+
+---
+
+## 6. Workflow (GitFlow) y Versionamiento
+
+El proyecto sigue una metodología basada en **GitFlow** para asegurar escalabilidad y evitar roturas en los entornos en vivo.
+
+### 6.1 Estructura de Ramas
+- **`main`**: Es la rama de **Producción**. Solo contiene código 100% estable, probado y listo para su uso final en servidores en vivo. Nunca se programa directamente aquí.
+- **`develop`**: Es la rama **Integradora** y base de nuestro desarrollo continuo. Toda nueva funcionalidad debe fusionarse primero aquí para someterse a pruebas conjuntas.
+- **`feature/<nombre>`**: Ramas temporales para desarrollar funcionalidades específicas (ej. `feature/multi-lang`, `feature/sqlite-fix`). Siempre nacen a partir de `develop`.
+
+### 6.2 Ciclo de Trabajo
+1. Se clona el proyecto y se ubica en la rama `develop`.
+2. Se crea una nueva rama: `git checkout -b feature/nueva-funcionalidad`.
+3. Al terminar, se realiza un *Pull Request* (PR) hacia `develop`.
+4. Una vez validada y testeada en `develop`, se empaqueta una *Release* y se fusiona hacia `main`.
+
+### 6.3 Política de Versionamiento
+Las versiones son estrictamente **consecutivas**.
+Toda *feature* o conjunto de características fusionado exitosamente en `develop` implicará un **incremento consecutivo (Version Bump)**.
+- El versionamiento se actualiza directamente en el archivo `build.gradle.kts`.
+- Por ejemplo, al añadir soporte Folia, se pasa de `v1.0.0` a `v1.1.0`. Parches de errores urgentes incrementan el último número (ej. `v1.1.1`).

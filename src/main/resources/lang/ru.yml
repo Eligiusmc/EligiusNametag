@@ -1,0 +1,23 @@
+# ==============================================================
+# EligiusNametag - Файл Русского Языка
+# ==============================================================
+
+# --- Настройки Игрока ---
+toggled_self_on: "<green>Теперь вы видите свой собственный nametag."
+toggled_self_off: "<red>Теперь вы не видите свой собственный nametag."
+
+# --- Администрация и Утилиты ---
+no_permission: "<red>У вас нет прав на это действие."
+reloaded: "<green>Конфигурация и nametags успешно перезагружены."
+lang_changed: "<green>Язык успешно изменён на {lang}."
+lang_not_found: "<red>Языковой файл '{lang}.yml' не найден в папке lang/."
+pets_enabled: "<green>Nametags для питомцев включены."
+pets_disabled: "<red>Nametags для питомцев отключены."
+
+# --- Меню Помощи ---
+help_header: "<gray>========== <aqua>EligiusNametag</aqua> =========="
+help_me: "<yellow>/enametag me</yellow> <gray>- Включить/выключить видимость своего nametag.</gray>"
+help_lang: "<yellow>/enametag lang <язык></yellow> <gray>- Изменить глобальный язык.</gray>"
+help_pets: "<yellow>/enametag pets</yellow> <gray>- Включить/выключить nametags питомцев.</gray>"
+help_reload: "<yellow>/enametag reload</yellow> <gray>- Перезагрузить конфигурацию.</gray>"
+help_footer: "<gray>======================================"

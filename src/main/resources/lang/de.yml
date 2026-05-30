@@ -1,0 +1,23 @@
+# ==============================================================
+# EligiusNametag - Deutsche Sprachdatei
+# ==============================================================
+
+# --- Spielereinstellungen ---
+toggled_self_on: "<green>Du kannst jetzt dein eigenes Nametag sehen."
+toggled_self_off: "<red>Du kannst dein eigenes Nametag nicht mehr sehen."
+
+# --- Verwaltung & Dienstprogramme ---
+no_permission: "<red>Du hast keine Berechtigung, dies zu tun."
+reloaded: "<green>Konfiguration und Nametags erfolgreich neu geladen."
+lang_changed: "<green>Sprache erfolgreich auf {lang} geändert."
+lang_not_found: "<red>Die Sprachdatei '{lang}.yml' wurde im lang/-Ordner nicht gefunden."
+pets_enabled: "<green>Die Nametags für Haustiere sind jetzt aktiviert."
+pets_disabled: "<red>Die Nametags für Haustiere sind jetzt deaktiviert."
+
+# --- Hilfemenü ---
+help_header: "<gray>========== <aqua>EligiusNametag</aqua> =========="
+help_me: "<yellow>/enametag me</yellow> <gray>- Schaltet dein eigenes Nametag ein/aus.</gray>"
+help_lang: "<yellow>/enametag lang <sprache></yellow> <gray>- Ändert die globale Sprache.</gray>"
+help_pets: "<yellow>/enametag pets</yellow> <gray>- Schaltet Nametags für Haustiere ein/aus.</gray>"
+help_reload: "<yellow>/enametag reload</yellow> <gray>- Lädt die globale Konfiguration neu.</gray>"
+help_footer: "<gray>======================================"

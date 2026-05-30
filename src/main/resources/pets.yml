@@ -1,0 +1,11 @@
+enabled: true
+# false = only mobs with a Name Tag item get holograms
+show_unnamed: false    
+default_format:
+  - "<gray>%luckperms_prefix%</gray>"
+  - "<white><DISPLAYNAME></white>"
+  - "<red>🖤 <HEALTH><dark_gray>/<MAX_HEALTH>"
+groups:
+  admin:
+    - "<red>Guardián de <PLAYER></red>"
+    - "<white><DISPLAYNAME></white>"

@@ -1,0 +1,23 @@
+# ==============================================================
+# EligiusNametag - Arquivo de Idioma em Português
+# ==============================================================
+
+# --- Preferências do Jogador ---
+toggled_self_on: "<green>Agora você pode ver seu próprio nametag."
+toggled_self_off: "<red>Você não pode mais ver seu próprio nametag."
+
+# --- Administração e Utilidade ---
+no_permission: "<red>Você não tem permissão para fazer isso."
+reloaded: "<green>Configuração e nametags recarregados com sucesso."
+lang_changed: "<green>Idioma alterado com sucesso para {lang}."
+lang_not_found: "<red>Arquivo de idioma '{lang}.yml' não encontrado na pasta lang/."
+pets_enabled: "<green>Os nametags de pets foram ativados."
+pets_disabled: "<red>Os nametags de pets foram desativados."
+
+# --- Menu de Ajuda ---
+help_header: "<gray>========== <aqua>EligiusNametag</aqua> =========="
+help_me: "<yellow>/enametag me</yellow> <gray>- Ativa/desativa seu próprio nametag.</gray>"
+help_lang: "<yellow>/enametag lang <idioma></yellow> <gray>- Altera o idioma global.</gray>"
+help_pets: "<yellow>/enametag pets</yellow> <gray>- Ativa/desativa nametags de pets.</gray>"
+help_reload: "<yellow>/enametag reload</yellow> <gray>- Recarrega a configuração global.</gray>"
+help_footer: "<gray>======================================"

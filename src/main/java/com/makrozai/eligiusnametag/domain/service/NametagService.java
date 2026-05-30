@@ -29,23 +29,47 @@ public class NametagService {
     }
 
     public void updateAllNametags() {
+        platform.prepareTick();
+        
         List<UUID> onlinePlayers = platform.getOnlinePlayers();
-        List<UUID> tamedMobs = config.isTamedMobsEnabled() ? platform.getTamedMobs() : new ArrayList<>();
+        List<UUID> tamedMobs = platform.getTamedMobs();
 
-        for (UUID targetId : onlinePlayers) {
-            updateTarget(targetId, onlinePlayers, true);
-        }
+        boolean isFolia = false;
+        try { Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); isFolia = true; } catch (ClassNotFoundException e) {}
 
-        for (UUID targetId : tamedMobs) {
-            updateTarget(targetId, onlinePlayers, false);
+        if (isFolia) {
+            org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag");
+            for (UUID targetId : onlinePlayers) {
+                org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
+                if (target != null) {
+                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, true), null, 1L);
+                }
+            }
+            for (UUID targetId : tamedMobs) {
+                org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
+                if (target != null) {
+                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, false), null, 1L);
+                }
+            }
+        } else {
+            for (UUID targetId : onlinePlayers) {
+                updateTarget(targetId, onlinePlayers, true);
+            }
+            for (UUID targetId : tamedMobs) {
+                updateTarget(targetId, onlinePlayers, false);
+            }
         }
+        
+        platform.endTick();
     }
 
     private void updateTarget(UUID targetId, List<UUID> potentialViewers, boolean isPlayer) {
         boolean isHidden = platform.isGloballyHidden(targetId);
         
-        if (!isPlayer && !config.isTamedMobsShowUnnamed() && !platform.hasCustomName(targetId)) {
-            isHidden = true;
+        if (!isPlayer) {
+            if (!config.isTamedMobsEnabled() || (!config.isTamedMobsShowUnnamed() && !platform.hasCustomName(targetId))) {
+                isHidden = true;
+            }
         }
 
         List<UUID> validViewers = new ArrayList<>();
@@ -72,7 +96,7 @@ public class NametagService {
             if (template == null || template.isEmpty()) {
                 renderer.hideNametag(targetId, validViewers);
             } else {
-                List<String> lines = new ArrayList<>();
+                List<net.kyori.adventure.text.Component> lines = new ArrayList<>();
                 for (String line : template) {
                     lines.add(platform.parsePlaceholders(targetId, line));
                 }
@@ -92,19 +116,25 @@ public class NametagService {
     }
 
     public boolean toggleSelfView(UUID playerId) {
+        org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag");
+        boolean isFolia = false;
+        try { Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); isFolia = true; } catch (ClassNotFoundException e) {}
+
         if (selfViewers.contains(playerId)) {
             selfViewers.remove(playerId);
-            org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(
-                org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag"), 
-                () -> database.setPlayerViewSelf(playerId, false)
-            );
+            if (isFolia) {
+                org.bukkit.Bukkit.getAsyncScheduler().runNow(plugin, task -> database.setPlayerViewSelf(playerId, false));
+            } else {
+                org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> database.setPlayerViewSelf(playerId, false));
+            }
             return false;
         } else {
             selfViewers.add(playerId);
-            org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(
-                org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag"), 
-                () -> database.setPlayerViewSelf(playerId, true)
-            );
+            if (isFolia) {
+                org.bukkit.Bukkit.getAsyncScheduler().runNow(plugin, task -> database.setPlayerViewSelf(playerId, true));
+            } else {
+                org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> database.setPlayerViewSelf(playerId, true));
+            }
             return true;
         }
     }

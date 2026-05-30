@@ -11,6 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,17 +30,39 @@ public class EligiusNametag extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        if (getServer().getClass().getName().contains("Mock")) {
-            getLogger().info("Running in MockBukkit environment.");
-        }
+        long startTime = System.currentTimeMillis();
+        boolean isFolia = false;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            isFolia = true;
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
+        
+        String platform = isFolia ? "Folia" : "Paper";
+        String version = getPluginMeta().getVersion();
         
         configAdapter = new YamlConfigAdapter(this);
+        String storageType = "mysql".equalsIgnoreCase(configAdapter.getDatabaseType()) ? "MySQL" : "SQLite";
+
+        StartupLogger.printLogo(version, platform, storageType);
+        
+        if (getServer().getClass().getName().contains("Mock")) {
+            StartupLogger.printStep("Running in MockBukkit environment.");
+        }
+        
+        StartupLogger.printStep("Loading configuration...");
         platformAdapter = new PaperPlatformAdapter();
         rendererAdapter = new ProtocolLibNametagRenderer(configAdapter.getLineSpacing(), configAdapter.getViewDistance());
         
-        databaseAdapter = new DatabaseAdapter(this);
-        databaseAdapter.initialize();
+        StartupLogger.printStep("Loading storage provider... [" + storageType + "]");
+        databaseAdapter = new DatabaseAdapter(this, configAdapter);
+        if (!databaseAdapter.initialize()) {
+            StartupLogger.printError("Failed to initialize database connection!");
+            if ("mysql".equalsIgnoreCase(configAdapter.getDatabaseType())) {
+                StartupLogger.printError("Please check your MySQL credentials in config.yml.");
+            }
+        }
 
+        StartupLogger.printStep("Loading internal managers...");
         nametagService = new NametagService(configAdapter, platformAdapter, rendererAdapter, databaseAdapter);
 
         // Register Command
@@ -49,8 +75,21 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         }
 
         getServer().getPluginManager().registerEvents(this, this);
+        
+        StartupLogger.printStep("Performing initial data load...");
+        // Carga inicial de mascotas para no perderlas al hacer reload
+        for (org.bukkit.World w : Bukkit.getWorlds()) {
+            for (org.bukkit.entity.Tameable t : w.getEntitiesByClass(org.bukkit.entity.Tameable.class)) {
+                if (t.isTamed()) {
+                    platformAdapter.addTamedMob(t.getUniqueId());
+                }
+            }
+        }
+        
         startTask();
-        getLogger().info("EligiusNametag enabled successfully.");
+        
+        long endTime = System.currentTimeMillis();
+        StartupLogger.printSuccess(endTime - startTime);
     }
 
     @Override
@@ -70,9 +109,18 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     private void startTask() {
         long ticks = Math.round(configAdapter.getInterval() * 20L);
         if (ticks < 1) ticks = 1;
-        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
-            nametagService.updateAllNametags();
-        }, ticks, ticks);
+        
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            io.papermc.paper.threadedregions.scheduler.ScheduledTask foliaTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> {
+                nametagService.updateAllNametags();
+            }, 1L, ticks);
+            taskId = foliaTask.hashCode();
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+            taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+                nametagService.updateAllNametags();
+            }, ticks, ticks);
+        }
     }
     
     public YamlConfigAdapter getConfigAdapter() {
@@ -88,5 +136,38 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         rendererAdapter.clearViewer(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onEntitiesLoad(EntitiesLoadEvent event) {
+        for (org.bukkit.entity.Entity e : event.getEntities()) {
+            if (e instanceof org.bukkit.entity.Tameable) {
+                org.bukkit.entity.Tameable t = (org.bukkit.entity.Tameable) e;
+                if (t.isTamed()) {
+                    platformAdapter.addTamedMob(t.getUniqueId());
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntitiesUnload(EntitiesUnloadEvent event) {
+        for (org.bukkit.entity.Entity e : event.getEntities()) {
+            if (e instanceof org.bukkit.entity.Tameable) {
+                platformAdapter.removeTamedMob(e.getUniqueId());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getEntity() instanceof org.bukkit.entity.Tameable) {
+            platformAdapter.removeTamedMob(event.getEntity().getUniqueId());
+        }
+    }
+
+    @EventHandler
+    public void onEntityTame(EntityTameEvent event) {
+        platformAdapter.addTamedMob(event.getEntity().getUniqueId());
     }
 }

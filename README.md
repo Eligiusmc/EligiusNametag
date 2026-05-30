@@ -8,6 +8,8 @@ Este plugin ha sido diseñado buscando la máxima eficiencia (usando ProtocolLib
 
 ## 🌟 Características Principales
 
+- **Soporte Nativo Folia:** Código asíncrono y thread-safe real diseñado para sacar el máximo provecho de las redes multihilo de Folia.
+- **Bases de Datos Flexibles:** Persistencia en SQLite local o conexión a MySQL remoto (gestionado inteligentemente por HikariCP) para redes proxy.
 - **Múltiples líneas:** Crea nametags de cualquier tamaño, 100% configurables.
 - **Jerarquía Vault:** Asigna formatos de nametag diferentes según el rango del usuario (ej. `admin`, `vip`, `usuario`).
 - **PlaceholderAPI Integrado:** Soporte para todas tus variables favoritas (ej. `%luckperms_prefix%`).
@@ -24,7 +26,7 @@ Este plugin ha sido diseñado buscando la máxima eficiencia (usando ProtocolLib
 2. Coloca el archivo en la carpeta `plugins/` de tu servidor.
 3. Asegúrate de tener instalado el plugin **ProtocolLib**.
 4. ¡Inicia el servidor!
-5. Se generará automáticamente la carpeta `plugins/EligiusNametag/` con tu `config.yml`.
+5. Se generará automáticamente la carpeta `plugins/EligiusNametag/` con tu `config.yml`, `players.yml`, `pets.yml` y la carpeta `lang/`.
 
 ### Dependencias
 
@@ -47,31 +49,29 @@ Todos los comandos por defecto se basan en `/eltag` (o sus alias personalizables
 |---|---|---|
 | `/eltag` | Muestra la versión del plugin instalada. | *Ninguno* |
 | `/eltag reload` | Recarga toda la configuración (formatos, alturas, etc.) en tiempo real. | `eligiusnametag.admin` |
+| `/eltag lang <idioma>` | Cambia el idioma global del plugin dinámicamente. | `eligiusnametag.admin` |
+| `/eltag pets` | Habilita o deshabilita los hologramas en las mascotas globalmente. | `eligiusnametag.admin` |
 | `/eltag me` | Activa o desactiva la visualización de tu propio nametag. | `eligiusnametag.viewself` |
 
 ---
 
-## ⚙️ Configuración (config.yml)
+## ⚙️ Configuración Modular
 
-El archivo `config.yml` es el cerebro visual de tu servidor. A continuación te presentamos los fragmentos de personalización más importantes:
+El plugin utiliza un sistema de configuración descentralizado para mayor organización:
 
-### Opciones Globales
-Puedes controlar la altura, la distancia de visión y qué comandos escribirán tus jugadores:
+### `config.yml` (Opciones Globales)
+Puedes controlar el entorno y la base de datos:
 
 ```yaml
 # Altura del holograma por encima de la cabeza del jugador
 y_offset: 0.35
 
-# Distancia máxima de visión en bloques
-view_distance: 64
-
-# Alias del comando principal
-command_aliases:
-  - "eltag"
-  - "enametag"
+# Base de datos (SQLite o MySQL)
+database:
+  type: "SQLITE"
 ```
 
-### Diseños para Jugadores
+### `players.yml` (Diseños para Jugadores)
 El diseño de los jugadores se configura como una lista de líneas. Si el jugador tiene el rango `admin` en Vault, usará ese diseño. Si no, usará el `default_format`.
 
 ```yaml
@@ -86,14 +86,12 @@ players:
       - "<gradient:red:gold><PLAYER></gradient>"
 ```
 
-### Diseños para Mascotas
-Si está activado, todos los lobos, gatos o loros domados tendrán su propio nametag holográfico. Las variables `<DISPLAYNAME>` muestran el nombre original que le pusiste con la Etiqueta Vanilla, y `<PLAYER>` mostrará quién es su dueño.
+### `pets.yml` (Diseños para Mascotas)
+Todos los lobos, gatos o loros domados tendrán su propio nametag holográfico.
 
 ```yaml
 pets:
   enabled: true
-  # Si es 'false', las mascotas no mostrarán holograma a menos que el jugador las haya renombrado con un Yunque.
-  show_unnamed: false 
   
   default_format:
     - "<gray>Mascota de <PLAYER></gray>"
@@ -106,4 +104,4 @@ pets:
 
 Si planeas compilar el plugin tú mismo, extender sus funcionales o si eres un agente IA intentando comprender cómo arreglar bugs dentro del ecosistema de ProtocolLib:
 
-👉 **[Lee la Documentación Técnica de Desarrollo (DEVELOPMENT.md)](docs/DEVELOPMENT.md)**
+👉 **[Lee la Documentación Técnica de Desarrollo y GitFlow (DEVELOPMENT.md)](docs/DEVELOPMENT.md)**

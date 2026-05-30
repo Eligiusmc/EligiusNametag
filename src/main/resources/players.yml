@@ -1,0 +1,9 @@
+# Player nametag formats (YAML lists, one line per list item)
+default_format:
+  - "<gray>%luckperms_prefix%</gray>"
+  - "<white><PLAYER></white>"
+  - "<white><HEALTH>❤ | %statistic_player_kills%⚔ | %statistic_deaths%💀</white>"
+groups:
+  admin:
+    - "<red>Admin</red>"
+    - "<white><PLAYER></white>"
