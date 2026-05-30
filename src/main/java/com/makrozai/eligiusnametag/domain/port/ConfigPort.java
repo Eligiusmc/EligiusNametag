@@ -15,4 +15,15 @@ public interface ConfigPort {
     java.util.List<String> getCommandAliases();
     String getMessage(String key);
     void reload();
+    
+    boolean hasLanguage(String lang);
+    void setLanguage(String lang);
+    void setPetsEnabled(boolean enabled);
+    
+    String getDatabaseType();
+    String getDatabaseHost();
+    int getDatabasePort();
+    String getDatabaseName();
+    String getDatabaseUsername();
+    String getDatabasePassword();
 }

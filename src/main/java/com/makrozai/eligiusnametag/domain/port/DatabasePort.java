@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.Set;
 
 public interface DatabasePort {
-    void initialize();
+    boolean initialize();
     void close();
     boolean getPlayerViewSelf(UUID uuid);
     void setPlayerViewSelf(UUID uuid, boolean viewSelf);

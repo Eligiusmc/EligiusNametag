@@ -49,7 +49,7 @@ public class NametagServiceTest {
         
         when(configPort.getPlayerNametagTemplate(anyString())).thenReturn(Arrays.asList("Test"));
         when(configPort.getYOffset()).thenReturn(0.35);
-        when(platformPort.parsePlaceholders(any(), anyString())).thenReturn("Test");
+        when(platformPort.parsePlaceholders(any(), anyString())).thenReturn(net.kyori.adventure.text.Component.text("Test"));
 
         nametagService.updateAllNametags();
 

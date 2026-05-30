@@ -32,16 +32,25 @@ public class EligiusNametagCommand {
                 .requires(source -> source.getSender().hasPermission("eligiusnametag.viewself"))
                 .executes(EligiusNametagCommand::meNode));
 
+        top.then(Commands.literal("help")
+                .executes(EligiusNametagCommand::helpNode));
+                
+        top.then(Commands.literal("lang")
+                .requires(source -> source.getSender().hasPermission("eligiusnametag.admin"))
+                .executes(c -> {
+                    c.getSource().getSender().sendMessage(Component.text("Usage: /eltag lang <language>", NamedTextColor.RED));
+                    return Command.SINGLE_SUCCESS;
+                })
+                .then(Commands.argument("language", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .executes(EligiusNametagCommand::langNode)));
+                        
+        top.then(Commands.literal("pets")
+                .requires(source -> source.getSender().hasPermission("eligiusnametag.admin"))
+                .executes(EligiusNametagCommand::petsToggleNode));
+
         top.executes(EligiusNametagCommand::rootNode);
 
         List<String> aliases = plugin.getConfigAdapter().getCommandAliases();
-        for (String alias : aliases) {
-            LiteralArgumentBuilder<CommandSourceStack> aliasTop = Commands.literal(alias);
-            aliasTop.then(top.getArguments().stream().findFirst().get()); // It's better to just redirect or reconstruct
-            
-            // To properly duplicate the command tree for aliases, we can just redirect to the main node
-            // But Paper allows registering aliases directly
-        }
         
         commands.register(
                 top.build(),
@@ -60,7 +69,11 @@ public class EligiusNametagCommand {
     private static int reloadNode(CommandContext<CommandSourceStack> context) {
         CommandSender sender = context.getSource().getSender();
         plugin.reloadPlugin();
-        sender.sendMessage(Component.text("EligiusNametag config reloaded successfully.", NamedTextColor.GREEN));
+        
+        String msgStr = plugin.getConfigAdapter().getMessage("reloaded");
+        if (msgStr == null || msgStr.isEmpty()) msgStr = "<green>Config reloaded successfully.";
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(msgStr));
+        
         return Command.SINGLE_SUCCESS;
     }
 
@@ -77,13 +90,73 @@ public class EligiusNametagCommand {
         String msgStr;
         if (nowEnabled) {
             msgStr = plugin.getConfigAdapter().getMessage("toggled_self_on");
-            if (msgStr == null || msgStr.isEmpty()) msgStr = "<green>Ahora puedes ver tu propio nametag.";
+            if (msgStr == null || msgStr.isEmpty()) msgStr = "<green>You can now see your own nametag.";
         } else {
             msgStr = plugin.getConfigAdapter().getMessage("toggled_self_off");
-            if (msgStr == null || msgStr.isEmpty()) msgStr = "<red>Ya no puedes ver tu propio nametag.";
+            if (msgStr == null || msgStr.isEmpty()) msgStr = "<red>You can no longer see your own nametag.";
         }
         
         player.sendMessage(MiniMessage.miniMessage().deserialize(msgStr));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int helpNode(CommandContext<CommandSourceStack> context) {
+        CommandSender sender = context.getSource().getSender();
+        
+        String[] helpKeys = {"help_header", "help_me", "help_lang", "help_pets", "help_reload", "help_footer"};
+        for (String key : helpKeys) {
+            String msg = plugin.getConfigAdapter().getMessage(key);
+            if (msg != null && !msg.isEmpty()) {
+                sender.sendMessage(MiniMessage.miniMessage().deserialize(msg));
+            }
+        }
+        
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int langNode(CommandContext<CommandSourceStack> context) {
+        CommandSender sender = context.getSource().getSender();
+        String lang = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "language");
+        
+        if (!plugin.getConfigAdapter().hasLanguage(lang)) {
+            String errorMsg = plugin.getConfigAdapter().getMessage("lang_not_found");
+            if (errorMsg == null || errorMsg.isEmpty()) errorMsg = "<red>Language file not found.";
+            errorMsg = errorMsg.replace("{lang}", lang);
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(errorMsg));
+            return Command.SINGLE_SUCCESS;
+        }
+        
+        plugin.getConfigAdapter().setLanguage(lang);
+        plugin.reloadPlugin();
+        
+        String msg = plugin.getConfigAdapter().getMessage("lang_changed");
+        if (msg == null || msg.isEmpty()) msg = "<green>Language changed.";
+        msg = msg.replace("{lang}", lang);
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(msg));
+        
+        return Command.SINGLE_SUCCESS;
+    }
+    
+    private static int petsToggleNode(CommandContext<CommandSourceStack> context) {
+        CommandSender sender = context.getSource().getSender();
+        
+        boolean currentState = plugin.getConfigAdapter().isTamedMobsEnabled();
+        boolean newState = !currentState;
+        
+        plugin.getConfigAdapter().setPetsEnabled(newState);
+        plugin.reloadPlugin();
+        
+        String msgStr;
+        if (newState) {
+            msgStr = plugin.getConfigAdapter().getMessage("pets_enabled");
+            if (msgStr == null || msgStr.isEmpty()) msgStr = "<green>Pets enabled.";
+        } else {
+            msgStr = plugin.getConfigAdapter().getMessage("pets_disabled");
+            if (msgStr == null || msgStr.isEmpty()) msgStr = "<red>Pets disabled.";
+        }
+        
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(msgStr));
+        
         return Command.SINGLE_SUCCESS;
     }
 }

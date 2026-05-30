@@ -21,6 +21,7 @@ dependencies {
         exclude(group = "org.bukkit")
         exclude(group = "org.spigotmc")
     }
+    implementation("com.zaxxer:HikariCP:5.1.0")
     
     // Testing Dependencies
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")

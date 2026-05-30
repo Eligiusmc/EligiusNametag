@@ -9,7 +9,6 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 
 import org.bukkit.entity.Entity;
@@ -23,6 +22,7 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
     private final ProtocolManager protocolManager;
     private final Map<UUID, List<Integer>> activeEntities = new ConcurrentHashMap<>();
     private final Map<Integer, Set<UUID>> lineSpawnedViewers = new ConcurrentHashMap<>();
+    private final Map<Integer, Map<UUID, String>> lineViewerJsonCache = new ConcurrentHashMap<>();
     private final AtomicInteger entityIdCounter = new AtomicInteger(Integer.MAX_VALUE / 2);
     private final double lineSpacing;
     private final float viewDistance;
@@ -34,7 +34,7 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
     }
 
     @Override
-    public void renderNametag(UUID targetId, List<String> lines, List<UUID> viewers, float yOffset) {
+    public void renderNametag(UUID targetId, List<Component> lines, List<UUID> viewers, float yOffset) {
         Entity target = Bukkit.getEntity(targetId);
         if (target == null) return;
         
@@ -52,24 +52,18 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
 
             for (int i = 0; i < lines.size(); i++) {
                 int lineEntityId = entityIds.get(i);
-                String rawLine = lines.get(i);
-                
-                // Convert legacy ampersand colors to MiniMessage tags
-                rawLine = rawLine.replace("&0", "<black>").replace("&1", "<dark_blue>").replace("&2", "<dark_green>").replace("&3", "<dark_aqua>")
-                        .replace("&4", "<dark_red>").replace("&5", "<dark_purple>").replace("&6", "<gold>").replace("&7", "<gray>")
-                        .replace("&8", "<dark_gray>").replace("&9", "<blue>").replace("&a", "<green>").replace("&b", "<aqua>")
-                        .replace("&c", "<red>").replace("&d", "<light_purple>").replace("&e", "<yellow>").replace("&f", "<white>")
-                        .replace("&k", "<obfuscated>").replace("&l", "<bold>").replace("&m", "<strikethrough>").replace("&n", "<underlined>")
-                        .replace("&o", "<italic>").replace("&r", "<reset>");
-
-                Component comp = MiniMessage.miniMessage().deserialize(rawLine);
+                Component comp = lines.get(i);
                 String jsonComp = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serialize(comp);
 
                 try {
                     Set<UUID> spawnedFor = lineSpawnedViewers.computeIfAbsent(lineEntityId, k -> ConcurrentHashMap.newKeySet());
                     boolean isNewSpawn = spawnedFor.add(viewerId);
                     
+                    Map<UUID, String> jsonCache = lineViewerJsonCache.computeIfAbsent(lineEntityId, k -> new ConcurrentHashMap<>());
+                    String lastJson = jsonCache.get(viewerId);
+                    
                     if (isNewSpawn) {
+                        jsonCache.put(viewerId, jsonComp);
                         // 1. Spawn Packet
                         PacketContainer spawnPacket = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
                         spawnPacket.getIntegers().write(0, lineEntityId);
@@ -78,7 +72,7 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
                         
                         // Set location to the parent so it spawns in a loaded chunk immediately
                         spawnPacket.getDoubles().write(0, target.getLocation().getX());
-                        spawnPacket.getDoubles().write(1, target.getLocation().getY());
+                        spawnPacket.getDoubles().write(1, target.getLocation().getY() + target.getHeight());
                         spawnPacket.getDoubles().write(2, target.getLocation().getZ());
 
                         protocolManager.sendServerPacket(viewer, spawnPacket);
@@ -99,6 +93,18 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
                         dataValues.add(new WrappedDataValue(11, WrappedDataWatcher.Registry.get(org.joml.Vector3f.class), offset));
                         
                         // Text Component
+                        Object compHandle = WrappedChatComponent.fromJson(jsonComp).getHandle();
+                        dataValues.add(new WrappedDataValue(23, WrappedDataWatcher.Registry.getChatComponentSerializer(false), compHandle));
+
+                        metaPacket.getDataValueCollectionModifier().write(0, dataValues);
+                        protocolManager.sendServerPacket(viewer, metaPacket);
+                    } else if (!jsonComp.equals(lastJson)) {
+                        jsonCache.put(viewerId, jsonComp);
+                        // 2.5 Metadata Update Packet (Dynamic Placeholders)
+                        PacketContainer metaPacket = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+                        metaPacket.getIntegers().write(0, lineEntityId);
+
+                        List<WrappedDataValue> dataValues = new ArrayList<>();
                         Object compHandle = WrappedChatComponent.fromJson(jsonComp).getHandle();
                         dataValues.add(new WrappedDataValue(23, WrappedDataWatcher.Registry.getChatComponentSerializer(false), compHandle));
 
@@ -150,6 +156,9 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
                 for (int id : ids) {
                     Set<UUID> spawnedFor = lineSpawnedViewers.get(id);
                     if (spawnedFor != null) spawnedFor.remove(viewerId);
+                    
+                    Map<UUID, String> jsonCache = lineViewerJsonCache.get(id);
+                    if (jsonCache != null) jsonCache.remove(viewerId);
                 }
             }
         }
@@ -165,6 +174,7 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
         }
         activeEntities.clear();
         lineSpawnedViewers.clear();
+        lineViewerJsonCache.clear();
     }
 
     /**
@@ -175,6 +185,9 @@ public class ProtocolLibNametagRenderer implements NametagRendererPort {
     public void clearViewer(UUID viewerId) {
         for (Set<UUID> viewers : lineSpawnedViewers.values()) {
             viewers.remove(viewerId);
+        }
+        for (Map<UUID, String> jsonCache : lineViewerJsonCache.values()) {
+            jsonCache.remove(viewerId);
         }
     }
 }

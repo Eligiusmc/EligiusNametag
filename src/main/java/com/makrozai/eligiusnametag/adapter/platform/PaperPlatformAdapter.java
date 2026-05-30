@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public class PaperPlatformAdapter implements PlatformPort {
     private Permission vaultPerms;
+    private final java.util.Set<UUID> cachedTamedMobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     public PaperPlatformAdapter() {
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
@@ -45,13 +46,28 @@ public class PaperPlatformAdapter implements PlatformPort {
     }
 
     @Override
+    public void prepareTick() { }
+
+    @Override
+    public void endTick() { }
+
+    public void addTamedMob(UUID uuid) {
+        cachedTamedMobs.add(uuid);
+    }
+
+    public void removeTamedMob(UUID uuid) {
+        cachedTamedMobs.remove(uuid);
+    }
+
+    @Override
     public List<UUID> getTamedMobs() {
         List<UUID> list = new ArrayList<>();
-        for (org.bukkit.World w : Bukkit.getWorlds()) {
-            for (Tameable t : w.getEntitiesByClass(Tameable.class)) {
-                if (t.isTamed()) {
-                    list.add(t.getUniqueId());
-                }
+        for (UUID uuid : cachedTamedMobs) {
+            org.bukkit.entity.Entity e = Bukkit.getEntity(uuid);
+            if (e instanceof Tameable && ((Tameable) e).isTamed() && !e.isDead() && e.isValid()) {
+                list.add(uuid);
+            } else {
+                cachedTamedMobs.remove(uuid);
             }
         }
         return list;
@@ -118,7 +134,7 @@ public class PaperPlatformAdapter implements PlatformPort {
 
     @SuppressWarnings("deprecation")
     @Override
-    public String parsePlaceholders(UUID targetId, String text) {
+    public net.kyori.adventure.text.Component parsePlaceholders(UUID targetId, String text) {
         org.bukkit.entity.Entity target = Bukkit.getEntity(targetId);
         String parsed = text;
         org.bukkit.OfflinePlayer op = null;
@@ -128,6 +144,12 @@ public class PaperPlatformAdapter implements PlatformPort {
             op = p;
             parsed = parsed.replace("<PLAYER>", p.getName());
             parsed = parsed.replace("<DISPLAYNAME>", p.displayName() != null ? p.displayName().toString() : p.getName());
+            
+            org.bukkit.attribute.AttributeInstance healthAttr = p.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
+            double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
+            parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(p.getHealth())));
+            parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
+            
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 parsed = PlaceholderAPI.setPlaceholders(p, parsed);
             }
@@ -143,7 +165,29 @@ public class PaperPlatformAdapter implements PlatformPort {
             }
             if (ownerName == null) ownerName = "Owner";
             parsed = parsed.replace("<PLAYER>", ownerName);
+            parsed = parsed.replace("<OWNER>", ownerName);
             parsed = parsed.replace("<DISPLAYNAME>", mobName);
+            parsed = parsed.replace("<CUSTOM_NAME>", t.getCustomName() != null ? t.getCustomName() : "");
+            
+            String rawType = t.getType().name().toLowerCase().replace("_", " ");
+            StringBuilder capType = new StringBuilder();
+            for (String word : rawType.split(" ")) {
+                if (!word.isEmpty()) {
+                    capType.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(" ");
+                }
+            }
+            parsed = parsed.replace("<TYPE>", capType.toString().trim());
+            
+            if (target instanceof org.bukkit.entity.Ageable) {
+                boolean isBaby = !((org.bukkit.entity.Ageable) target).isAdult();
+                parsed = parsed.replace("<AGE>", isBaby ? "Baby" : "Adult");
+            }
+            
+            org.bukkit.attribute.AttributeInstance healthAttr = t.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
+            double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
+            parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(t.getHealth())));
+            parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
+            
             if (op != null && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 parsed = PlaceholderAPI.setPlaceholders(op, parsed);
             }
@@ -171,7 +215,19 @@ public class PaperPlatformAdapter implements PlatformPort {
                 parsed = sb.toString();
             }
         }
-        return parsed;
+        // Convert standard legacy colors to MiniMessage format just in case PlaceholderAPI returns them
+        if (parsed.contains("&") || parsed.contains("§")) {
+            parsed = parsed.replace("§", "&");
+            parsed = parsed.replace("&0", "<black>").replace("&1", "<dark_blue>").replace("&2", "<dark_green>")
+                           .replace("&3", "<dark_aqua>").replace("&4", "<dark_red>").replace("&5", "<dark_purple>")
+                           .replace("&6", "<gold>").replace("&7", "<gray>").replace("&8", "<dark_gray>")
+                           .replace("&9", "<blue>").replace("&a", "<green>").replace("&b", "<aqua>")
+                           .replace("&c", "<red>").replace("&d", "<light_purple>").replace("&e", "<yellow>")
+                           .replace("&f", "<white>").replace("&l", "<bold>").replace("&m", "<strikethrough>")
+                           .replace("&n", "<underlined>").replace("&o", "<italic>").replace("&r", "<reset>");
+        }
+        
+        return net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(parsed);
     }
 
     @Override
