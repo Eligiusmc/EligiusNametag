@@ -26,10 +26,13 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Extract Version from build.gradle.kts
+    - name: Prepare gradle.properties for CI
+      run: sed -i '/org.gradle.java.home/d' gradle.properties
+
+    - name: Extract Version from gradle.properties
       id: extract_version
       run: |
-        VERSION=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts || echo "1.0.0")
+        VERSION=$(grep -oP '^pluginVersion=\K.*' gradle.properties || echo "1.0.0")
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "Extracted version: $VERSION"
 
