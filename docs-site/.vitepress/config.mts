@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/EligiusNametag/',
   title: "EligiusNametag",
   description: "Documentación oficial del plugin de nametags holográficos.",
   themeConfig: {
