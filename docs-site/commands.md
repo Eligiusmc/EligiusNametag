@@ -1,0 +1,16 @@
+# Comandos y Permisos
+
+Todos los comandos por defecto se basan en `/eltag` (o sus alias personalizables `/enametag` y `/eligiusnametag`).
+
+| Comando | Descripción | Permiso Requerido |
+|---|---|---|
+| `/eltag` | Muestra la versión del plugin instalada y el logo del autor. | *Ninguno* |
+| `/eltag reload` | Recarga toda la configuración y los archivos YAML en tiempo real, sin reiniciar el servidor. | `eligiusnametag.admin` |
+| `/eltag lang <idioma>` | Cambia el idioma global del plugin dinámicamente y recarga los lenguajes al instante. | `eligiusnametag.admin` |
+| `/eltag pets` | Alterna globalmente la habilitación de los hologramas de texto sobre las mascotas. | `eligiusnametag.admin` |
+| `/eltag me` | Activa o desactiva de manera personal la visualización de tu propio nametag (Guardado automático en DB). | `eligiusnametag.viewself` |
+
+## Detalles de Permisos Adicionales
+
+- `eligiusnametag.*`: Otorga acceso total a todos los comandos de administración.
+- *Nota:* Si tienes LuckPerms, no olvides asignar el permiso principal a tu grupo *default* o *admin* para que las variables de formato se sincronicen correctamente.
