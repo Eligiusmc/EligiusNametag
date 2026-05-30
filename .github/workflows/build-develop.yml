@@ -1,4 +1,4 @@
-name: Develop CI (Beta Builds)
+name: Develop CI (Beta Releases)
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - develop
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -26,11 +29,30 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    - name: Extract Version from build.gradle.kts
+      id: extract_version
+      run: |
+        VERSION=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts || echo "1.0.0")
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "Extracted version: $VERSION"
+
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Upload Beta Build Artifact
-      uses: actions/upload-artifact@v4
+    - name: Create Beta Release on GitHub
+      uses: softprops/action-gh-release@v2
+      if: github.event_name == 'push'
       with:
-        name: EligiusNametag-Beta
-        path: build/libs/EligiusNametag*.jar
+        tag_name: v${{ env.VERSION }}-beta.${{ github.run_number }}
+        name: EligiusNametag v${{ env.VERSION }} (Beta Build #${{ github.run_number }})
+        body: |
+          🧪 **Versión de Desarrollo (Beta Automática)**
+          
+          Esta es una compilación inestable generada automáticamente desde la rama `develop`.
+          Contiene características nuevas que aún están siendo testeadas. No se recomienda para servidores en producción que exijan 100% de estabilidad.
+          
+          _Si buscas la versión estable, por favor descarga las Releases oficiales (sin la etiqueta Beta)._
+        draft: false
+        prerelease: true
+        files: build/libs/EligiusNametag*.jar
+        generate_release_notes: false
