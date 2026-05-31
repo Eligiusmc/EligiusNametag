@@ -5,7 +5,7 @@ description: Zeigen Sie alle verfügbaren Befehle und Berechtigungen für Eligiu
 
 # Befehle und Berechtigungen
 
-Alle Standardbefehle basieren auf `/enametag` (oder den anpassbaren Aliasen `/eltag` und `/eligiusnametag`).
+Alle Standardbefehle basieren auf `/enametag` (oder den anpassbaren Aliasen `/eligiusnametag`).
 
 | Befehl | Beschreibung | Erforderliche Berechtigung |
 |--------|--------------|----------------------------|

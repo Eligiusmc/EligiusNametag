@@ -3,6 +3,6 @@ version: ${projectVersion}
 main: com.makrozai.eligiusnametag.EligiusNametag
 api-version: 1.21
 authors: [makrozai]
-softdepend: [ItemsAdder, PlaceholderAPI, Vault, ProtocolLib]
+softdepend: [ItemsAdder, PlaceholderAPI, Vault]
 libraries:
   - com.zaxxer:HikariCP:5.1.0

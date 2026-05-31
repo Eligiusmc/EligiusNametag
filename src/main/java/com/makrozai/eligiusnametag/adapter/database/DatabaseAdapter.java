@@ -99,7 +99,7 @@ public class DatabaseAdapter implements DatabasePort {
                 hikariDataSource.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to close database connections: " + e.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class DatabaseAdapter implements DatabasePort {
                 }
             }
         } catch (SQLException | NullPointerException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to query player view_self: " + e.getMessage());
         }
         return false;
     }
@@ -152,7 +152,7 @@ public class DatabaseAdapter implements DatabasePort {
                 }
             }
         } catch (SQLException | NullPointerException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to update player view_self: " + e.getMessage());
         }
     }
 
@@ -176,7 +176,7 @@ public class DatabaseAdapter implements DatabasePort {
                 }
             }
         } catch (SQLException | NullPointerException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to fetch all view_self players: " + e.getMessage());
         }
         return players;
     }

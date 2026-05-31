@@ -8,10 +8,6 @@ authors:
 
 dependencies:
     server:
-      ProtocolLib:
-        load: BEFORE
-        required: true
-        join-classpath: true
       PlaceholderAPI:
         load: BEFORE
         required: false

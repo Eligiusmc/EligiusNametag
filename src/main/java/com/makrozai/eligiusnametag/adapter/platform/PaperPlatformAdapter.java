@@ -17,6 +17,22 @@ import java.util.UUID;
 public class PaperPlatformAdapter implements PlatformPort {
     private Permission vaultPerms;
     private final java.util.Set<UUID> cachedTamedMobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    
+    // Fallback universal para 1.21.1 (GENERIC_MAX_HEALTH) y 1.21.2+ (MAX_HEALTH)
+    private static org.bukkit.attribute.Attribute CACHED_MAX_HEALTH_ATTRIBUTE;
+    static {
+        try {
+            // Intentar 1.21.2+
+            CACHED_MAX_HEALTH_ATTRIBUTE = (org.bukkit.attribute.Attribute) org.bukkit.attribute.Attribute.class.getField("MAX_HEALTH").get(null);
+        } catch (Exception e) {
+            try {
+                // Fallback a 1.21.1 o inferior
+                CACHED_MAX_HEALTH_ATTRIBUTE = (org.bukkit.attribute.Attribute) org.bukkit.attribute.Attribute.class.getField("GENERIC_MAX_HEALTH").get(null);
+            } catch (Exception ex) {
+                CACHED_MAX_HEALTH_ATTRIBUTE = null;
+            }
+        }
+    }
 
     public PaperPlatformAdapter() {
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
@@ -145,7 +161,7 @@ public class PaperPlatformAdapter implements PlatformPort {
             parsed = parsed.replace("<PLAYER>", p.getName());
             parsed = parsed.replace("<DISPLAYNAME>", p.displayName() != null ? p.displayName().toString() : p.getName());
             
-            org.bukkit.attribute.AttributeInstance healthAttr = p.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
+            org.bukkit.attribute.AttributeInstance healthAttr = p.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
             parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(p.getHealth())));
             parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
@@ -183,7 +199,7 @@ public class PaperPlatformAdapter implements PlatformPort {
                 parsed = parsed.replace("<AGE>", isBaby ? "Baby" : "Adult");
             }
             
-            org.bukkit.attribute.AttributeInstance healthAttr = t.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH);
+            org.bukkit.attribute.AttributeInstance healthAttr = t.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
             parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(t.getHealth())));
             parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));

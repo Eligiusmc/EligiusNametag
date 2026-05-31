@@ -16,7 +16,7 @@ line_spacing: 0.275
 y_offset: 0.35
 
 # Global plugin prefix for all messages
-prefix: "<dark_gray>[<gradient:blue:aqua>Eltag</gradient>]</dark_gray> "
+prefix: "<dark_gray>[<gradient:blue:aqua>Enametag</gradient>]</dark_gray> "
 
 # Language file to use (e.g., 'es' for lang/es.yml, 'en' for lang/en.yml)
 language: "es"
@@ -24,7 +24,7 @@ language: "es"
 # Command aliases (all point to the same command tree)
 command_aliases:
   - "enametag"
-  - "eltag"
+  - "eligiusnametag"
 
 # Database configuration
 database:

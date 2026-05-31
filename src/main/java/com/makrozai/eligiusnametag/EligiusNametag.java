@@ -2,7 +2,7 @@ package com.makrozai.eligiusnametag;
 
 import com.makrozai.eligiusnametag.adapter.config.YamlConfigAdapter;
 import com.makrozai.eligiusnametag.adapter.platform.PaperPlatformAdapter;
-import com.makrozai.eligiusnametag.adapter.renderer.ProtocolLibNametagRenderer;
+import com.makrozai.eligiusnametag.adapter.renderer.BukkitNametagRenderer;
 import com.makrozai.eligiusnametag.domain.service.NametagService;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
@@ -26,7 +26,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 public class EligiusNametag extends JavaPlugin implements Listener {
     private YamlConfigAdapter configAdapter;
     private PaperPlatformAdapter platformAdapter;
-    private ProtocolLibNametagRenderer rendererAdapter;
+    private BukkitNametagRenderer rendererAdapter;
     private DatabaseAdapter databaseAdapter;
     private NametagService nametagService;
     private int taskId = -1;
@@ -54,7 +54,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         
         StartupLogger.printStep("Loading configuration...");
         platformAdapter = new PaperPlatformAdapter();
-        rendererAdapter = new ProtocolLibNametagRenderer(configAdapter.getLineSpacing(), configAdapter.getViewDistance());
+        rendererAdapter = new BukkitNametagRenderer(this, configAdapter.getViewDistance(), configAdapter.getLineSpacing());
         
         StartupLogger.printStep("Loading storage provider... [" + storageType + "]");
         databaseAdapter = new DatabaseAdapter(this, configAdapter);

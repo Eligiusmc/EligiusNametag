@@ -24,7 +24,6 @@ view_distance: 64
 # Alle diese führen das Hilfemenü oder verschachtelte Befehle aus.
 command_aliases:
   - "enametag"
-  - "eltag"
 ```
 
 ---
