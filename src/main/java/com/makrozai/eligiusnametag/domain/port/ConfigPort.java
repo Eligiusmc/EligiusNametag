@@ -19,6 +19,7 @@ public interface ConfigPort {
     boolean hasLanguage(String lang);
     void setLanguage(String lang);
     void setPetsEnabled(boolean enabled);
+    boolean isCheckUpdates();
     
     String getDatabaseType();
     String getDatabaseHost();

@@ -21,3 +21,8 @@ help_lang: "<yellow>/enametag lang <язык></yellow> <gray>- Изменить 
 help_pets: "<yellow>/enametag pets</yellow> <gray>- Включить/выключить nametags питомцев.</gray>"
 help_reload: "<yellow>/enametag reload</yellow> <gray>- Перезагрузить конфигурацию.</gray>"
 help_footer: "<gray>======================================"
+
+update_available_header: "<dark_gray><strikethrough>--------------------------------------------------</strikethrough></dark_gray>\n<gradient:#9b59b6:#8e44ad><b>EligiusNametag</b></gradient> <dark_gray>�</dark_gray> <yellow>???????? ??????????!</yellow>"
+update_available_versions: "<gray>???? ??????:</gray> <red>v{current}</red> <dark_gray>|</dark_gray> <gray>????? ??????:</gray> <green>v{new}</green>"
+update_available_download: "<click:open_url:'{url}'><hover:show_text:'<green>???????, ????? ??????? GitHub</green>'><aqua><b>[ ??????? ????? ??? ?????????? ]</b></aqua></hover></click>\n<dark_gray><strikethrough>--------------------------------------------------</strikethrough></dark_gray>"
+

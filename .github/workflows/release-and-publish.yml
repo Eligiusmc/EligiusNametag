@@ -1,9 +1,10 @@
 name: Release & Publish Packages (Release & Alpha Branches)
 
 on:
+  release:
+    types: [published]
   push:
     branches:
-      - main
       - alpha
 
 jobs:
@@ -60,14 +61,11 @@ jobs:
           git tag -a ${{ steps.get_version.outputs.tag }} -m "Release ${{ steps.get_version.outputs.tag }}"
           git push origin ${{ steps.get_version.outputs.tag }}
 
-      - name: Create GitHub Release and Upload JAR
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.get_version.outputs.tag }}
-          files: build/libs/*.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GitHub Release is now handled by Release Please.
+          # The JAR was uploaded by Release Please.
+          # We only keep this job structure so it matches alpha behavior, 
+          # but we don't strictly need to re-upload for "main" here.
+          echo "GitHub Release handled by Release Please."
 
   publish-hangar:
     if: github.repository_owner == 'Lyttle-Development'

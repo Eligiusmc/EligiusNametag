@@ -191,6 +191,11 @@ public class YamlConfigAdapter implements ConfigPort {
     }
 
     @Override
+    public boolean isCheckUpdates() {
+        return config.getBoolean("check_updates", true);
+    }
+
+    @Override
     public String getDatabaseType() {
         return config.getString("database.type", "sqlite");
     }

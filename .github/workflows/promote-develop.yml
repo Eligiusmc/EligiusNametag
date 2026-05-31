@@ -1,0 +1,50 @@
+name: Promote Develop to Master
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git log origin/master..origin/develop --oneline --no-merges > commits.txt
+          
+          echo "## Promotion from Develop to Master" > pr_body.txt
+          echo "The following commits will be promoted to production:" >> pr_body.txt
+          echo "" >> pr_body.txt
+          
+          if [ ! -s commits.txt ]; then
+            echo "No new commits to promote."
+            exit 0
+          fi
+
+          while read p; do
+            echo "- $p" >> pr_body.txt
+          done < commits.txt
+          
+          # Check if PR already exists
+          PR_EXISTS=$(gh pr list --base master --head develop --json number -q '.[0].number')
+          
+          if [ -n "$PR_EXISTS" ]; then
+            echo "PR already exists: #$PR_EXISTS"
+            gh pr edit $PR_EXISTS --body-file pr_body.txt
+          else
+            gh pr create \
+              --base master \
+              --head develop \
+              --title "chore: promote develop to master" \
+              --body-file pr_body.txt
+          fi

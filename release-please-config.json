@@ -1,0 +1,15 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "type": "regex",
+          "path": "gradle.properties",
+          "regex": "pluginVersion=([0-9]+\\.[0-9]+\\.[0-9]+)"
+        }
+      ]
+    }
+  }
+}
