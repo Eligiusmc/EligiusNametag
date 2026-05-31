@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: Guía de Instalación
-      link: /installation
+      link: /es/installation
     - theme: alt
       text: Descargar Release
       link: https://github.com/Eligiusmc/EligiusNametag/releases/latest

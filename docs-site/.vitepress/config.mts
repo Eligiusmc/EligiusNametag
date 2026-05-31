@@ -3,6 +3,24 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   base: '/EligiusNametag/',
   title: "EligiusNametag",
+  srcDir: 'src',
+  sitemap: {
+    hostname: 'https://eligiusmc.github.io/EligiusNametag/'
+  },
+  transformHead({ siteConfig, pageData }) {
+    const head = []
+    const locales = Object.keys(siteConfig.site.locales)
+    
+    // Add hreflang for all locales
+    for (const locale of locales) {
+      if (locale === 'root') continue
+      head.push(['link', { rel: 'alternate', hreflang: locale, href: `https://eligiusmc.github.io/EligiusNametag/${locale}/${pageData.relativePath.replace('index.md', '').replace('.md', '')}` }])
+    }
+    // Add x-default
+    head.push(['link', { rel: 'alternate', hreflang: 'x-default', href: `https://eligiusmc.github.io/EligiusNametag/${pageData.relativePath.replace('index.md', '').replace('.md', '')}` }])
+    
+    return head
+  },
   head: [
     ['link', { rel: 'icon', href: '/EligiusNametag/assets/angry.png' }],
     ['script', {}, `

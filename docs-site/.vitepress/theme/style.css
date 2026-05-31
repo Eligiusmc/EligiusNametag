@@ -33,15 +33,15 @@ body {
 @keyframes floatGlow {
   0% {
     transform: translateY(0px);
-    filter: drop-shadow(0 0 15px rgba(255, 42, 133, 0.4));
+    filter: drop-shadow(0 0 5px rgba(157, 0, 255, 0.4));
   }
   50% {
     transform: translateY(-15px);
-    filter: drop-shadow(0 0 35px rgba(255, 126, 179, 0.7));
+    filter: drop-shadow(0 0 15px rgba(157, 0, 255, 0.9));
   }
   100% {
     transform: translateY(0px);
-    filter: drop-shadow(0 0 15px rgba(255, 42, 133, 0.4));
+    filter: drop-shadow(0 0 5px rgba(157, 0, 255, 0.4));
   }
 }
 
@@ -59,6 +59,8 @@ body {
 
 .VPButton.brand {
   box-shadow: 0 4px 15px rgba(255, 42, 133, 0.3);
+  background-color: var(--vp-c-brand-1) !important;
+  color: #ffffff !important;
 }
 
 .VPButton:hover {
