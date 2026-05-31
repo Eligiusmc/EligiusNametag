@@ -107,10 +107,66 @@ export default defineConfig({
         ]
       }
     },
-    fr: { label: 'Français', lang: 'fr' },
-    de: { label: 'Deutsch', lang: 'de' },
-    pt: { label: 'Português', lang: 'pt' },
-    ru: { label: 'Русский', lang: 'ru' }
+    fr: {
+      label: 'Français',
+      lang: 'fr',
+      themeConfig: {
+        nav: [
+          { text: '🏠 Accueil', link: '/fr/' },
+          { text: '📖 Documentation', link: '/fr/installation' }
+        ],
+        sidebar: [
+          { text: '🚀 Démarrage', items: [{ text: 'Installation', link: '/fr/installation' }, { text: 'Commandes', link: '/fr/commands' }] },
+          { text: '⚙️ Configuration', items: [{ text: 'Global', link: '/fr/config/global' }, { text: 'Joueurs', link: '/fr/config/players' }, { text: 'Animaux', link: '/fr/config/pets' }] },
+          { text: '🛡️ Support', items: [{ text: 'Troubleshooting', link: '/fr/troubleshooting' }] }
+        ]
+      }
+    },
+    de: {
+      label: 'Deutsch',
+      lang: 'de',
+      themeConfig: {
+        nav: [
+          { text: '🏠 Startseite', link: '/de/' },
+          { text: '📖 Dokumentation', link: '/de/installation' }
+        ],
+        sidebar: [
+          { text: '🚀 Erste Schritte', items: [{ text: 'Installation', link: '/de/installation' }, { text: 'Befehle', link: '/de/commands' }] },
+          { text: '⚙️ Konfiguration', items: [{ text: 'Global', link: '/de/config/global' }, { text: 'Spieler', link: '/de/config/players' }, { text: 'Haustiere', link: '/de/config/pets' }] },
+          { text: '🛡️ Support', items: [{ text: 'Fehlerbehebung', link: '/de/troubleshooting' }] }
+        ]
+      }
+    },
+    pt: {
+      label: 'Português',
+      lang: 'pt',
+      themeConfig: {
+        nav: [
+          { text: '🏠 Início', link: '/pt/' },
+          { text: '📖 Documentação', link: '/pt/installation' }
+        ],
+        sidebar: [
+          { text: '🚀 Primeiros Passos', items: [{ text: 'Instalação', link: '/pt/installation' }, { text: 'Comandos', link: '/pt/commands' }] },
+          { text: '⚙️ Configuração', items: [{ text: 'Global', link: '/pt/config/global' }, { text: 'Jogadores', link: '/pt/config/players' }, { text: 'Pets', link: '/pt/config/pets' }] },
+          { text: '🛡️ Suporte', items: [{ text: 'Troubleshooting', link: '/pt/troubleshooting' }] }
+        ]
+      }
+    },
+    ru: {
+      label: 'Русский',
+      lang: 'ru',
+      themeConfig: {
+        nav: [
+          { text: '🏠 Главная', link: '/ru/' },
+          { text: '📖 Документация', link: '/ru/installation' }
+        ],
+        sidebar: [
+          { text: '🚀 Начало работы', items: [{ text: 'Установка', link: '/ru/installation' }, { text: 'Команды', link: '/ru/commands' }] },
+          { text: '⚙️ Конфигурация', items: [{ text: 'Глобальная', link: '/ru/config/global' }, { text: 'Игроки', link: '/ru/config/players' }, { text: 'Питомцы', link: '/ru/config/pets' }] },
+          { text: '🛡️ Поддержка', items: [{ text: 'Устранение неполадок', link: '/ru/troubleshooting' }] }
+        ]
+      }
+    }
   },
   themeConfig: {
     socialLinks: [

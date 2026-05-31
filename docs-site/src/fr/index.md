@@ -15,8 +15,17 @@ hero:
     - theme: alt
       text: Télécharger la Release
       link: https://github.com/Eligiusmc/EligiusNametag/releases/latest
+    - theme: alt
+      text: Voir sur GitHub
+      link: https://github.com/Eligiusmc/EligiusNametag
 
 features:
-  - title: Ultra Efficace
-    details: Rend les TextDisplays purement sur le réseau sans créer de déchets en mémoire physique.
+  - title: Ultra Efficace (ProtocolLib)
+    details: Rend les TextDisplays purement sur le réseau sans créer de déchets en mémoire physique, prévenant les lags.
+  - title: Folia & Scalabilité
+    details: Architecture asynchrone prête pour les réseaux distribués utilisant HikariCP pour les connexions MySQL/SQLite.
+  - title: Designs Illimités
+    details: Plusieurs lignes, icônes personnalisées d'ItemsAdder, dégradés MiniMessage, et support de la hiérarchie Vault.
+  - title: Animaux Inclus
+    details: Faites en sorte que les loups et les chats de vos joueurs VIP héritent du même style de nametag.
 ---
