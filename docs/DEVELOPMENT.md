@@ -144,3 +144,39 @@ El proyecto utiliza un flujo de trabajo altamente automatizado mediante **Releas
 - Analizará el historial y abrirá su propio PR en `master` (ej. `chore(main): release 1.1.0`).
 - Este PR contiene la actualización automática del archivo `gradle.properties` y la generación/actualización del `CHANGELOG.md`.
 - Al aprobar y mezclar este PR final, la Action publicará automáticamente el TAG (`v1.1.0`), compilará el `.jar` y lo subirá a GitHub Releases, Modrinth y Hangar.
+
+---
+
+## 7. Documentación y Wiki (VitePress)
+
+La Wiki oficial del proyecto está construida usando **VitePress** y se encuentra dentro de la carpeta `docs-site/`. 
+Está alojada en GitHub Pages y soporta múltiples idiomas nativamente.
+
+### 7.1 Arquitectura de Traducciones (i18n)
+La Wiki no usa un único archivo para todos los idiomas. Cada idioma tiene su propio directorio dentro de `docs-site/src/`:
+- `src/` (Inglés - Default)
+- `src/es/` (Español)
+- `src/fr/` (Francés)
+- `src/de/` (Alemán)
+- `src/pt/` (Portugués)
+- `src/ru/` (Ruso)
+
+### 7.2 Añadir Nuevo Contenido a la Wiki
+Si creas una nueva funcionalidad en el plugin y necesitas documentarla:
+1. Crea el archivo `.md` en la raíz inglesa (ej. `src/config/new_feature.md`).
+2. **Duplica y Traduce:** Debes copiar ese mismo archivo en cada una de las carpetas de idiomas (`src/es/config/new_feature.md`, etc.) y traducir su contenido. No hacerlo causará penalizaciones SEO de Google (Duplicate Content).
+3. **Frontmatter SEO:** Todos los archivos Markdown deben iniciar obligatoriamente con metadatos YAML para mejorar su visibilidad en buscadores:
+```markdown
+---
+title: Título de la Página
+description: Descripción corta de 150 caracteres.
+---
+```
+4. **Actualiza la Barra Lateral (Sidebar):** Debes registrar el nuevo enlace en el archivo `docs-site/.vitepress/config.mts`, en la sección `themeConfig.sidebar` de **cada uno de los idiomas** (locales) que hayas añadido.
+
+Para compilar y testear la Wiki localmente antes de enviar tu PR, usa:
+```bash
+cd docs-site
+npm install
+npm run docs:dev
+```

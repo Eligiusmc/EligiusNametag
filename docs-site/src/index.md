@@ -1,0 +1,31 @@
+---
+layout: home
+
+hero:
+  name: "EligiusNametag"
+  text: "The future of nametags"
+  tagline: "High-efficiency holograms for Paper 1.21+ with Folia support and decentralized database."
+  image:
+    src: /assets/angry.png
+    alt: Eligius Logo
+  actions:
+    - theme: brand
+      text: Installation Guide
+      link: /installation
+    - theme: alt
+      text: Download Release
+      link: https://github.com/Eligiusmc/EligiusNametag/releases/latest
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/Eligiusmc/EligiusNametag
+
+features:
+  - title: Ultra Efficient (ProtocolLib)
+    details: Renders TextDisplays purely on network level without creating garbage in physical memory, preventing lag on your server.
+  - title: Folia & Scalability
+    details: Asynchronous architecture ready for distributed networks using HikariCP for concurrent MySQL/SQLite connections.
+  - title: Unlimited Designs
+    details: Multiple lines, custom icons from ItemsAdder, MiniMessage gradients, and Vault hierarchy support.
+  - title: Pets Included
+    details: Make your VIP players' wolves and cats inherit their exact nametag style.
+---

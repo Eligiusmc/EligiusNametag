@@ -49,12 +49,14 @@ jobs:
         tag_name: v${{ env.VERSION }}-beta.${{ github.run_number }}
         name: EligiusNametag v${{ env.VERSION }} (Beta Build #${{ github.run_number }})
         body: |
-          🧪 **Versión de Desarrollo (Beta Automática)**
+          🧪 **Development Version (Auto-generated Beta)**
           
-          Esta es una compilación inestable generada automáticamente desde la rama `develop`.
-          Contiene características nuevas que aún están siendo testeadas. No se recomienda para servidores en producción que exijan 100% de estabilidad.
+          This is an unstable beta build automatically generated from the `develop` branch of **EligiusNametag**.
+          It contains new features that are still undergoing testing and verification. 
           
-          _Si buscas la versión estable, por favor descarga las Releases oficiales (sin la etiqueta Beta)._
+          ⚠️ **Not recommended for production servers** that require 100% stability.
+          
+          _If you are looking for the stable version, please download the official Releases (without the Beta tag)._
         draft: false
         prerelease: true
         files: build/libs/EligiusNametag*.jar
