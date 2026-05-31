@@ -24,7 +24,6 @@ view_distance: 64
 # Tous ceux-ci exécuteront le menu d'aide ou les commandes imbriquées.
 command_aliases:
   - "enametag"
-  - "eltag"
 ```
 
 ---

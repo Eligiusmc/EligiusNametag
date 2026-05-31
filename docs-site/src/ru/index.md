@@ -1,10 +1,12 @@
 ---
 layout: home
+title: "EligiusNametag - Высокоэффективные голограммы для Paper"
+description: "Ультимативный, сверхэффективный плагин голографических неймтегов для Paper 1.21 - 26.1.2+ и Folia."
 
 hero:
   name: "EligiusNametag"
   text: "Будущее неймтегов"
-  tagline: "Высокоэффективные голограммы для Paper 1.21+ с поддержкой Folia и децентрализованной базой данных."
+  tagline: "Высокоэффективные голограммы для Paper 1.21 - 26.1.2+ с поддержкой Folia и децентрализованной базой данных."
   image:
     src: /assets/angry.png
     alt: Eligius Logo
@@ -20,7 +22,7 @@ hero:
       link: https://github.com/Eligiusmc/EligiusNametag
 
 features:
-  - title: Сверхэффективность (ProtocolLib)
+  - title: Сверхэффективность (Native API)
     details: Рендерит TextDisplays исключительно на уровне сети, не создавая мусора в физической памяти и предотвращая лаги.
   - title: Folia и Масштабируемость
     details: Асинхронная архитектура для распределенных сетей с использованием HikariCP для MySQL/SQLite соединений.
