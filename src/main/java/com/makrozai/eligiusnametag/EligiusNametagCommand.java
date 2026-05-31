@@ -38,7 +38,7 @@ public class EligiusNametagCommand {
         top.then(Commands.literal("lang")
                 .requires(source -> source.getSender().hasPermission("eligiusnametag.admin"))
                 .executes(c -> {
-                    c.getSource().getSender().sendMessage(Component.text("Usage: /eltag lang <language>", NamedTextColor.RED));
+                    c.getSource().getSender().sendMessage(Component.text("Usage: /enametag lang <language>", NamedTextColor.RED));
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("language", com.mojang.brigadier.arguments.StringArgumentType.word())

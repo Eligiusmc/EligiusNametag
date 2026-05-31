@@ -10,6 +10,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
@@ -19,6 +20,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.makrozai.eligiusnametag.adapter.database.DatabaseAdapter;
+import com.makrozai.eligiusnametag.domain.service.UpdateChecker;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class EligiusNametag extends JavaPlugin implements Listener {
     private YamlConfigAdapter configAdapter;
@@ -88,6 +91,10 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         
         startTask();
         
+        if (configAdapter.isCheckUpdates()) {
+            UpdateChecker.fetch(version);
+        }
+        
         long endTime = System.currentTimeMillis();
         StartupLogger.printSuccess(endTime - startTime);
     }
@@ -136,6 +143,30 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         rendererAdapter.clearViewer(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().hasPermission("eligiusnametag.admin") && UpdateChecker.isUpdateAvailable()) {
+            String header = configAdapter.getMessage("update_available_header");
+            String versions = configAdapter.getMessage("update_available_versions");
+            String download = configAdapter.getMessage("update_available_download");
+            
+            if (header != null && !header.isEmpty()) {
+                event.getPlayer().sendMessage(MiniMessage.miniMessage().deserialize(header));
+                
+                if (versions != null && !versions.isEmpty()) {
+                    versions = versions.replace("{current}", getPluginMeta().getVersion())
+                                       .replace("{new}", UpdateChecker.getLatestVersion());
+                    event.getPlayer().sendMessage(MiniMessage.miniMessage().deserialize(versions));
+                }
+                
+                if (download != null && !download.isEmpty()) {
+                    download = download.replace("{url}", UpdateChecker.getDownloadUrl());
+                    event.getPlayer().sendMessage(MiniMessage.miniMessage().deserialize(download));
+                }
+            }
+        }
     }
 
     @EventHandler

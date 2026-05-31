@@ -10,6 +10,9 @@ hero:
       text: Guía de Instalación
       link: /installation
     - theme: alt
+      text: Descargar Release
+      link: https://github.com/Eligiusmc/EligiusNametag/releases/latest
+    - theme: alt
       text: Ver en GitHub
       link: https://github.com/Eligiusmc/EligiusNametag
 

@@ -18,8 +18,8 @@ view_distance: 64
 # Alias del comando principal
 # Todos estos ejecutarán el menú de ayuda o comandos anidados.
 command_aliases:
-  - "eltag"
   - "enametag"
+  - "eltag"
 ```
 
 ---
@@ -37,7 +37,7 @@ database:
 ```
 
 ### 🔹 Opción B: MySQL (Redes Velocity/Bungee)
-Ideal si posees múltiples servidores conectados y deseas que la preferencia del comando `/eltag me` (mostrar u ocultar tu nametag) viaje con el jugador de un servidor a otro.
+Ideal si posees múltiples servidores conectados y deseas que la preferencia del comando `/enametag me` (mostrar u ocultar tu nametag) viaje con el jugador de un servidor a otro.
 
 ```yaml
 database:

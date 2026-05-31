@@ -32,4 +32,13 @@ public class StartupLogger {
     public static void printSuccess(long ms) {
         Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <green>Successfully enabled. (took " + ms + "ms)</green>"));
     }
+
+    public static void printUpToDate(String version) {
+        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <green>✓ You are running the latest version (v" + version + ").</green>"));
+    }
+
+    public static void printUpdateNotice(String newVersion, String url) {
+        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <yellow>⚠️ A new update (v" + newVersion + ") is available!</yellow>"));
+        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <dark_gray>🔗 Download it here:</dark_gray> <aqua><underlined>" + url + "</underlined></aqua>"));
+    }
 }
