@@ -3,26 +3,29 @@ layout: home
 
 hero:
   name: "EligiusNametag"
-  text: "El futuro de los nametags"
-  tagline: "Hologramas de alta eficiencia para Paper 1.21+ con soporte Folia y base de datos descentralizada."
+  text: "The future of nametags"
+  tagline: "High-efficiency holograms for Paper 1.21+ with Folia support and decentralized database."
+  image:
+    src: /assets/angry.png
+    alt: Eligius Logo
   actions:
     - theme: brand
-      text: Guía de Instalación
+      text: Installation Guide
       link: /installation
     - theme: alt
-      text: Descargar Release
+      text: Download Release
       link: https://github.com/Eligiusmc/EligiusNametag/releases/latest
     - theme: alt
-      text: Ver en GitHub
+      text: View on GitHub
       link: https://github.com/Eligiusmc/EligiusNametag
 
 features:
-  - title: Ultra Eficiente (ProtocolLib)
-    details: Renderiza TextDisplays puramente en red sin crear basura en memoria física, previniendo lag en tu servidor.
-  - title: Folia & Escalabilidad
-    details: Arquitectura asíncrona preparada para redes distribuidas usando HikariCP para conexiones MySQL/SQLite concurrentes.
-  - title: Diseños Ilimitados
-    details: Múltiples líneas, íconos personalizados de ItemsAdder, gradientes de MiniMessage y jerarquía de Vault.
-  - title: Mascotas Incluidas
-    details: Haz que los lobos y gatos de tus jugadores VIP hereden su mismo estilo de nametag.
+  - title: Ultra Efficient (ProtocolLib)
+    details: Renders TextDisplays purely on network level without creating garbage in physical memory, preventing lag on your server.
+  - title: Folia & Scalability
+    details: Asynchronous architecture ready for distributed networks using HikariCP for concurrent MySQL/SQLite connections.
+  - title: Unlimited Designs
+    details: Multiple lines, custom icons from ItemsAdder, MiniMessage gradients, and Vault hierarchy support.
+  - title: Pets Included
+    details: Make your VIP players' wolves and cats inherit their exact nametag style.
 ---
