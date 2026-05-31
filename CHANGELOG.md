@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.1.0...v1.2.0) (2026-05-31)
+
+
+### Features
+
+* **wiki & ci:** i18n support, animated dark theme, and automated releases enhancement ([#11](https://github.com/Eligiusmc/EligiusNametag/issues/11)) ([2bae140](https://github.com/Eligiusmc/EligiusNametag/commit/2bae140cc64e5936d33a8778c59a677d2345af69))
+
 ## [1.1.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.0.0...v1.1.0) (2026-05-31)
 
 
