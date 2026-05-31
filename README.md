@@ -13,8 +13,7 @@
   [![Wiki](https://img.shields.io/badge/Wiki-Multi--Language-blueviolet?style=flat-square&logo=gitbook)](https://eligiusmc.github.io/EligiusNametag/)
 
   [📚 **Read the Official Wiki (6 Languages)**](https://eligiusmc.github.io/EligiusNametag/) •
-  [🐛 **Report an Issue**](https://github.com/Eligiusmc/EligiusNametag/issues) •
-  [🇪🇸 **Leer en Español**](README_es.md)
+  [🐛 **Report an Issue**](https://github.com/Eligiusmc/EligiusNametag/issues)
 
 </div>
 
