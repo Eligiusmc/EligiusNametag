@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.2.0...v1.3.0) (2026-05-31)
+
+
+### Features
+
+* **core:** migrate to native Bukkit TextDisplays and drop ProtocolLib ([526a1a9](https://github.com/Eligiusmc/EligiusNametag/commit/526a1a9aa482ef4e7b6f14654b3e570007100a8c))
+
 ## [1.2.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.1.0...v1.2.0) (2026-05-31)
 
 
