@@ -1,6 +1,8 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("com.modrinth.minotaur") version "2.8.7"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 repositories {
@@ -64,4 +66,20 @@ tasks.named<ProcessResources>("processResources") {
     filesMatching("plugin.yml") {
         expand("projectVersion" to versionString)
     }
+}
+
+// --- Modrinth Publishing Configuration ---
+modrinth {
+    token.set(System.getenv("MODRINTH_API_TOKEN"))
+    projectId.set("eligiusnametag") // You can use the slug here
+    versionNumber.set(versionString)
+    
+    // Modrinth expects 'release', 'beta', or 'alpha'
+    val channelEnv = System.getenv("CHANNEL") ?: "Release"
+    versionType.set(channelEnv.lowercase())
+    
+    uploadFile.set(tasks.named("shadowJar"))
+    gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4")
+    loaders.addAll("paper", "folia")
+    syncBodyFrom.set(rootProject.file("MODRINTH.md").readText())
 }
