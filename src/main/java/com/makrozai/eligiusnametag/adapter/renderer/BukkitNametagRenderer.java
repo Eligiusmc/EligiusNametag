@@ -37,16 +37,29 @@ public class BukkitNametagRenderer implements NametagRendererPort {
 
         List<TextDisplay> displays = activeEntities.computeIfAbsent(targetId, k -> new ArrayList<>());
 
+        // 0. Remove any dead or invalid displays (Fixes memory leaks on chunk unload)
+        displays.removeIf(display -> {
+            if (!display.isValid() || display.isDead()) {
+                lineSpawnedViewers.remove(display.getUniqueId());
+                lineJsonCache.remove(display.getUniqueId());
+                return true;
+            }
+            return false;
+        });
+
         // 1. Spawn missing lines
         while (displays.size() < lines.size()) {
-            Location spawnLoc = target.getLocation();
+            Location spawnLoc = target.getLocation().add(0, target.getBoundingBox().getHeight(), 0);
             TextDisplay display = target.getWorld().spawn(spawnLoc, TextDisplay.class, entity -> {
                 entity.setPersistent(false);
-                entity.setVisibleByDefault(false);
+                entity.setVisibleByDefault(true);
                 entity.setBillboard(Display.Billboard.CENTER);
                 entity.setViewRange((float) viewDistance);
                 entity.setShadowRadius(0f);
                 entity.setShadowStrength(0f);
+                entity.setTeleportDuration(0);
+                entity.setInterpolationDuration(0);
+                entity.setTextOpacity((byte) 0);
                 // Ensure text is visible through blocks just like virtual ones usually are if configured?
                 // Depending on requirements.
             });
@@ -71,6 +84,13 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             if (display.getVehicle() == null || !display.getVehicle().getUniqueId().equals(target.getUniqueId())) {
                 target.addPassenger(display);
             }
+            
+            // Delayed visibility to prevent fly-in animation
+            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (display.isValid() && !display.isDead()) {
+                    display.setTextOpacity((byte) -1);
+                }
+            }, 2L);
 
             // Set translation (yOffset)
             float calculatedYOffset = yOffset + ((lines.size() - 1 - i) * (float) lineSpacing);
@@ -140,6 +160,20 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                         currentViewers.remove(viewerId);
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void destroyNametag(UUID targetId) {
+        List<TextDisplay> displays = activeEntities.remove(targetId);
+        if (displays != null) {
+            for (TextDisplay display : displays) {
+                if (display.isValid() && !display.isDead()) {
+                    display.remove();
+                }
+                lineSpawnedViewers.remove(display.getUniqueId());
+                lineJsonCache.remove(display.getUniqueId());
             }
         }
     }

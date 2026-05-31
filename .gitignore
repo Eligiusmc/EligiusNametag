@@ -51,3 +51,4 @@ skills-lock.json
 run/
 docs-site/node_modules/
 
+run_*/

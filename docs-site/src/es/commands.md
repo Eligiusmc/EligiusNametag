@@ -10,6 +10,7 @@ Todos los comandos por defecto se basan en `/enametag` (o sus alias personalizab
 | Comando | Descripción | Permiso Requerido |
 |---|---|---|
 | `/enametag` | Muestra la versión del plugin instalada y el logo del autor. | *Ninguno* |
+| `/enametag help` | Muestra el menú de ayuda con todos los comandos disponibles. | `eligiusnametag.admin` |
 | `/enametag reload` | Recarga toda la configuración y los archivos YAML en tiempo real, sin reiniciar el servidor. | `eligiusnametag.admin` |
 | `/enametag lang <idioma>` | Cambia el idioma global del plugin dinámicamente y recarga los lenguajes al instante. | `eligiusnametag.admin` |
 | `/enametag pets` | Alterna globalmente la habilitación de los hologramas de texto sobre las mascotas. | `eligiusnametag.admin` |
