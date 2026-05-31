@@ -21,3 +21,8 @@ help_lang: "<yellow>/enametag lang <idioma></yellow> <gray>- Cambia el idioma gl
 help_pets: "<yellow>/enametag pets</yellow> <gray>- Activa o desactiva nametags de mascotas.</gray>"
 help_reload: "<yellow>/enametag reload</yellow> <gray>- Recarga la configuraciÃ³n global.</gray>"
 help_footer: "<gray>======================================"
+
+update_available_header: "<dark_gray><strikethrough>--------------------------------------------------</strikethrough></dark_gray>\n<gradient:#9b59b6:#8e44ad><b>EligiusNametag</b></gradient> <dark_gray>»</dark_gray> <yellow>¡Actualización Disponible!</yellow>"
+update_available_versions: "<gray>Tu versión:</gray> <red>v{current}</red> <dark_gray>|</dark_gray> <gray>Nueva versión:</gray> <green>v{new}</green>"
+update_available_download: "<click:open_url:'{url}'><hover:show_text:'<green>Click para abrir GitHub</green>'><aqua><b>[ HAZ CLICK AQUÍ PARA DESCARGAR ]</b></aqua></hover></click>\n<dark_gray><strikethrough>--------------------------------------------------</strikethrough></dark_gray>"
+

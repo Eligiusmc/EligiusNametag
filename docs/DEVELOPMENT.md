@@ -118,21 +118,29 @@ El plugin está diseñado para apuntar exclusivamente a la API de **Paper 1.21+*
 
 ## 6. Workflow (GitFlow) y Versionamiento
 
-El proyecto sigue una metodología basada en **GitFlow** para asegurar escalabilidad y evitar roturas en los entornos en vivo.
+El proyecto utiliza un flujo de trabajo altamente automatizado mediante **Release Please** y **GitHub Actions** para garantizar lanzamientos estables y versionamiento semántico predecible. Sigue estas reglas al contribuir:
 
 ### 6.1 Estructura de Ramas
-- **`main`**: Es la rama de **Producción**. Solo contiene código 100% estable, probado y listo para su uso final en servidores en vivo. Nunca se programa directamente aquí.
-- **`develop`**: Es la rama **Integradora** y base de nuestro desarrollo continuo. Toda nueva funcionalidad debe fusionarse primero aquí para someterse a pruebas conjuntas.
-- **`feature/<nombre>`**: Ramas temporales para desarrollar funcionalidades específicas (ej. `feature/multi-lang`, `feature/sqlite-fix`). Siempre nacen a partir de `develop`.
+- **`master`**: Es la rama de **Producción**. Nunca se programa directamente aquí ni se abren PRs manuales para integrar funcionalidades. Su actualización está orquestada por bots.
+- **`develop`**: Es la rama **Integradora** y base de nuestro desarrollo continuo (Beta). 
+- **`feature/<nombre>`**: Ramas temporales para desarrollar funcionalidades específicas. Siempre nacen a partir de `develop`.
 
-### 6.2 Ciclo de Trabajo
-1. Se clona el proyecto y se ubica en la rama `develop`.
-2. Se crea una nueva rama: `git checkout -b feature/nueva-funcionalidad`.
-3. Al terminar, se realiza un *Pull Request* (PR) hacia `develop`.
-4. Una vez validada y testeada en `develop`, se empaqueta una *Release* y se fusiona hacia `main`.
+### 6.2 Ciclo de Trabajo (Conventional Commits)
+- Todo trabajo debe realizarse en una rama `feature/xyz`.
+- Es obligatorio usar prefijos de **Conventional Commits** tanto en los commits como al fusionar el PR hacia `develop`:
+  - `feat:` para nuevas características (Aumenta la versión `MINOR`, ej. 1.0.0 -> 1.1.0).
+  - `fix:` para corrección de errores (Aumenta la versión `PATCH`, ej. 1.0.0 -> 1.0.1).
+  - `docs:`, `chore:`, `refactor:`, `style:` (No aumentan versión).
+  - `BREAKING CHANGE:` en el cuerpo del commit (Aumenta la versión `MAJOR`, ej. 1.0.0 -> 2.0.0).
+- Abre un PR de tu rama hacia `develop`. Al aprobarse, se compilará una versión Beta automáticamente.
 
-### 6.3 Política de Versionamiento
-Las versiones son estrictamente **consecutivas**.
-Toda *feature* o conjunto de características fusionado exitosamente en `develop` implicará un **incremento consecutivo (Version Bump)**.
-- El versionamiento se actualiza directamente en el archivo `build.gradle.kts`.
-- Por ejemplo, al añadir soporte Folia, se pasa de `v1.0.0` a `v1.1.0`. Parches de errores urgentes incrementan el último número (ej. `v1.1.1`).
+### 6.3 Promoción a Producción (Develop -> Master)
+- Cuando `develop` esté lista para un lanzamiento, los Administradores deben ir a **Actions** en GitHub y ejecutar el flujo **"Promote Develop to Master"**.
+- Esto generará automáticamente un Pull Request de `develop` a `master` enumerando los commits realizados.
+- El equipo revisa y aprueba este PR.
+
+### 6.4 Lanzamiento y Versionado (Release Please)
+- Inmediatamente después de mezclarse el código en `master`, el bot de **Release Please** se activará.
+- Analizará el historial y abrirá su propio PR en `master` (ej. `chore(main): release 1.1.0`).
+- Este PR contiene la actualización automática del archivo `gradle.properties` y la generación/actualización del `CHANGELOG.md`.
+- Al aprobar y mezclar este PR final, la Action publicará automáticamente el TAG (`v1.1.0`), compilará el `.jar` y lo subirá a GitHub Releases, Modrinth y Hangar.
