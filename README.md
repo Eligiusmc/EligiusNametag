@@ -1,108 +1,79 @@
-# EligiusNametag
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Eligiusmc/EligiusNametag/master/docs-site/src/public/Eligiusnametaglogorender.png" alt="EligiusNametag Logo" width="200" />
 
-Este es el núcleo de **EligiusNametag**, un plugin holográfico ultra-eficiente diseñado para Paper y Folia 1.21+.
-Usamos `TextDisplays` de Minecraft (vía ProtocolLib) para renderizar los nametags sin generar lag ni entidades físicas en el servidor.
+  # EligiusNametag
 
-> 📖 **[Leer la Wiki Oficial Completa](https://Eligiusmc.github.io/EligiusNametag)**
+  *The ultimate, ultra-efficient holographic nametag plugin for Paper & Folia.*
 
----
+  [![Paper API](https://img.shields.io/badge/Paper-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
+  [![Folia Compatible](https://img.shields.io/badge/Folia-Compatible-ff5e00?style=flat-square&logo=fastapi)](https://papermc.io/software/folia)
+  [![Java 21](https://img.shields.io/badge/Java-21_LTS-007396?style=flat-square&logo=openjdk)](https://adoptium.net/)
+  [![License](https://img.shields.io/github/license/Eligiusmc/EligiusNametag?style=flat-square&color=blue)](LICENSE)
+  [![Release](https://img.shields.io/github/v/release/Eligiusmc/EligiusNametag?style=flat-square&color=success)](https://github.com/Eligiusmc/EligiusNametag/releases)
+  [![Wiki](https://img.shields.io/badge/Wiki-Multi--Language-blueviolet?style=flat-square&logo=gitbook)](https://eligiusmc.github.io/EligiusNametag/)
 
-## 🌟 Características Principales
+  [📚 **Read the Official Wiki (6 Languages)**](https://eligiusmc.github.io/EligiusNametag/) •
+  [🐛 **Report an Issue**](https://github.com/Eligiusmc/EligiusNametag/issues) •
+  [🇪🇸 **Leer en Español**](README_es.md)
 
-- **Soporte Nativo Folia:** Código asíncrono y thread-safe real diseñado para sacar el máximo provecho de las redes multihilo de Folia.
-- **Bases de Datos Flexibles:** Persistencia en SQLite local o conexión a MySQL remoto (gestionado inteligentemente por HikariCP) para redes proxy.
-- **Múltiples líneas:** Crea nametags de cualquier tamaño, 100% configurables.
-- **Jerarquía Vault:** Asigna formatos de nametag diferentes según el rango del usuario (ej. `admin`, `vip`, `usuario`).
-- **PlaceholderAPI Integrado:** Soporte para todas tus variables favoritas (ej. `%luckperms_prefix%`).
-- **Iconos de ItemsAdder:** Convierte mágicamente atajos como `:rank_dev:` en imágenes de fuente reales arriba de la cabeza de los jugadores.
-- **Formato MiniMessage Moderno:** Usa `<red>`, `<bold>`, `<gradient:red:blue>` para diseños increíbles, además de soportar automáticamente códigos legacy (`&c`, `&l`).
-- **Control para el Jugador:** Comando `/eltag me` para que el propio usuario decida si quiere ver su propio nametag (sus preferencias se guardan en base de datos al reiniciar).
-- **Mascotas Holográficas:** Dale un toque único a los lobos y gatos de tus jugadores. El nametag de la mascota heredará el formato del rango VIP/Admin de su dueño.
-
----
-
-## 💾 Instalación
-
-1. Descarga el `.jar` compilado de EligiusNametag.
-2. Coloca el archivo en la carpeta `plugins/` de tu servidor.
-3. Asegúrate de tener instalado el plugin **ProtocolLib**.
-4. ¡Inicia el servidor!
-5. Se generará automáticamente la carpeta `plugins/EligiusNametag/` con tu `config.yml`, `players.yml`, `pets.yml` y la carpeta `lang/`.
-
-### Dependencias
-
-| Plugin | Requerido | Descripción |
-|---|---|---|
-| **ProtocolLib** | ✅ Obligatorio | Requerido para enviar la magia visual de los TextDisplays sin laggear el servidor. |
-| **PlaceholderAPI** | ❌ Opcional | Recomendado para agregar variables y estadísticas en los nombres. |
-| **Vault** | ❌ Opcional | Recomendado para vincular los nombres a los rangos de tu servidor. |
-| **ItemsAdder** | ❌ Opcional | Recomendado para inyectar emojis/iconos gráficos en los nombres. |
-
-> **Nota de Compatibilidad:** Solo funciona en servidores **Paper 1.21 o superior** debido a las capacidades nativas de la API de texto y Brigadier introducidas en estas versiones. Se requiere **Java 21**.
+</div>
 
 ---
 
-## 🎮 Comandos y Permisos
+## 🌟 Overview
 
-Todos los comandos por defecto se basan en `/enametag` (o sus alias personalizables `/eltag` y `/eligiusnametag`).
+**EligiusNametag** is a next-generation nametag plugin built exclusively for Minecraft 1.21+ servers running Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` injected at the packet level via ProtocolLib. This means **zero lag**, infinite lines, and perfect visual synchronization.
 
-| Comando | Descripción | Permiso Requerido |
-|---|---|---|
-| `/enametag` | Muestra la versión del plugin instalada. | *Ninguno* |
-| `/enametag reload` | Recarga toda la configuración (formatos, alturas, etc.) en tiempo real. | `eligiusnametag.admin` |
-| `/enametag lang <idioma>` | Cambia el idioma global del plugin dinámicamente. | `eligiusnametag.admin` |
-| `/enametag pets` | Habilita o deshabilita los hologramas en las mascotas globalmente. | `eligiusnametag.admin` |
-| `/enametag me` | Activa o desactiva la visualización de tu propio nametag. | `eligiusnametag.viewself` |
+### ✨ Key Features
+
+- ⚡ **True Folia Support:** Built from the ground up with asynchronous, thread-safe architecture to fully leverage Folia's multi-threading capabilities.
+- 💾 **Smart Data Persistence:** Local SQLite or remote MySQL powered by **HikariCP** for safe, high-performance database pooling across proxy networks.
+- 🎨 **Modern MiniMessage Formatting:** Say goodbye to `&c`. Use `<gradient:red:blue>`, `<bold>`, or HEX colors like `<#ff00ff>` for breathtaking designs.
+- 👑 **Vault Hierarchy Integration:** Automatically assigns nametag formats based on the user's primary Vault rank (e.g., admin, vip, default).
+- 🐾 **Holographic Pets:** Tamed wolves, cats, and parrots inherit their owner's rank formatting!
+- 🖼️ **ItemsAdder Ready:** Fully supports font-images and custom emojis like `:rank_dev:` rendering flawlessly above players' heads.
+- 🌐 **Global i18n:** In-game messages are completely customizable via language files with hot-swapping support.
 
 ---
 
-## ⚙️ Configuración Modular
+## 🚀 Quick Start
 
-El plugin utiliza un sistema de configuración descentralizado para mayor organización:
+1. Download the latest `EligiusNametag-x.x.x.jar` from the [Releases](https://github.com/Eligiusmc/EligiusNametag/releases) page.
+2. Drop it into your `plugins/` directory.
+3. Make sure you have **[ProtocolLib](https://github.com/dmulloy2/ProtocolLib/releases)** installed.
+4. Start your server!
+5. Visit the **[Wiki](https://eligiusmc.github.io/EligiusNametag/)** to learn how to configure groups, databases, and more.
 
-### `config.yml` (Opciones Globales)
-Puedes controlar el entorno y la base de datos:
+---
 
-```yaml
-# Altura del holograma por encima de la cabeza del jugador
-y_offset: 0.35
+## 👨‍💻 For Developers & Contributors
 
-# Base de datos (SQLite o MySQL)
-database:
-  type: "SQLITE"
+We love open-source contributions! If you want to dive into the codebase, fix bugs, or understand our Hexagonal Architecture:
+
+👉 **[Read the Development Guidelines (DEVELOPMENT.md)](docs/DEVELOPMENT.md)**
+
+### Building from Source
+
+This project enforces **Java 21 LTS** and targets **Paper 1.21+**.
+
+```bash
+# Clone the repository
+git clone https://github.com/Eligiusmc/EligiusNametag.git
+cd EligiusNametag
+
+# Build the jar using Gradle
+./gradlew build
 ```
+*The compiled `.jar` will be available in `build/libs/`.*
 
-### `players.yml` (Diseños para Jugadores)
-El diseño de los jugadores se configura como una lista de líneas. Si el jugador tiene el rango `admin` en Vault, usará ese diseño. Si no, usará el `default_format`.
+### Contributing Best Practices
 
-```yaml
-players:
-  default_format:
-    - "<yellow>Jugador</yellow>"
-    - "<white><PLAYER></white>"
-  
-  groups:
-    admin:
-      - "<red>:rank_dev: Administrador</red>"
-      - "<gradient:red:gold><PLAYER></gradient>"
-```
-
-### `pets.yml` (Diseños para Mascotas)
-Todos los lobos, gatos o loros domados tendrán su propio nametag holográfico.
-
-```yaml
-pets:
-  enabled: true
-  
-  default_format:
-    - "<gray>Mascota de <PLAYER></gray>"
-    - "<white><DISPLAYNAME></white>"
-```
+- **Branching:** Never push directly to `master`. All work should stem from `develop` into `feature/<name>` branches.
+- **Commits:** We strictly enforce [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat:`, `fix:`, `docs:`). This powers our automated Release Please pipelines.
+- **Documentation:** If you add a new feature, please update the multilingual Wiki (`docs-site/src/`). 
 
 ---
 
-## 👨‍💻 Para Desarrolladores
+## 📄 License
 
-Si planeas compilar el plugin tú mismo, extender sus funcionales o si eres un agente IA intentando comprender cómo arreglar bugs dentro del ecosistema de ProtocolLib:
-
-👉 **[Lee la Documentación Técnica de Desarrollo y GitFlow (DEVELOPMENT.md)](docs/DEVELOPMENT.md)**
+This project is licensed under the [MIT License](LICENSE).
