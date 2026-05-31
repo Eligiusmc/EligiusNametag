@@ -33,6 +33,7 @@ public class EligiusNametagCommand {
                 .executes(EligiusNametagCommand::meNode));
 
         top.then(Commands.literal("help")
+                .requires(source -> source.getSender().hasPermission("eligiusnametag.admin"))
                 .executes(EligiusNametagCommand::helpNode));
                 
         top.then(Commands.literal("lang")
@@ -91,9 +92,11 @@ public class EligiusNametagCommand {
         if (nowEnabled) {
             msgStr = plugin.getConfigAdapter().getMessage("toggled_self_on");
             if (msgStr == null || msgStr.isEmpty()) msgStr = "<green>You can now see your own nametag.";
+            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
         } else {
             msgStr = plugin.getConfigAdapter().getMessage("toggled_self_off");
             if (msgStr == null || msgStr.isEmpty()) msgStr = "<red>You can no longer see your own nametag.";
+            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.5f);
         }
         
         player.sendMessage(MiniMessage.miniMessage().deserialize(msgStr));

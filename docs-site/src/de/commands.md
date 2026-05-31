@@ -10,6 +10,7 @@ Alle Standardbefehle basieren auf `/enametag` (oder den anpassbaren Aliasen `/el
 | Befehl | Beschreibung | Erforderliche Berechtigung |
 |--------|--------------|----------------------------|
 | `/enametag` | Zeigt die installierte Plugin-Version und das Autorenlogo an. | *Keine* |
+| `/enametag help` | Zeigt das Hilfemenü mit allen verfügbaren Befehlen an. | `eligiusnametag.admin` |
 | `/enametag reload` | Lädt alle Konfigurations- und YAML-Dateien in Echtzeit neu, ohne den Server neu zu starten. | `eligiusnametag.admin` |
 | `/enametag lang <sprache>` | Ändert die globale Plugin-Sprache dynamisch und lädt die Sprachen sofort neu. | `eligiusnametag.admin` |
 | `/enametag pets` | Schaltet global die Anzeige von Text-Hologrammen über Haustieren um. | `eligiusnametag.admin` |

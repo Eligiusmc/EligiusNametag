@@ -180,3 +180,21 @@ cd docs-site
 npm install
 npm run docs:dev
 ```
+
+---
+
+## 8. Technical Notes & Fixes (v1.3.0)
+
+### TextDisplay Animation Bug (Fly-in)
+By default, native `TextDisplay` entities interpolate movement and mounting. When spawning a `TextDisplay` while a player is moving quickly (sprinting/flying), the client receives the spawn coordinates at the server's tick location, but by the time the packet is processed, the player has moved. This creates a visual "fly-in" animation from behind the player to the mounting offset.
+
+**Solution: Tactical Invisibility:**
+To fix this, we set `entity.setTextOpacity((byte) 0);` in the spawn consumer. We then use a 2-tick delayed task (`runTaskLater`) to set the opacity back to 255 (`(byte) -1`). This allows the client to perform the mount interpolation while the text is completely invisible, resulting in a perfect pop-in appearance without visual lag.
+Additionally, we added `entity.setTeleportDuration(0)` and `entity.setInterpolationDuration(0)` to prevent native interpolation.
+
+### EntitiesUnloadEvent Memory Leak
+Non-persistent `TextDisplay` entities (`entity.setPersistent(false)`) are not saved to the chunk and are silently discarded by Bukkit when chunks unload. Because they are not explicitly removed by the server, their `isValid()` method might still return `true`, causing them to ghost in memory and break our `removeIf` cleanup logic on reload.
+
+**Solution:**
+We listen to `EntitiesUnloadEvent`, check for `Tameable` entities, and explicitly call `rendererAdapter.destroyNametag(e.getUniqueId())`, which forces `display.remove()` to properly deallocate the displays before the chunk unloads.
+

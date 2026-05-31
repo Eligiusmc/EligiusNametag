@@ -142,6 +142,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        rendererAdapter.destroyNametag(event.getPlayer().getUniqueId());
         rendererAdapter.clearViewer(event.getPlayer().getUniqueId());
     }
 
@@ -186,6 +187,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         for (org.bukkit.entity.Entity e : event.getEntities()) {
             if (e instanceof org.bukkit.entity.Tameable) {
                 platformAdapter.removeTamedMob(e.getUniqueId());
+                rendererAdapter.destroyNametag(e.getUniqueId());
             }
         }
     }
@@ -194,6 +196,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         if (event.getEntity() instanceof org.bukkit.entity.Tameable) {
             platformAdapter.removeTamedMob(event.getEntity().getUniqueId());
+            rendererAdapter.destroyNametag(event.getEntity().getUniqueId());
         }
     }
 

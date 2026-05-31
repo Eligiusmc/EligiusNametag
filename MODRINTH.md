@@ -42,6 +42,14 @@ Why should only players look good? **EligiusNametag** automatically extends the 
 
 ---
 
+## 🚀 What's New in v1.3.0
+* **Tactical Invisibility Engine:** Eliminated the native Minecraft "fly-in" visual interpolation bug! Now, even if you are flying with Elytras at lightspeed, your nametag will spawn instantly above your head without dragging from behind.
+* **Zero Ghost Entities:** Fixed a critical PaperMC memory leak with non-persistent `TextDisplays` by implementing explicit chunk unload garbage collection.
+* **Smart UI Feedback:** The `/enametag me` command now features Minecraft XP Orb audio cues.
+* **Robust Encoding:** Full UTF-8 support across 6 global languages out of the box, with an improved in-game update notifier.
+
+---
+
 ## 📚 Multi-Language Wiki
 We believe in accessible documentation. Our Official Wiki is fully translated into **6 languages** (English, Spanish, French, German, Portuguese, and Russian) so your entire administration team can configure it without friction.
 
