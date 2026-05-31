@@ -1,3 +1,8 @@
+---
+title: Instalación y Requisitos
+description: Aprende cómo instalar EligiusNametag en tu servidor Paper o Folia.
+---
+
 # Instalación y Requisitos
 
 EligiusNametag es un plugin moderno y potente. Al aprovechar las últimas características de la API de texto de Minecraft y el sistema de subprocesos múltiples, requiere un entorno actualizado.

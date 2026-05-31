@@ -1,18 +1,23 @@
-# Resolución de Problemas (Troubleshooting)
+---
+title: Troubleshooting
+description: Common issues and solutions when using EligiusNametag.
+---
 
-¿Tienes algún problema con EligiusNametag? Revisa estas soluciones comunes:
+# Troubleshooting
 
-### 1. El Nametag no aparece encima del jugador
-- **¿Tienes ProtocolLib instalado?** Nuestro plugin depende estrictamente de inyección de paquetes para que los nametags floten suavemente sin causar lag.
-- **¿Tienes PlaceholderAPI instalado?** Si usas variables como `%vault_rank%` y no tienes PAPI, el texto puede fallar en renderizarse.
+Having issues with EligiusNametag? Check these common solutions:
 
-### 2. Error de "Database Connection Closed"
-- Esto ha sido **solucionado en versiones recientes**. Asegúrate de estar corriendo la última versión `v1.x.x` o superior. Si usas **MySQL**, verifica que la IP y las credenciales en `config.yml` sean las correctas. De lo contrario, usa `SQLITE` local.
+### 1. The Nametag doesn't appear above the player
+- **Do you have ProtocolLib installed?** Our plugin strictly relies on packet injection so nametags float smoothly without causing lag.
+- **Do you have PlaceholderAPI installed?** If you use variables like `%vault_rank%` and don't have PAPI, the text might fail to render.
 
-### 3. Advertencias de ViaVersion en la Consola
-Si usas ViaVersion para permitir que jugadores con la 1.20 entren a tu servidor 1.21+, podrías ver mensajes sobre *Metadata* y *Protocol Versions*.
-- **Causa:** El cliente antiguo (ej. 1.20.2) no tiene el código nativo para procesar bien entidades grandes de `TEXT_DISPLAY`.
-- **Solución:** Recomendamos encarecidamente que exijas versiones 1.21+ para la visualización perfecta de hologramas, o ignores la advertencia si el jugador no presenta crasheos visuales.
+### 2. "Database Connection Closed" Error
+- This has been **fixed in recent versions**. Ensure you are running the latest version `v1.x.x` or higher. If you use **MySQL**, verify that the IP and credentials in `config.yml` are correct. Otherwise, use local `SQLITE`.
 
-### 4. /enametag lang no actualiza el mensaje de ayuda
-Al usar `/enametag lang en`, el plugin lee de `lang/en.yml`. Si notas que alguna traducción está vacía o un comando se comporta raro, puedes borrar la carpeta `lang/` en tu directorio de plugins para que EligiusNametag la re-genere limpiamente con los últimos estándares.
+### 3. ViaVersion Warnings in Console
+If you use ViaVersion to allow players on 1.20 to join your 1.21+ server, you might see messages about *Metadata* and *Protocol Versions*.
+- **Cause:** The old client (e.g., 1.20.2) lacks the native code to properly process large `TEXT_DISPLAY` entities.
+- **Solution:** We highly recommend requiring 1.21+ versions for perfect hologram visualization, or simply ignore the warning if the player experiences no visual crashes.
+
+### 4. /enametag lang doesn't update the help message
+When using `/enametag lang en`, the plugin reads from `lang/en.yml`. If you notice a translation is empty or a command acts weird, you can delete the `lang/` folder in your plugins directory so EligiusNametag can regenerate it cleanly with the latest standards.

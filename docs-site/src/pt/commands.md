@@ -1,16 +1,21 @@
-# Comandos y Permisos
+---
+title: Comandos e Permissões
+description: Veja todos os comandos e permissões disponíveis para o EligiusNametag.
+---
 
-Todos los comandos por defecto se basan en `/enametag` (o sus alias personalizables `/eltag` y `/eligiusnametag`).
+# Comandos e Permissões
 
-| Comando | Descripción | Permiso Requerido |
-|---|---|---|
-| `/enametag` | Muestra la versión del plugin instalada y el logo del autor. | *Ninguno* |
-| `/enametag reload` | Recarga toda la configuración y los archivos YAML en tiempo real, sin reiniciar el servidor. | `eligiusnametag.admin` |
-| `/enametag lang <idioma>` | Cambia el idioma global del plugin dinámicamente y recarga los lenguajes al instante. | `eligiusnametag.admin` |
-| `/enametag pets` | Alterna globalmente la habilitación de los hologramas de texto sobre las mascotas. | `eligiusnametag.admin` |
-| `/enametag me` | Activa o desactiva de manera personal la visualización de tu propio nametag (Guardado automático en DB). | `eligiusnametag.viewself` |
+Todos os comandos padrão são baseados em `/enametag` (ou seus aliases personalizáveis `/eltag` e `/eligiusnametag`).
 
-## Detalles de Permisos Adicionales
+| Comando | Descrição | Permissão Necessária |
+|---------|-------------|----------------------|
+| `/enametag` | Exibe a versão do plugin instalada e o logotipo do autor. | *Nenhuma* |
+| `/enametag reload` | Recarrega todas as configurações e arquivos YAML em tempo real, sem reiniciar o servidor. | `eligiusnametag.admin` |
+| `/enametag lang <idioma>` | Muda dinamicamente o idioma global do plugin e recarrega os idiomas instantaneamente. | `eligiusnametag.admin` |
+| `/enametag pets` | Alterna globalmente a exibição de hologramas de texto acima dos pets. | `eligiusnametag.admin` |
+| `/enametag me` | Alterna pessoalmente a exibição da sua própria nametag (Salvo automaticamente no banco de dados). | `eligiusnametag.viewself` |
 
-- `eligiusnametag.*`: Otorga acceso total a todos los comandos de administración.
-- *Nota:* Si tienes LuckPerms, no olvides asignar el permiso principal a tu grupo *default* o *admin* para que las variables de formato se sincronicen correctamente.
+## Detalhes Adicionais de Permissão
+
+- `eligiusnametag.*`: Concede acesso total a todos os comandos de administração.
+- *Nota:* Se você usa LuckPerms, não se esqueça de atribuir a permissão principal ao seu grupo *default* ou *admin* para que as variáveis de formatação sejam sincronizadas corretamente.

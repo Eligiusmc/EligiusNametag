@@ -1,3 +1,8 @@
+---
+title: Resolución de Problemas
+description: Problemas comunes y soluciones al usar EligiusNametag.
+---
+
 # Resolución de Problemas (Troubleshooting)
 
 ¿Tienes algún problema con EligiusNametag? Revisa estas soluciones comunes:

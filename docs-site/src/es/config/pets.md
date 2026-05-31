@@ -1,3 +1,8 @@
+---
+title: Mascotas Holográficas
+description: Cómo configurar los nametags de mascotas en pets.yml.
+---
+
 # Mascotas Holográficas (pets.yml)
 
 El sistema de mascotas es una de las características más innovadoras de EligiusNametag. Con él, cualquier lobo, loro, o gato domado por un jugador recibirá un nametag holográfico flotante que sigue a la mascota fluidamente.

@@ -1,56 +1,61 @@
-# Diseños de Jugadores (players.yml)
+---
+title: Дизайны игроков
+description: Настройте пользовательские дизайны MiniMessage и Vault в players.yml.
+---
 
-Aquí es donde ocurre la magia visual. El archivo `players.yml` te permite definir **grupos ilimitados** usando el moderno motor de *MiniMessage*, interpolado con la versatilidad de *PlaceholderAPI*.
+# Дизайны игроков (players.yml)
+
+Здесь происходит визуальная магия. Файл `players.yml` позволяет вам определять **неограниченное количество групп** с использованием современного движка *MiniMessage*, интерполированного с универсальностью *PlaceholderAPI*.
 
 ---
 
-## 🎨 Entendiendo MiniMessage
+## 🎨 Понимание MiniMessage
 
-En lugar de usar los antiguos y limitados códigos de color como `&c` o `&l`, ahora puedes usar etiquetas HTML súper descriptivas.
+Вместо использования старых и ограниченных цветовых кодов, таких как `&c` или `&l`, теперь вы можете использовать очень подробные HTML-теги.
 
-| Etiqueta | Resultado |
-|----------|-----------|
-| `<red>` | Texto en color rojo puro |
-| `<#ff00ff>` | Texto usando código HEX personalizado |
-| `<bold>` | Texto en **negrita** |
-| `<gradient:red:blue>` | Genera una transición suave entre dos o más colores |
+| Тег | Результат |
+|-----|-----------|
+| `<red>` | Чисто красный текст |
+| `<#ff00ff>` | Текст с использованием пользовательского HEX-кода |
+| `<bold>` | **Жирный** текст |
+| `<gradient:red:blue>` | Создает плавный переход между двумя или более цветами |
 
 ---
 
-## 👥 Formato por Defecto (Default)
+## 👥 Формат по умолчанию
 
-Cualquier usuario que no calce en ninguna jerarquía de rangos caerá en este diseño:
+Любой пользователь, который не попадает в иерархию рангов, получит этот дизайн:
 
 ```yaml
 players:
   default_format:
-    - "<yellow>Jugador</yellow>"
+    - "<yellow>Игрок</yellow>"
     - "<white><PLAYER></white>"
 ```
-*Notarás que puedes crear tantas líneas como desees simplemente añadiendo guiones (`-`) a la lista.*
+*Вы заметите, что можете создать столько строк, сколько хотите, просто добавляя дефисы (`-`) в список.*
 
 ---
 
-## 👑 Rangos y Vault Avanzados
+## 👑 Продвинутые ранги и Vault
 
-Puedes crear grupos de nametag que coincidan exactamente con el nombre de tu rango en **LuckPerms** (o cualquier otro sistema de permisos compatible con Vault). El plugin lee el rango principal (*Primary Group*) del jugador y busca su equivalente aquí.
+Вы можете создавать группы неймтегов, которые точно соответствуют вашему названию ранга в **LuckPerms** (или любой другой системе прав, совместимой с Vault). Плагин считывает главную группу игрока (*Primary Group*) и ищет её эквивалент здесь.
 
 ```yaml
   groups:
     vip:
-      - "<gradient:gold:yellow>⭐ Usuario VIP</gradient>"
+      - "<gradient:gold:yellow>⭐ VIP Пользователь</gradient>"
       - "<white><PLAYER></white>"
     admin:
-      - "<red>:rank_dev: Administrador Supremo</red>"
+      - "<red>:rank_dev: Верховный Админ</red>"
       - "<gradient:red:dark_red><bold><PLAYER></bold></gradient>"
 ```
 
-### 🖼️ Integración con ItemsAdder / Oraxen
+### 🖼️ Интеграция с ItemsAdder / Oraxen
 
-Si observas detenidamente el formato de `admin`, notarás el texto `:rank_dev:`. 
+Если вы внимательно посмотрите на формат `admin`, вы заметите текст `:rank_dev:`. 
 
-Si tienes **ItemsAdder** o cualquier Resource Pack instalado en tu servidor, el cliente del jugador leerá esto y reemplazará automáticamente los dos puntos por una **imagen de fuente real** renderizada sobre la cabeza del administrador.
+Если у вас установлен **ItemsAdder** или любой ресурс-пак на вашем сервере, клиент игрока прочитает это и автоматически заменит двоеточия на **настоящее изображение шрифта**, отображаемое над головой администратора.
 
-::: tip 💡 CONSEJO DE DISEÑO
-Evita hacer Nametags de más de 3 líneas para los jugadores comunes. Excesivas líneas pueden obstruir la visión en pvp o en construcciones densas.
+::: tip 💡 СОВЕТ ПО ДИЗАЙНУ
+Избегайте создания неймтегов более чем в 3 строки для обычных игроков. Избыточное количество строк может закрывать обзор в PvP или в плотных постройках.
 :::

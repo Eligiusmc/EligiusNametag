@@ -1,3 +1,8 @@
+---
+title: Configuración Global
+description: Aprende cómo configurar EligiusNametag globalmente vía config.yml.
+---
+
 # Configuración Global (config.yml)
 
 El archivo `config.yml` es el cerebro del plugin. Controla cómo el plugin interactúa con tu servidor a nivel macro, afectando a todos los jugadores por igual.

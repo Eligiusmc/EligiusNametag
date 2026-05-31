@@ -1,8 +1,13 @@
-# Mascotas Holográficas (pets.yml)
+---
+title: Голографические питомцы
+description: Как настроить неймтеги питомцев в pets.yml.
+---
 
-El sistema de mascotas es una de las características más innovadoras de EligiusNametag. Con él, cualquier lobo, loro, o gato domado por un jugador recibirá un nametag holográfico flotante que sigue a la mascota fluidamente.
+# Голографические питомцы (pets.yml)
 
-### Configuración Base
+Система питомцев — одна из самых инновационных функций EligiusNametag. С её помощью любой волк, попугай или кошка, прирученные игроком, получат плавающий голографический неймтег, который плавно следует за питомцем.
+
+### Базовая конфигурация
 
 ```yaml
 pets:
@@ -10,18 +15,18 @@ pets:
   show_unnamed: false 
 ```
 
-- Si `show_unnamed` está en `true`, incluso un lobo genérico domado tendrá un holograma de texto. 
-- Si lo pones en `false`, solo las mascotas que el jugador renombre usando un **Yunque** (Name Tag vanilla) activarán el sistema holográfico para conservar un estilo más Vanilla en el servidor general.
+- Если `show_unnamed` установлено на `true`, даже у обычного прирученного волка будет текстовая голограмма. 
+- Если установлено на `false`, только питомцы, которых игрок переименовывает с помощью **Наковальни** (ванильная Бирка), активируют голографическую систему, чтобы сохранить более ванильный стиль на общем сервере.
 
-### Diseño de las Líneas
-Usa `<DISPLAYNAME>` para mostrar el nombre que le puso el jugador en el yunque y `<PLAYER>` para citar al dueño.
+### Дизайн строк
+Используйте `<DISPLAYNAME>`, чтобы показать имя, которое игрок дал ему в наковальне, и `<PLAYER>`, чтобы процитировать владельца.
 
 ```yaml
   default_format:
-    - "<gray>Mascota de <PLAYER></gray>"
+    - "<gray>Питомец <PLAYER></gray>"
     - "<white><DISPLAYNAME></white>"
 ```
 
-### 🐾 ¡El secreto más importante!
-Las mascotas **heredan** el diseño del rango Vault de su dueño.
-Esto quiere decir que si el dueño de un gato tiene rango "Admin" en `players.yml`, y el rango Admin tiene un texto rojo y un ícono de fuego, **el gato también lucirá el texto rojo y el ícono de fuego** en su variable de grupo (si lo configuras así cruzando variables PAPI o permisos de LuckPerms a nivel del nodo `<PLAYER>`).
+### 🐾 Самый большой секрет!
+Питомцы **наследуют** дизайн ранга Vault своего владельца.
+Это означает, что если владелец кошки имеет ранг "Admin" в `players.yml`, и ранг Admin имеет красный текст и значок огня, **кошка также будет показывать красный текст и значок огня** в своей переменной группы (если вы настроите это так, пересекая переменные PAPI или права LuckPerms на уровне узла `<PLAYER>`).

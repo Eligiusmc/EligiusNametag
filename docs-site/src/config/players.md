@@ -1,56 +1,61 @@
-# Diseños de Jugadores (players.yml)
+---
+title: Player Designs
+description: Configure custom MiniMessage and Vault designs in players.yml.
+---
 
-Aquí es donde ocurre la magia visual. El archivo `players.yml` te permite definir **grupos ilimitados** usando el moderno motor de *MiniMessage*, interpolado con la versatilidad de *PlaceholderAPI*.
+# Player Designs (players.yml)
+
+This is where the visual magic happens. The `players.yml` file allows you to define **unlimited groups** using the modern *MiniMessage* engine, interpolated with the versatility of *PlaceholderAPI*.
 
 ---
 
-## 🎨 Entendiendo MiniMessage
+## 🎨 Understanding MiniMessage
 
-En lugar de usar los antiguos y limitados códigos de color como `&c` o `&l`, ahora puedes usar etiquetas HTML súper descriptivas.
+Instead of using old and limited color codes like `&c` or `&l`, you can now use highly descriptive HTML tags.
 
-| Etiqueta | Resultado |
-|----------|-----------|
-| `<red>` | Texto en color rojo puro |
-| `<#ff00ff>` | Texto usando código HEX personalizado |
-| `<bold>` | Texto en **negrita** |
-| `<gradient:red:blue>` | Genera una transición suave entre dos o más colores |
+| Tag | Result |
+|-----|--------|
+| `<red>` | Pure red text |
+| `<#ff00ff>` | Text using custom HEX code |
+| `<bold>` | **Bold** text |
+| `<gradient:red:blue>` | Generates a smooth transition between two or more colors |
 
 ---
 
-## 👥 Formato por Defecto (Default)
+## 👥 Default Format
 
-Cualquier usuario que no calce en ninguna jerarquía de rangos caerá en este diseño:
+Any user who does not fit into a rank hierarchy will fall into this design:
 
 ```yaml
 players:
   default_format:
-    - "<yellow>Jugador</yellow>"
+    - "<yellow>Player</yellow>"
     - "<white><PLAYER></white>"
 ```
-*Notarás que puedes crear tantas líneas como desees simplemente añadiendo guiones (`-`) a la lista.*
+*You will notice that you can create as many lines as you want simply by adding hyphens (`-`) to the list.*
 
 ---
 
-## 👑 Rangos y Vault Avanzados
+## 👑 Advanced Ranks & Vault
 
-Puedes crear grupos de nametag que coincidan exactamente con el nombre de tu rango en **LuckPerms** (o cualquier otro sistema de permisos compatible con Vault). El plugin lee el rango principal (*Primary Group*) del jugador y busca su equivalente aquí.
+You can create nametag groups that exactly match your rank name in **LuckPerms** (or any other Vault-compatible permission system). The plugin reads the player's *Primary Group* and looks for its equivalent here.
 
 ```yaml
   groups:
     vip:
-      - "<gradient:gold:yellow>⭐ Usuario VIP</gradient>"
+      - "<gradient:gold:yellow>⭐ VIP User</gradient>"
       - "<white><PLAYER></white>"
     admin:
-      - "<red>:rank_dev: Administrador Supremo</red>"
+      - "<red>:rank_dev: Supreme Admin</red>"
       - "<gradient:red:dark_red><bold><PLAYER></bold></gradient>"
 ```
 
-### 🖼️ Integración con ItemsAdder / Oraxen
+### 🖼️ Integration with ItemsAdder / Oraxen
 
-Si observas detenidamente el formato de `admin`, notarás el texto `:rank_dev:`. 
+If you look closely at the `admin` format, you'll notice the text `:rank_dev:`. 
 
-Si tienes **ItemsAdder** o cualquier Resource Pack instalado en tu servidor, el cliente del jugador leerá esto y reemplazará automáticamente los dos puntos por una **imagen de fuente real** renderizada sobre la cabeza del administrador.
+If you have **ItemsAdder** or any Resource Pack installed on your server, the player's client will read this and automatically replace the colons with an **actual font image** rendered above the admin's head.
 
-::: tip 💡 CONSEJO DE DISEÑO
-Evita hacer Nametags de más de 3 líneas para los jugadores comunes. Excesivas líneas pueden obstruir la visión en pvp o en construcciones densas.
+::: tip 💡 DESIGN TIP
+Avoid making Nametags more than 3 lines long for regular players. Excessive lines can obstruct vision in PvP or dense builds.
 :::

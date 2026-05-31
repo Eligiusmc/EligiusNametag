@@ -1,28 +1,33 @@
-# Instalación y Requisitos
+---
+title: Installation und Anforderungen
+description: Erfahren Sie, wie Sie EligiusNametag auf Ihrem Paper- oder Folia-Server installieren.
+---
 
-EligiusNametag es un plugin moderno y potente. Al aprovechar las últimas características de la API de texto de Minecraft y el sistema de subprocesos múltiples, requiere un entorno actualizado.
+# Installation und Anforderungen
 
-## 📋 Requisitos del Sistema
+EligiusNametag ist ein modernes und leistungsstarkes Plugin. Da es die neuesten Funktionen der Minecraft Text-API und Multi-Threading nutzt, erfordert es eine aktuelle Umgebung.
 
-| Requisito | Versión Mínima | Razón |
-|-----------|---------------|-------|
-| **Plataforma** | Paper 1.21 o Folia 1.21+ | Uso estricto de componentes `TEXT_DISPLAY` y comandos Brigadier. |
-| **Java** | Java 21 LTS | Código fuente compilado en formato JDK 21. |
+## 📋 Systemanforderungen
 
-## 📦 Dependencias
+| Anforderung | Mindestversion | Grund |
+|-------------|----------------|-------|
+| **Plattform** | Paper 1.21 oder Folia 1.21+ | Strikte Verwendung von `TEXT_DISPLAY` Komponenten und Brigadier-Befehlen. |
+| **Java** | Java 21 LTS | Quellcode im JDK 21-Format kompiliert. |
 
-Debes tener instalados los siguientes plugins en tu carpeta `plugins/`:
+## 📦 Abhängigkeiten
 
-1. **ProtocolLib** *(Obligatorio)*: Utilizado para enviar los paquetes de hologramas de manera invisible y sin consumo de TPS físicos.
-2. **Vault** *(Opcional)*: Si deseas otorgar diseños de nametag específicos dependiendo del rango del usuario (Admin, VIP, etc.).
-3. **PlaceholderAPI** *(Opcional)*: Para parsear variables externas como estadísticas, dinero o clanes en los nametags.
-4. **ItemsAdder** *(Opcional)*: Para mostrar emojis personalizados en los nombres.
+Sie müssen die folgenden Plugins in Ihrem `plugins/` Ordner installiert haben:
 
-## 🚀 Pasos de Instalación
+1. **ProtocolLib** *(Erforderlich)*: Wird verwendet, um Hologrammpakete unsichtbar zu senden, ohne physische TPS zu verbrauchen.
+2. **Vault** *(Optional)*: Wenn Sie spezifische Nametag-Designs abhängig vom Rang des Benutzers (Admin, VIP usw.) vergeben möchten.
+3. **PlaceholderAPI** *(Optional)*: Um externe Variablen wie Statistiken, Geld oder Clans in den Nametags zu parsen.
+4. **ItemsAdder** *(Optional)*: Um benutzerdefinierte Emojis in Namen anzuzeigen.
 
-1. Descarga el archivo `EligiusNametag-1.x.x.jar` desde la pestaña **Releases**.
-2. Copia el archivo en el directorio `plugins/` de tu servidor.
-3. Asegúrate de tener **ProtocolLib** instalado.
-4. Inicia tu servidor.
-5. Verás en la consola la animación de inicio con el gato de Eligius MC confirmando que el plugin se ha conectado.
-6. ¡Listo! Puedes configurar todo desde `plugins/EligiusNametag/`.
+## 🚀 Installationsschritte
+
+1. Laden Sie die Datei `EligiusNametag-1.x.x.jar` aus dem **Releases** Tab herunter.
+2. Kopieren Sie die Datei in das `plugins/` Verzeichnis Ihres Servers.
+3. Stellen Sie sicher, dass **ProtocolLib** installiert ist.
+4. Starten Sie Ihren Server.
+5. Sie sehen die Startanimation in der Konsole mit der Eligius MC Katze, die bestätigt, dass sich das Plugin erfolgreich verbunden hat.
+6. Fertig! Sie können alles in `plugins/EligiusNametag/` konfigurieren.

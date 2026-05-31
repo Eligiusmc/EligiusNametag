@@ -1,56 +1,61 @@
-# Diseños de Jugadores (players.yml)
+---
+title: Designs des Joueurs
+description: Configurez les designs personnalisés MiniMessage et Vault dans players.yml.
+---
 
-Aquí es donde ocurre la magia visual. El archivo `players.yml` te permite definir **grupos ilimitados** usando el moderno motor de *MiniMessage*, interpolado con la versatilidad de *PlaceholderAPI*.
+# Designs des Joueurs (players.yml)
+
+C'est ici que la magie visuelle opère. Le fichier `players.yml` vous permet de définir **des groupes illimités** en utilisant le moteur moderne *MiniMessage*, interpolé avec la polyvalence de *PlaceholderAPI*.
 
 ---
 
-## 🎨 Entendiendo MiniMessage
+## 🎨 Comprendre MiniMessage
 
-En lugar de usar los antiguos y limitados códigos de color como `&c` o `&l`, ahora puedes usar etiquetas HTML súper descriptivas.
+Au lieu d'utiliser d'anciens codes couleur limités comme `&c` ou `&l`, vous pouvez désormais utiliser des balises HTML hautement descriptives.
 
-| Etiqueta | Resultado |
-|----------|-----------|
-| `<red>` | Texto en color rojo puro |
-| `<#ff00ff>` | Texto usando código HEX personalizado |
-| `<bold>` | Texto en **negrita** |
-| `<gradient:red:blue>` | Genera una transición suave entre dos o más colores |
+| Balise | Résultat |
+|--------|----------|
+| `<red>` | Texte en rouge pur |
+| `<#ff00ff>` | Texte utilisant un code HEX personnalisé |
+| `<bold>` | Texte en **gras** |
+| `<gradient:red:blue>` | Génère une transition fluide entre deux ou plusieurs couleurs |
 
 ---
 
-## 👥 Formato por Defecto (Default)
+## 👥 Format par Défaut
 
-Cualquier usuario que no calce en ninguna jerarquía de rangos caerá en este diseño:
+Tout utilisateur qui ne correspond pas à une hiérarchie de rangs tombera dans ce design :
 
 ```yaml
 players:
   default_format:
-    - "<yellow>Jugador</yellow>"
+    - "<yellow>Joueur</yellow>"
     - "<white><PLAYER></white>"
 ```
-*Notarás que puedes crear tantas líneas como desees simplemente añadiendo guiones (`-`) a la lista.*
+*Vous remarquerez que vous pouvez créer autant de lignes que vous le souhaitez en ajoutant simplement des tirets (`-`) à la liste.*
 
 ---
 
-## 👑 Rangos y Vault Avanzados
+## 👑 Rangs Avancés & Vault
 
-Puedes crear grupos de nametag que coincidan exactamente con el nombre de tu rango en **LuckPerms** (o cualquier otro sistema de permisos compatible con Vault). El plugin lee el rango principal (*Primary Group*) del jugador y busca su equivalente aquí.
+Vous pouvez créer des groupes de nametag qui correspondent exactement à votre nom de rang dans **LuckPerms** (ou tout autre système de permissions compatible avec Vault). Le plugin lit le rang principal (*Primary Group*) du joueur et cherche son équivalent ici.
 
 ```yaml
   groups:
     vip:
-      - "<gradient:gold:yellow>⭐ Usuario VIP</gradient>"
+      - "<gradient:gold:yellow>⭐ Utilisateur VIP</gradient>"
       - "<white><PLAYER></white>"
     admin:
-      - "<red>:rank_dev: Administrador Supremo</red>"
+      - "<red>:rank_dev: Admin Suprême</red>"
       - "<gradient:red:dark_red><bold><PLAYER></bold></gradient>"
 ```
 
-### 🖼️ Integración con ItemsAdder / Oraxen
+### 🖼️ Intégration avec ItemsAdder / Oraxen
 
-Si observas detenidamente el formato de `admin`, notarás el texto `:rank_dev:`. 
+Si vous regardez attentivement le format `admin`, vous remarquerez le texte `:rank_dev:`. 
 
-Si tienes **ItemsAdder** o cualquier Resource Pack instalado en tu servidor, el cliente del jugador leerá esto y reemplazará automáticamente los dos puntos por una **imagen de fuente real** renderizada sobre la cabeza del administrador.
+Si vous avez **ItemsAdder** ou tout autre pack de ressources installé sur votre serveur, le client du joueur lira ceci et remplacera automatiquement les deux-points par une **véritable image de police** rendue au-dessus de la tête de l'administrateur.
 
-::: tip 💡 CONSEJO DE DISEÑO
-Evita hacer Nametags de más de 3 líneas para los jugadores comunes. Excesivas líneas pueden obstruir la visión en pvp o en construcciones densas.
+::: tip 💡 CONSEIL DE DESIGN
+Évitez de faire des Nametags de plus de 3 lignes pour les joueurs réguliers. Des lignes excessives peuvent obstruer la vision en JcJ ou dans les constructions denses.
 :::

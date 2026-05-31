@@ -1,8 +1,13 @@
-# Mascotas Holográficas (pets.yml)
+---
+title: Pets Holográficos
+description: Como configurar as nametags dos pets no pets.yml.
+---
 
-El sistema de mascotas es una de las características más innovadoras de EligiusNametag. Con él, cualquier lobo, loro, o gato domado por un jugador recibirá un nametag holográfico flotante que sigue a la mascota fluidamente.
+# Pets Holográficos (pets.yml)
 
-### Configuración Base
+O sistema de pets é uma das características mais inovadoras do EligiusNametag. Com ele, qualquer lobo, papagaio ou gato domado por um jogador receberá uma nametag holográfica flutuante que segue o pet suavemente.
+
+### Configuração Base
 
 ```yaml
 pets:
@@ -10,18 +15,18 @@ pets:
   show_unnamed: false 
 ```
 
-- Si `show_unnamed` está en `true`, incluso un lobo genérico domado tendrá un holograma de texto. 
-- Si lo pones en `false`, solo las mascotas que el jugador renombre usando un **Yunque** (Name Tag vanilla) activarán el sistema holográfico para conservar un estilo más Vanilla en el servidor general.
+- Se `show_unnamed` estiver `true`, mesmo um lobo domado genérico terá um holograma de texto. 
+- Se estiver `false`, apenas os pets que o jogador renomear usando uma **Bigorna** (Name Tag vanilla) ativarão o sistema holográfico, para conservar um estilo mais Vanilla no servidor geral.
 
-### Diseño de las Líneas
-Usa `<DISPLAYNAME>` para mostrar el nombre que le puso el jugador en el yunque y `<PLAYER>` para citar al dueño.
+### Design das Linhas
+Use `<DISPLAYNAME>` para mostrar o nome que o jogador deu na bigorna, e `<PLAYER>` para citar o dono.
 
 ```yaml
   default_format:
-    - "<gray>Mascota de <PLAYER></gray>"
+    - "<gray>Pet de <PLAYER></gray>"
     - "<white><DISPLAYNAME></white>"
 ```
 
-### 🐾 ¡El secreto más importante!
-Las mascotas **heredan** el diseño del rango Vault de su dueño.
-Esto quiere decir que si el dueño de un gato tiene rango "Admin" en `players.yml`, y el rango Admin tiene un texto rojo y un ícono de fuego, **el gato también lucirá el texto rojo y el ícono de fuego** en su variable de grupo (si lo configuras así cruzando variables PAPI o permisos de LuckPerms a nivel del nodo `<PLAYER>`).
+### 🐾 O Maior Segredo!
+Os pets **herdam** o design do rank Vault de seu dono.
+Isso significa que se o dono de um gato tiver o rank "Admin" no `players.yml`, e o rank Admin tiver um texto vermelho e um ícone de fogo, **o gato também exibirá o texto vermelho e o ícone de fogo** na sua variável de grupo (se você configurá-lo dessa maneira cruzando variáveis PAPI ou permissões LuckPerms no nível do nó `<PLAYER>`).

@@ -1,8 +1,13 @@
-# Mascotas Holográficas (pets.yml)
+---
+title: Holografische Haustiere
+description: So konfigurieren Sie Haustier-Nametags in der pets.yml.
+---
 
-El sistema de mascotas es una de las características más innovadoras de EligiusNametag. Con él, cualquier lobo, loro, o gato domado por un jugador recibirá un nametag holográfico flotante que sigue a la mascota fluidamente.
+# Holografische Haustiere (pets.yml)
 
-### Configuración Base
+Das Haustiersystem ist eine der innovativsten Funktionen von EligiusNametag. Damit erhält jeder Wolf, Papagei oder Katze, der von einem Spieler gezähmt wurde, ein schwebendes holografisches Nametag, das dem Haustier reibungslos folgt.
+
+### Basis-Konfiguration
 
 ```yaml
 pets:
@@ -10,18 +15,18 @@ pets:
   show_unnamed: false 
 ```
 
-- Si `show_unnamed` está en `true`, incluso un lobo genérico domado tendrá un holograma de texto. 
-- Si lo pones en `false`, solo las mascotas que el jugador renombre usando un **Yunque** (Name Tag vanilla) activarán el sistema holográfico para conservar un estilo más Vanilla en el servidor general.
+- Wenn `show_unnamed` auf `true` steht, erhält selbst ein generischer gezähmter Wolf ein Text-Hologramm. 
+- Wenn es auf `false` gesetzt ist, aktivieren nur Haustiere, die der Spieler mit einem **Amboss** (Vanilla Name Tag) umbenennt, das holografische System, um einen Vanilla-ähnlicheren Stil auf dem allgemeinen Server beizubehalten.
 
-### Diseño de las Líneas
-Usa `<DISPLAYNAME>` para mostrar el nombre que le puso el jugador en el yunque y `<PLAYER>` para citar al dueño.
+### Zeilendesign
+Verwenden Sie `<DISPLAYNAME>`, um den Namen anzuzeigen, den der Spieler ihm im Amboss gegeben hat, und `<PLAYER>`, um den Besitzer zu zitieren.
 
 ```yaml
   default_format:
-    - "<gray>Mascota de <PLAYER></gray>"
+    - "<gray>Haustier von <PLAYER></gray>"
     - "<white><DISPLAYNAME></white>"
 ```
 
-### 🐾 ¡El secreto más importante!
-Las mascotas **heredan** el diseño del rango Vault de su dueño.
-Esto quiere decir que si el dueño de un gato tiene rango "Admin" en `players.yml`, y el rango Admin tiene un texto rojo y un ícono de fuego, **el gato también lucirá el texto rojo y el ícono de fuego** en su variable de grupo (si lo configuras así cruzando variables PAPI o permisos de LuckPerms a nivel del nodo `<PLAYER>`).
+### 🐾 Das größte Geheimnis!
+Haustiere **erben** das Vault-Rangdesign ihres Besitzers.
+Das bedeutet: Wenn der Besitzer einer Katze den Rang "Admin" in der `players.yml` hat, und der Admin-Rang roten Text und ein Feuersymbol aufweist, **zeigt die Katze ebenfalls den roten Text und das Feuersymbol** in ihrer Gruppenvariable (wenn Sie dies so konfigurieren, indem Sie PAPI-Variablen oder LuckPerms-Berechtigungen auf der Ebene des `<PLAYER>` Knotens kreuzen).

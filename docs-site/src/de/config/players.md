@@ -1,56 +1,61 @@
-# Diseños de Jugadores (players.yml)
+---
+title: Spieler Designs
+description: Konfigurieren Sie benutzerdefinierte MiniMessage- und Vault-Designs in der players.yml.
+---
 
-Aquí es donde ocurre la magia visual. El archivo `players.yml` te permite definir **grupos ilimitados** usando el moderno motor de *MiniMessage*, interpolado con la versatilidad de *PlaceholderAPI*.
+# Spieler Designs (players.yml)
+
+Hier passiert die visuelle Magie. Die Datei `players.yml` ermöglicht es Ihnen, **unbegrenzte Gruppen** mit der modernen *MiniMessage* Engine zu definieren, interpoliert mit der Vielseitigkeit der *PlaceholderAPI*.
 
 ---
 
-## 🎨 Entendiendo MiniMessage
+## 🎨 MiniMessage verstehen
 
-En lugar de usar los antiguos y limitados códigos de color como `&c` o `&l`, ahora puedes usar etiquetas HTML súper descriptivas.
+Anstatt alte und eingeschränkte Farbcodes wie `&c` oder `&l` zu verwenden, können Sie nun hochgradig deskriptive HTML-Tags verwenden.
 
-| Etiqueta | Resultado |
-|----------|-----------|
-| `<red>` | Texto en color rojo puro |
-| `<#ff00ff>` | Texto usando código HEX personalizado |
-| `<bold>` | Texto en **negrita** |
-| `<gradient:red:blue>` | Genera una transición suave entre dos o más colores |
+| Tag | Ergebnis |
+|-----|----------|
+| `<red>` | Rein roter Text |
+| `<#ff00ff>` | Text mit benutzerdefiniertem HEX-Code |
+| `<bold>` | **Fetter** Text |
+| `<gradient:red:blue>` | Erzeugt einen reibungslosen Übergang zwischen zwei oder mehr Farben |
 
 ---
 
-## 👥 Formato por Defecto (Default)
+## 👥 Standardformat
 
-Cualquier usuario que no calce en ninguna jerarquía de rangos caerá en este diseño:
+Jeder Benutzer, der in keine Ranghierarchie passt, fällt in dieses Design:
 
 ```yaml
 players:
   default_format:
-    - "<yellow>Jugador</yellow>"
+    - "<yellow>Spieler</yellow>"
     - "<white><PLAYER></white>"
 ```
-*Notarás que puedes crear tantas líneas como desees simplemente añadiendo guiones (`-`) a la lista.*
+*Sie werden feststellen, dass Sie so viele Zeilen erstellen können, wie Sie möchten, indem Sie einfach Bindestriche (`-`) zur Liste hinzufügen.*
 
 ---
 
-## 👑 Rangos y Vault Avanzados
+## 👑 Fortgeschrittene Ränge & Vault
 
-Puedes crear grupos de nametag que coincidan exactamente con el nombre de tu rango en **LuckPerms** (o cualquier otro sistema de permisos compatible con Vault). El plugin lee el rango principal (*Primary Group*) del jugador y busca su equivalente aquí.
+Sie können Nametag-Gruppen erstellen, die exakt Ihrem Rangnamen in **LuckPerms** (oder einem anderen Vault-kompatiblen Berechtigungssystem) entsprechen. Das Plugin liest die *Primary Group* (Hauptgruppe) des Spielers und sucht hier nach deren Entsprechung.
 
 ```yaml
   groups:
     vip:
-      - "<gradient:gold:yellow>⭐ Usuario VIP</gradient>"
+      - "<gradient:gold:yellow>⭐ VIP Benutzer</gradient>"
       - "<white><PLAYER></white>"
     admin:
-      - "<red>:rank_dev: Administrador Supremo</red>"
+      - "<red>:rank_dev: Oberster Admin</red>"
       - "<gradient:red:dark_red><bold><PLAYER></bold></gradient>"
 ```
 
-### 🖼️ Integración con ItemsAdder / Oraxen
+### 🖼️ Integration mit ItemsAdder / Oraxen
 
-Si observas detenidamente el formato de `admin`, notarás el texto `:rank_dev:`. 
+Wenn Sie sich das `admin` Format genau ansehen, werden Sie den Text `:rank_dev:` bemerken. 
 
-Si tienes **ItemsAdder** o cualquier Resource Pack instalado en tu servidor, el cliente del jugador leerá esto y reemplazará automáticamente los dos puntos por una **imagen de fuente real** renderizada sobre la cabeza del administrador.
+Wenn Sie **ItemsAdder** oder ein beliebiges Ressourcenpaket auf Ihrem Server installiert haben, liest der Client des Spielers dies und ersetzt die Doppelpunkte automatisch durch ein **echtes Schriftbild**, das über dem Kopf des Admins gerendert wird.
 
-::: tip 💡 CONSEJO DE DISEÑO
-Evita hacer Nametags de más de 3 líneas para los jugadores comunes. Excesivas líneas pueden obstruir la visión en pvp o en construcciones densas.
+::: tip 💡 DESIGN-TIPP
+Vermeiden Sie es, Nametags für normale Spieler mehr als 3 Zeilen lang zu machen. Übermäßig viele Zeilen können die Sicht im PvP oder in dichten Gebäuden behindern.
 :::

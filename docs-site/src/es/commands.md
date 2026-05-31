@@ -1,3 +1,8 @@
+---
+title: Comandos y Permisos
+description: Mira todos los comandos y permisos disponibles para EligiusNametag.
+---
+
 # Comandos y Permisos
 
 Todos los comandos por defecto se basan en `/enametag` (o sus alias personalizables `/eltag` y `/eligiusnametag`).

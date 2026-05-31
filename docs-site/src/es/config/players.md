@@ -1,3 +1,8 @@
+---
+title: Diseños de Jugadores
+description: Configura diseños personalizados con MiniMessage y Vault en players.yml.
+---
+
 # Diseños de Jugadores (players.yml)
 
 Aquí es donde ocurre la magia visual. El archivo `players.yml` te permite definir **grupos ilimitados** usando el moderno motor de *MiniMessage*, interpolado con la versatilidad de *PlaceholderAPI*.

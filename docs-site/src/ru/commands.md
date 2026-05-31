@@ -1,16 +1,21 @@
-# Comandos y Permisos
+---
+title: Команды и права
+description: Просмотр всех доступных команд и прав для EligiusNametag.
+---
 
-Todos los comandos por defecto se basan en `/enametag` (o sus alias personalizables `/eltag` y `/eligiusnametag`).
+# Команды и права
 
-| Comando | Descripción | Permiso Requerido |
-|---|---|---|
-| `/enametag` | Muestra la versión del plugin instalada y el logo del autor. | *Ninguno* |
-| `/enametag reload` | Recarga toda la configuración y los archivos YAML en tiempo real, sin reiniciar el servidor. | `eligiusnametag.admin` |
-| `/enametag lang <idioma>` | Cambia el idioma global del plugin dinámicamente y recarga los lenguajes al instante. | `eligiusnametag.admin` |
-| `/enametag pets` | Alterna globalmente la habilitación de los hologramas de texto sobre las mascotas. | `eligiusnametag.admin` |
-| `/enametag me` | Activa o desactiva de manera personal la visualización de tu propio nametag (Guardado automático en DB). | `eligiusnametag.viewself` |
+Все команды по умолчанию основаны на `/enametag` (или настраиваемых алиасах `/eltag` и `/eligiusnametag`).
 
-## Detalles de Permisos Adicionales
+| Команда | Описание | Требуемое право |
+|---------|----------|-----------------|
+| `/enametag` | Отображает установленную версию плагина и логотип автора. | *Нет* |
+| `/enametag reload` | Перезагружает всю конфигурацию и YAML-файлы в реальном времени без перезапуска сервера. | `eligiusnametag.admin` |
+| `/enametag lang <язык>` | Динамически изменяет глобальный язык плагина и мгновенно перезагружает языки. | `eligiusnametag.admin` |
+| `/enametag pets` | Глобально переключает отображение текстовых голограмм над питомцами. | `eligiusnametag.admin` |
+| `/enametag me` | Лично включает или выключает отображение вашего собственного неймтега (Автосохранение в БД). | `eligiusnametag.viewself` |
 
-- `eligiusnametag.*`: Otorga acceso total a todos los comandos de administración.
-- *Nota:* Si tienes LuckPerms, no olvides asignar el permiso principal a tu grupo *default* o *admin* para que las variables de formato se sincronicen correctamente.
+## Дополнительная информация о правах
+
+- `eligiusnametag.*`: Предоставляет полный доступ ко всем командам администратора.
+- *Примечание:* Если вы используете LuckPerms, не забудьте назначить главное право вашей группе *default* или *admin*, чтобы переменные форматирования синхронизировались правильно.

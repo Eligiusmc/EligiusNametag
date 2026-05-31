@@ -1,22 +1,27 @@
-# Configuración Global (config.yml)
+---
+title: Configuration Globale
+description: Apprenez à configurer EligiusNametag globalement via config.yml.
+---
 
-El archivo `config.yml` es el cerebro del plugin. Controla cómo el plugin interactúa con tu servidor a nivel macro, afectando a todos los jugadores por igual.
+# Configuration Globale (config.yml)
+
+Le fichier `config.yml` est le cerveau du plugin. Il contrôle la façon dont le plugin interagit avec votre serveur au niveau macro, affectant tous les joueurs de manière égale.
 
 ---
 
-## 🛠️ Variables de Interfaz
+## 🛠️ Variables d'Interface
 
 ```yaml
-# Altura del holograma por encima de la cabeza del jugador
-# Recomendado: 0.35 para humanos, 0.50 si usas skins con sombreros grandes.
+# Hauteur de l'hologramme au-dessus de la tête du joueur
+# Recommandé : 0.35 pour les humains, 0.50 si vous utilisez des skins avec de grands chapeaux.
 y_offset: 0.35
 
-# Distancia máxima de visión en bloques
-# Valores más bajos pueden mejorar el rendimiento del cliente.
+# Distance de vue maximale en blocs
+# Des valeurs plus basses peuvent améliorer les performances du client.
 view_distance: 64
 
-# Alias del comando principal
-# Todos estos ejecutarán el menú de ayuda o comandos anidados.
+# Alias de la commande principale
+# Tous ceux-ci exécuteront le menu d'aide ou les commandes imbriquées.
 command_aliases:
   - "enametag"
   - "eltag"
@@ -24,20 +29,20 @@ command_aliases:
 
 ---
 
-## 💾 Conexión de Bases de Datos (HikariCP)
+## 💾 Connexion Base de Données (HikariCP)
 
-A diferencia de otros plugins básicos que guardan las preferencias en archivos de texto, EligiusNametag permite un flujo concurrente perfecto usando el estándar de la industria `HikariCP` para evitar caídas de rendimiento (Lag Spikes) durante guardados masivos en redes inmensas de Folia.
+Contrairement aux plugins basiques qui enregistrent les préférences dans des fichiers texte, EligiusNametag permet un flux concurrentiel fluide en utilisant le standard industriel `HikariCP` pour éviter les baisses de performances (Lag Spikes) lors des sauvegardes massives sur d'énormes réseaux Folia.
 
-### 🔹 Opción A: SQLite (Local)
-Ideal para servidores únicos (Survival, Skyblock aislado). No requiere configuración externa. Se creará automáticamente un archivo `database.db` en la carpeta del plugin.
+### 🔹 Option A : SQLite (Local)
+Idéal pour les serveurs uniques (Survie isolée, Skyblock). Ne nécessite aucune configuration externe. Un fichier `database.db` sera automatiquement créé dans le dossier du plugin.
 
 ```yaml
 database:
   type: "SQLITE" 
 ```
 
-### 🔹 Opción B: MySQL (Redes Velocity/Bungee)
-Ideal si posees múltiples servidores conectados y deseas que la preferencia del comando `/enametag me` (mostrar u ocultar tu nametag) viaje con el jugador de un servidor a otro.
+### 🔹 Option B : MySQL (Réseaux Velocity/Bungee)
+Idéal si vous possédez plusieurs serveurs connectés et souhaitez que la préférence de la commande `/enametag me` (afficher ou masquer votre nametag) voyage avec le joueur d'un serveur à l'autre.
 
 ```yaml
 database:
@@ -50,6 +55,6 @@ database:
     password: "super_secure_password"
 ```
 
-::: warning ⚠️ IMPORTANTE SOBRE MYSQL
-Asegúrate de que la base de datos `eligius_network` ya exista en tu servidor MySQL/MariaDB antes de encender el plugin. El plugin creará las tablas internamente, pero no puede crear la base de datos raíz por motivos de seguridad.
+::: warning ⚠️ IMPORTANT CONCERNANT MYSQL
+Assurez-vous que la base de données `eligius_network` existe déjà sur votre serveur MySQL/MariaDB avant d'activer le plugin. Le plugin créera les tables en interne, mais ne peut pas créer la base de données racine pour des raisons de sécurité.
 :::
