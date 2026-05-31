@@ -76,7 +76,6 @@ export default defineConfig({
     es: {
       label: 'Español',
       lang: 'es',
-      link: '/es/',
       description: "Documentación oficial del plugin de nametags holográficos.",
       themeConfig: {
         nav: [
@@ -108,10 +107,10 @@ export default defineConfig({
         ]
       }
     },
-    fr: { label: 'Français', lang: 'fr', link: '/fr/' },
-    de: { label: 'Deutsch', lang: 'de', link: '/de/' },
-    pt: { label: 'Português', lang: 'pt', link: '/pt/' },
-    ru: { label: 'Русский', lang: 'ru', link: '/ru/' }
+    fr: { label: 'Français', lang: 'fr' },
+    de: { label: 'Deutsch', lang: 'de' },
+    pt: { label: 'Português', lang: 'pt' },
+    ru: { label: 'Русский', lang: 'ru' }
   },
   themeConfig: {
     socialLinks: [
