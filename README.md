@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Eligiusmc/EligiusNametag/master/docs-site/src/public/Eligiusnametaglogorender.png" alt="EligiusNametag Logo" width="200" />
+  <img src="docs-site/src/public/assets/readme.png" alt="EligiusNametag Logo" width="100%" />
 
   # EligiusNametag
 
   *The ultimate, ultra-efficient holographic nametag plugin for Paper & Folia.*
 
-  [![Paper API](https://img.shields.io/badge/Paper-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
+  [![Paper API](https://img.shields.io/badge/Paper-1.21--26.1.2+-333333?style=flat-square&logo=paper)](https://papermc.io/)
   [![Folia Compatible](https://img.shields.io/badge/Folia-Compatible-ff5e00?style=flat-square&logo=fastapi)](https://papermc.io/software/folia)
   [![Java 21](https://img.shields.io/badge/Java-21_LTS-007396?style=flat-square&logo=openjdk)](https://adoptium.net/)
   [![License](https://img.shields.io/github/license/Eligiusmc/EligiusNametag?style=flat-square&color=blue)](LICENSE)
@@ -21,7 +21,7 @@
 
 ## 🌟 Overview
 
-**EligiusNametag** is a next-generation nametag plugin built exclusively for Minecraft 1.21+ servers running Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` injected at the packet level via ProtocolLib. This means **zero lag**, infinite lines, and perfect visual synchronization.
+**EligiusNametag** is a next-generation nametag plugin built exclusively for Minecraft 1.21 - 26.1.2+ servers running Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means **zero lag**, infinite lines, and perfect visual synchronization without fragile third-party dependencies.
 
 ### ✨ Key Features
 
@@ -39,9 +39,8 @@
 
 1. Download the latest `EligiusNametag-x.x.x.jar` from the [Releases](https://github.com/Eligiusmc/EligiusNametag/releases) page.
 2. Drop it into your `plugins/` directory.
-3. Make sure you have **[ProtocolLib](https://github.com/dmulloy2/ProtocolLib/releases)** installed.
-4. Start your server!
-5. Visit the **[Wiki](https://eligiusmc.github.io/EligiusNametag/)** to learn how to configure groups, databases, and more.
+3. Start your server!
+4. Visit the **[Wiki](https://eligiusmc.github.io/EligiusNametag/)** to learn how to configure groups, databases, and more.
 
 ---
 
@@ -53,7 +52,7 @@ We love open-source contributions! If you want to dive into the codebase, fix bu
 
 ### Building from Source
 
-This project enforces **Java 21 LTS** and targets **Paper 1.21+**.
+This project enforces **Java 21 LTS** and targets **Paper 1.21 - 26.1.2+**.
 
 ```bash
 # Clone the repository

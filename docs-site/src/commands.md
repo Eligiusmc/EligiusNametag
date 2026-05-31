@@ -5,7 +5,7 @@ description: View all available commands and permissions for EligiusNametag.
 
 # Commands & Permissions
 
-All default commands are based on `/enametag` (or its customizable aliases `/eltag` and `/eligiusnametag`).
+All default commands are based on `/enametag` (or its customizable aliases `/eligiusnametag`).
 
 | Command | Description | Required Permission |
 |---------|-------------|---------------------|

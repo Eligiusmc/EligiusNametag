@@ -1,10 +1,12 @@
 ---
 layout: home
+title: "EligiusNametag - High-efficiency holograms for Paper"
+description: "The ultimate, ultra-efficient holographic nametag plugin for Paper 1.21 - 26.1.2+ and Folia."
 
 hero:
   name: "EligiusNametag"
   text: "The future of nametags"
-  tagline: "High-efficiency holograms for Paper 1.21+ with Folia support and decentralized database."
+  tagline: "High-efficiency holograms for Paper 1.21 - 26.1.2+ with Folia support and decentralized database."
   image:
     src: /assets/angry.png
     alt: Eligius Logo
@@ -20,7 +22,7 @@ hero:
       link: https://github.com/Eligiusmc/EligiusNametag
 
 features:
-  - title: Ultra Efficient (ProtocolLib)
+  - title: Ultra Efficient (Native API)
     details: Renders TextDisplays purely on network level without creating garbage in physical memory, preventing lag on your server.
   - title: Folia & Scalability
     details: Asynchronous architecture ready for distributed networks using HikariCP for concurrent MySQL/SQLite connections.

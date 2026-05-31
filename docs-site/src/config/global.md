@@ -24,7 +24,6 @@ view_distance: 64
 # All of these will execute the help menu or nested commands.
 command_aliases:
   - "enametag"
-  - "eltag"
 ```
 
 ---

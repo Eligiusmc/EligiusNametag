@@ -24,7 +24,6 @@ view_distance: 64
 # Все они будут открывать меню помощи или вложенные команды.
 command_aliases:
   - "enametag"
-  - "eltag"
 ```
 
 ---

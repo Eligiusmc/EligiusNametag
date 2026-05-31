@@ -5,7 +5,7 @@ description: Voir toutes les commandes et permissions disponibles pour EligiusNa
 
 # Commandes et Permissions
 
-Toutes les commandes par défaut sont basées sur `/enametag` (ou ses alias personnalisables `/eltag` et `/eligiusnametag`).
+Toutes les commandes par défaut sont basées sur `/enametag` (ou ses alias personnalisables `/eligiusnametag`).
 
 | Commande | Description | Permission Requise |
 |----------|-------------|--------------------|

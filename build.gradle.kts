@@ -7,7 +7,7 @@ repositories {
     mavenLocal()
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") } // PaperMC
     maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
-    maven { url = uri("https://repo.dmulloy2.net/repository/public/") } // ProtocolLib
+
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.maven.apache.org/maven2/") }
     maven { url = uri("https://repo.extendedclip.com/releases/") } // PlaceholderAPI
@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:" + (property("paperVersion") as String) + "-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
+
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
         exclude(group = "org.bukkit")
         exclude(group = "org.spigotmc")

@@ -5,7 +5,7 @@ description: Veja todos os comandos e permissões disponíveis para o EligiusNam
 
 # Comandos e Permissões
 
-Todos os comandos padrão são baseados em `/enametag` (ou seus aliases personalizáveis `/eltag` e `/eligiusnametag`).
+Todos os comandos padrão são baseados em `/enametag` (ou seus aliases personalizáveis `/eligiusnametag`).
 
 | Comando | Descrição | Permissão Necessária |
 |---------|-------------|----------------------|
