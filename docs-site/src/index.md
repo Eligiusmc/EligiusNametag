@@ -30,4 +30,6 @@ features:
     details: Multiple lines, custom icons from ItemsAdder, MiniMessage gradients, and Vault hierarchy support.
   - title: Pets Included
     details: Make your VIP players' wolves and cats inherit their exact nametag style.
+  - title: Anonymous Metrics
+    details: Uses bStats to collect anonymous server statistics (like database and platform usage) to help us improve.
 ---

@@ -41,29 +41,22 @@ Evalúa la distancia, permisos, visibilidad y los grupos del jugador/mascota, ge
 
 ---
 
-## 2. Pipeline de Renderizado y ProtocolLib
+## 2. Pipeline de Renderizado y TextDisplays Nativos
 
-El renderizado se confía enteramente a **ProtocolLib** (`ProtocolLibNametagRenderer`) mediante la inyección directa de paquetes en red hacia el cliente. Nunca se crean entidades físicas reales en el servidor (para evitar basura de memoria y caídas de TPS en servidores masivos).
+A partir de la versión `1.3.0`, el plugin eliminó su dependencia de ProtocolLib y migró a un renderizador **100% nativo de Bukkit** utilizando entidades `TextDisplay`. Nunca se crean entidades físicas reales pesadas (como `ArmorStands`), lo que garantiza que el servidor mantenga altos TPS y evite basura de memoria.
 
-### 2.1 El ciclo de los paquetes
-Cuando el `NametagService` solicita renderizar un holograma, el adaptador de ProtocolLib hace lo siguiente por cada espectador:
+### 2.1 El ciclo de las Entidades y Paquetes
+Cuando el `NametagService` solicita renderizar un holograma, el adaptador `BukkitNametagRenderer` hace lo siguiente:
 
-1. **Paquete `SPAWN_ENTITY` (Solo Primera Vez):** 
-   Se crea una entidad virtual de tipo `TEXT_DISPLAY`. Las coordenadas iniciales de aparición (`X, Y, Z`) son obligatoriamente inyectadas usando la locación de la entidad principal. Si no se hace, la entidad virtual aparecerá en `0,0,0`, y si el espectador no tiene cargado el chunk `0,0`, su cliente ignorará la entidad.
-2. **Paquete `ENTITY_METADATA` (Solo Primera Vez):**
-   Envía el componente de texto real, así como el offset de altura (translation) para apilar los TextDisplays uno sobre el otro sin empujarse físicamente.
-3. **Paquete `MOUNT` (Periódico):**
-   Envía al cliente la orden de montar el TextDisplay como "pasajero" de la mascota/jugador. Esto permite que el cliente renderice el texto moviéndose junto con la entidad principal sin latencia o temblores (ya que la interpolación del movimiento la hace el cliente).
+1. **Creación de `TextDisplay`:** 
+   Se spawnea un `TextDisplay` en el mundo utilizando la API de Bukkit, configurado como "no persistente" (`setPersistent(false)`) para que no se guarde en disco con el chunk.
+2. **Enganche y Desfase (`setTransformation` y `addPassenger`):**
+   La entidad de texto se acopla como "pasajero" al jugador o mascota. El cliente de Minecraft se encarga automáticamente de renderizar el movimiento y la interpolación del texto. Los desfases de altura se aplican de forma nativa a través de `setTransformation(new Transformation(...))`.
+3. **Visibilidad Individualizada:**
+   En lugar de manipular paquetes, se utiliza la API `player.showEntity()` y `player.hideEntity()` para que el holograma solo sea enviado a los jugadores autorizados en un radio definido.
 
-### 2.2 Bug Resuelto: Crasheo de ViaVersion (JNI Exception)
-**Síntoma:** Al entrar o salir repetidamente, la JVM entera se colapsaba con un error de acceso a la memoria nativa (`EXCEPTION_ACCESS_VIOLATION en jvm.dll`).
-**Causa:** Inicialmente, los paquetes `ENTITY_METADATA` y `MOUNT` se enviaban *en cada ciclo* a los jugadores para asegurar el acople correcto, pero `ENTITY_METADATA` contiene componentes de chat muy grandes. ViaVersion, al interceptar esto asincrónicamente y tratar de traducir los componentes JSON a formatos Legacy 2 veces por segundo, generaba corrupción de memoria nativa.
-**Solución:** Los metadatos de texto ahora solo se envían estrictamente una vez durante la creación (`isNewSpawn = true`), mientras que solo el paquete `MOUNT` (que es de tamaño insignificante) se repite periódicamente en cada actualización.
-
-### 2.3 Bug Resuelto: Desincronización del paquete Mount
-**Síntoma:** Al hacer un teletransporte largo o reconectarse, el holograma de las mascotas desaparecía, pero el de vainilla seguía ahí.
-**Causa:** `NametagService` detectaba que el usuario estaba cerca del perro y enviaba los paquetes `SPAWN` y `MOUNT` al cliente inmediatamente. Sin embargo, el cliente demoraba varios ticks más en recibir y cargar la información de la entidad real del perro. El cliente ignoraba el paquete `MOUNT` porque el perro aún no existía, dejando el TextDisplay flotando sin rumbo en `X, Y, Z`. 
-**Solución:** Como se indicó en la sección 2.1, mover el `MOUNT` fuera del bloque `isNewSpawn` garantiza que una vez el cliente termine de cargar al perro, el siguiente `MOUNT` (que llega cada 0.5s) re-enganchará exitosamente el holograma al animal de forma imperceptible.
+### 2.2 Eliminación de Bugs Previos (ProtocolLib/ViaVersion)
+Históricamente, enviar componentes JSON pesados mediante ProtocolLib 2 veces por segundo colapsaba ViaVersion, y tratar de emparejar paquetes `MOUNT` asincrónicos desincronizaba hologramas. Al usar la API nativa de Paper/Bukkit, el servidor maneja internamente la gestión del ciclo de vida y los meta-paquetes sin causar excepciones de memoria (JNI) o cuellos de botella en la red.
 
 ---
 

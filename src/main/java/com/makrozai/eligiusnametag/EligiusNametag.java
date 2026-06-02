@@ -22,6 +22,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.makrozai.eligiusnametag.adapter.database.DatabaseAdapter;
 import com.makrozai.eligiusnametag.domain.service.UpdateChecker;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
+
 
 public class EligiusNametag extends JavaPlugin implements Listener {
     private YamlConfigAdapter configAdapter;
@@ -94,6 +97,11 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         if (configAdapter.isCheckUpdates()) {
             UpdateChecker.fetch(version);
         }
+        
+        StartupLogger.printStep("Initializing metrics...");
+        Metrics metrics = new Metrics(this, 31756);
+        metrics.addCustomChart(new SimplePie("database_type", () -> storageType));
+        metrics.addCustomChart(new SimplePie("platform", () -> platform));
         
         long endTime = System.currentTimeMillis();
         StartupLogger.printSuccess(endTime - startTime);

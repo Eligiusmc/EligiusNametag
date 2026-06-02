@@ -30,4 +30,6 @@ features:
     details: Mehrere Zeilen, benutzerdefinierte Icons (ItemsAdder), MiniMessage-Farbverläufe und Vault-Hierarchie.
   - title: Haustiere Inklusive
     details: Lassen Sie die Wölfe und Katzen Ihrer VIP-Spieler denselben Nametag-Stil erben.
+  - title: Anonyme Metriken
+    details: Nutzt bStats, um anonyme Serverstatistiken (wie Datenbank- und Plattformnutzung) zu sammeln und uns bei der Verbesserung zu helfen.
 ---

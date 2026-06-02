@@ -31,10 +31,11 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 * **ItemsAdder & Oraxen:** Display custom emojis and icons natively right inside the nametag.
 
 ### 👑 Hierarchy & Permissions
-Easily assign different visual designs depending on the player's rank using **Vault**. Give your VIPs an imposing, glowing nametag while keeping defaults simple.
-
-### 🐺 Pet Holograms
-Why should only players look good? **EligiusNametag** automatically extends the player's custom nametag style to their tamed Wolves and Cats!
+- 👑 **Vault Hierarchy Integration:** Automatically assigns nametag formats based on the user's primary Vault rank (e.g., admin, vip, default).
+- 🐾 **Holographic Pets:** Tamed wolves, cats, and parrots inherit their owner's rank formatting!
+- 🖼️ **ItemsAdder Ready:** Fully supports font-images and custom emojis like `:rank_dev:` rendering flawlessly above players' heads.
+- 🌐 **Global i18n:** In-game messages are completely customizable via language files with hot-swapping support.
+- 📊 **bStats Integration:** Anonymous usage metrics help guide the plugin's development. Opt-out anytime in your global bStats config.
 
 ### ⚡ Enterprise Scalability
 * **Folia Ready:** Built completely asynchronous.

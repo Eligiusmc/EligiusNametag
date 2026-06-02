@@ -30,4 +30,6 @@ features:
     details: Plusieurs lignes, icônes personnalisées d'ItemsAdder, dégradés MiniMessage, et support de la hiérarchie Vault.
   - title: Animaux Inclus
     details: Faites en sorte que les loups et les chats de vos joueurs VIP héritent du même style de nametag.
+  - title: Métriques Anonymes
+    details: Utilise bStats pour collecter des statistiques de serveur anonymes (comme l'utilisation de la base de données et de la plateforme) pour nous aider à nous améliorer.
 ---

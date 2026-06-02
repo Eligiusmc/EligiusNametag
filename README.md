@@ -32,6 +32,7 @@
 - 🐾 **Holographic Pets:** Tamed wolves, cats, and parrots inherit their owner's rank formatting!
 - 🖼️ **ItemsAdder Ready:** Fully supports font-images and custom emojis like `:rank_dev:` rendering flawlessly above players' heads.
 - 🌐 **Global i18n:** In-game messages are completely customizable via language files with hot-swapping support.
+- 📊 **bStats Integration:** Anonymous usage metrics help guide the plugin's development. Opt-out anytime in your global bStats config.
 
 ---
 

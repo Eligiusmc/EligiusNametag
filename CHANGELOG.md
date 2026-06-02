@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.1](https://github.com/Eligiusmc/EligiusNametag/compare/v1.3.0...v1.3.1) (2026-05-31)
+## [1.3.1] - 2026-06-02
+
+### Added
+- **bStats Integration:** We now collect anonymous usage metrics (Server platform, Database type, etc.) to help guide future development. You can opt out via your global `bStats/config.yml`.
+
+### Bug Fixes
+
+* resolve TextDisplay memory leaks, fly-in interpolation bugs and update UTF-8 lang ([307b42a](https://github.com/Eligiusmc/EligiusNametag/commit/307b42a1fdf4549b5966ca0f5eaf09b1b98609e2))
+
+## [1.3.0] - 2026-05-30
+
+
+### Features
+
+* **core:** migrate to native Bukkit TextDisplays and drop ProtocolLib ([526a1a9](https://github.com/Eligiusmc/EligiusNametag/commit/526a1a9aa482ef4e7b6f14654b3e570007100a8c))
+
 ## [1.2.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.1.0...v1.2.0) (2026-05-31)
 
 
