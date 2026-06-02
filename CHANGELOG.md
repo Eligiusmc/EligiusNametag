@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.3.1...v1.4.0) (2026-06-02)
+
+
+### Features
+
+* bStats integration and telemetry ([73f0dd1](https://github.com/Eligiusmc/EligiusNametag/commit/73f0dd156d3d5f7655ebce3027421ede680b0026))
+
 ## [1.3.1](https://github.com/Eligiusmc/EligiusNametag/compare/v1.3.0...v1.3.1) (2026-05-31)
 ## [1.3.1] - 2026-06-02
 
