@@ -9,7 +9,7 @@ on:
 
 jobs:
   publish-github:
-    if: github.repository_owner == 'Lyttle-Development'
+    if: github.repository_owner == 'Eligiusmc'
     runs-on: ubuntu-22.04
     env:
       GPR_USER: ${{ secrets.GPR_USER }}
@@ -68,7 +68,7 @@ jobs:
           echo "GitHub Release handled by Release Please."
 
   publish-hangar:
-    if: github.repository_owner == 'Lyttle-Development'
+    if: github.repository_owner == 'Eligiusmc'
     runs-on: ubuntu-22.04
     env:
       HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
@@ -105,7 +105,7 @@ jobs:
           ./gradlew publishPluginPublicationToHangar --stacktrace
 
   publish-modrinth:
-    if: github.repository_owner == 'Lyttle-Development'
+    if: github.repository_owner == 'Eligiusmc'
     runs-on: ubuntu-22.04
     env:
       MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
