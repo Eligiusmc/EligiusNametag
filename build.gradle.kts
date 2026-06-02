@@ -25,6 +25,7 @@ dependencies {
     }
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.bstats:bstats-bukkit:3.2.1")
+    implementation("redis.clients:jedis:5.1.2")
 
     
     // Testing Dependencies
@@ -72,6 +73,9 @@ tasks.named<ProcessResources>("processResources") {
 
 tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
     relocate("org.bstats", "com.makrozai.eligiusnametag.libs.bstats")
+    relocate("redis.clients.jedis", "com.makrozai.eligiusnametag.libs.jedis")
+    relocate("org.apache.commons.pool2", "com.makrozai.eligiusnametag.libs.commons.pool2")
+    relocate("org.json", "com.makrozai.eligiusnametag.libs.json")
 }
 
 

@@ -27,4 +27,9 @@ public interface ConfigPort {
     String getDatabaseName();
     String getDatabaseUsername();
     String getDatabasePassword();
+    
+    boolean isRedisEnabled();
+    String getRedisHost();
+    int getRedisPort();
+    String getRedisPassword();
 }

@@ -57,3 +57,18 @@ database:
 ::: warning ⚠️ WICHTIG BEZÜGLICH MYSQL
 Stellen Sie sicher, dass die Datenbank `eligius_network` bereits auf Ihrem MySQL/MariaDB-Server existiert, bevor Sie das Plugin aktivieren. Das Plugin erstellt die Tabellen intern, kann aber aus Sicherheitsgründen die Stammdatenbank nicht erstellen.
 :::
+
+
+---
+
+## 🔴 Redis Pub/Sub Synchronisation
+
+Wenn Sie ein Proxy-Netzwerk (BungeeCord, Velocity) betreiben, reicht MySQL-Polling für visuelle Aktualisierungen in Echtzeit nicht aus. Wenn Redis aktiviert ist und ein Spieler sein Nametag in der Lobby ausblendet, wird diese Änderung in weniger als 5 Millisekunden sofort auf dem Survival-Server repliziert.
+
+`yaml
+redis:
+  enabled: true
+  host: '127.0.0.1'
+  port: 6379
+  password: 'my_secure_redis_password'
+`

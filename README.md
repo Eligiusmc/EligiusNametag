@@ -27,6 +27,7 @@
 
 - ⚡ **True Folia Support:** Built from the ground up with asynchronous, thread-safe architecture to fully leverage Folia's multi-threading capabilities.
 - 💾 **Smart Data Persistence:** Local SQLite or remote MySQL powered by **HikariCP** for safe, high-performance database pooling across proxy networks.
+- 🔴 **Native Redis Pub/Sub:** Zero-polling real-time cross-server synchronization. Toggling your nametag on a lobby instantly updates the survival server in less than 5ms!
 - 🎨 **Modern MiniMessage Formatting:** Say goodbye to `&c`. Use `<gradient:red:blue>`, `<bold>`, or HEX colors like `<#ff00ff>` for breathtaking designs.
 - 👑 **Vault Hierarchy Integration:** Automatically assigns nametag formats based on the user's primary Vault rank (e.g., admin, vip, default).
 - 🐾 **Holographic Pets:** Tamed wolves, cats, and parrots inherit their owner's rank formatting!

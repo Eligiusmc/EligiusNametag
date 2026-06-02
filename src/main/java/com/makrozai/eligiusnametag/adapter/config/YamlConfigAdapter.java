@@ -202,26 +202,46 @@ public class YamlConfigAdapter implements ConfigPort {
 
     @Override
     public String getDatabaseHost() {
-        return config.getString("database.mysql.host", "localhost");
+        return config.getString("database.host", "localhost");
     }
 
     @Override
     public int getDatabasePort() {
-        return config.getInt("database.mysql.port", 3306);
+        return config.getInt("database.port", 3306);
     }
 
     @Override
     public String getDatabaseName() {
-        return config.getString("database.mysql.database", "eligiusnametag");
+        return config.getString("database.database", "eligius_nametag");
     }
 
     @Override
     public String getDatabaseUsername() {
-        return config.getString("database.mysql.username", "root");
+        return config.getString("database.username", "root");
     }
 
     @Override
     public String getDatabasePassword() {
-        return config.getString("database.mysql.password", "");
+        return config.getString("database.password", "");
+    }
+    
+    @Override
+    public boolean isRedisEnabled() {
+        return config.getBoolean("redis.enabled", false);
+    }
+
+    @Override
+    public String getRedisHost() {
+        return config.getString("redis.host", "localhost");
+    }
+
+    @Override
+    public int getRedisPort() {
+        return config.getInt("redis.port", 6379);
+    }
+
+    @Override
+    public String getRedisPassword() {
+        return config.getString("redis.password", "");
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
-import java.util.Collections;
+
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -30,9 +30,8 @@ public class NametagServiceTest {
         rendererPort = Mockito.mock(NametagRendererPort.class);
         databasePort = Mockito.mock(DatabasePort.class);
         
-        when(databasePort.getAllPlayersWithViewSelf()).thenReturn(Collections.emptySet());
-        
-        nametagService = new NametagService(configPort, platformPort, rendererPort, databasePort);
+        when(databasePort.getAllPlayersWithViewSelf()).thenReturn(java.util.Collections.emptySet());
+        nametagService = new NametagService(configPort, platformPort, rendererPort, databasePort, null);
     }
 
     @Test

@@ -45,15 +45,28 @@ Ideal si posees múltiples servidores conectados y deseas que la preferencia del
 
 ```yaml
 database:
-  type: "MYSQL"
-  mysql:
-    host: "127.0.0.1"
-    port: 3306
-    database: "eligius_network"
-    username: "admin"
-    password: "super_secure_password"
+  type: "mysql"
+  host: "127.0.0.1"
+  port: 3306
+  database: "eligius_network"
+  username: "admin"
+  password: "super_secure_password"
 ```
 
 ::: warning ⚠️ IMPORTANTE SOBRE MYSQL
 Asegúrate de que la base de datos `eligius_network` ya exista en tu servidor MySQL/MariaDB antes de encender el plugin. El plugin creará las tablas internamente, pero no puede crear la base de datos raíz por motivos de seguridad.
 :::
+
+---
+
+## 🔴 Sincronización Redis Pub/Sub
+
+Si ejecutas una red proxy (BungeeCord, Velocity), el polling de MySQL no es suficiente para actualizaciones visuales en tiempo real. Al habilitar Redis, si un jugador oculta su nametag en el Lobby, el cambio se replicará instantáneamente en el servidor Survival en menos de 5 milisegundos.
+
+```yaml
+redis:
+  enabled: true
+  host: "127.0.0.1"
+  port: 6379
+  password: "my_secure_redis_password"
+```
