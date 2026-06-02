@@ -24,6 +24,8 @@ dependencies {
         exclude(group = "org.spigotmc")
     }
     implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
+
     
     // Testing Dependencies
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
@@ -67,6 +69,11 @@ tasks.named<ProcessResources>("processResources") {
         expand("projectVersion" to versionString)
     }
 }
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    relocate("org.bstats", "com.makrozai.eligiusnametag.libs.bstats")
+}
+
 
 // --- Modrinth Publishing Configuration ---
 modrinth {

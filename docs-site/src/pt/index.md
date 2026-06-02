@@ -30,4 +30,6 @@ features:
     details: Múltiplas linhas, ícones personalizados do ItemsAdder, gradientes do MiniMessage e suporte para a hierarquia do Vault.
   - title: Pets Inclusos
     details: Faça com que os lobos e gatos dos seus jogadores VIP herdem o mesmo estilo de nametag.
+  - title: Métricas Anônimas
+    details: Usa o bStats para coletar estatísticas anônimas do servidor (como uso de banco de dados e plataforma) para nos ajudar a melhorar.
 ---
