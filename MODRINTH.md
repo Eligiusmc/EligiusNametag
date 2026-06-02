@@ -40,6 +40,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 ### ⚡ Enterprise Scalability
 * **Folia Ready:** Built completely asynchronous.
 * **Multi-Server Database:** Connect multiple servers using our highly optimized **HikariCP MySQL/MariaDB** adapter, or keep it lightweight with SQLite.
+* **Redis Pub/Sub Synchronization (NEW):** Instant, zero-polling memory synchronization across your entire proxy network. Toggle a nametag anywhere, and it updates everywhere instantly.
 
 ---
 

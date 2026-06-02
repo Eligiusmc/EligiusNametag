@@ -57,3 +57,18 @@ database:
 ::: warning ⚠️ IMPORTANTE SOBRE MYSQL
 Certifique-se de que o banco de dados `eligius_network` já exista no seu servidor MySQL/MariaDB antes de ligar o plugin. O plugin criará as tabelas internamente, mas não pode criar o banco de dados raiz por motivos de segurança.
 :::
+
+
+---
+
+## 🔴 Sincronização Redis Pub/Sub
+
+Se você executa uma rede proxy (BungeeCord, Velocity), o polling do MySQL não é suficiente para atualizações visuais em tempo real. Ao ativar o Redis, se um jogador ocultar sua nametag no Lobby, a mudança será replicada instantaneamente no servidor Survival em menos de 5 milissegundos.
+
+`yaml
+redis:
+  enabled: true
+  host: '127.0.0.1'
+  port: 6379
+  password: 'my_secure_redis_password'
+`

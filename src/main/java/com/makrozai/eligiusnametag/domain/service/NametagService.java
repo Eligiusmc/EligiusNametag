@@ -3,6 +3,7 @@ package com.makrozai.eligiusnametag.domain.service;
 import com.makrozai.eligiusnametag.domain.port.ConfigPort;
 import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
+import com.makrozai.eligiusnametag.domain.port.SyncPort;
 
 import java.util.ArrayList;
 
@@ -18,14 +19,27 @@ public class NametagService {
     private final PlatformPort platform;
     private final NametagRendererPort renderer;
     private final DatabasePort database;
+    private final SyncPort syncPort;
     private final Set<UUID> selfViewers = ConcurrentHashMap.newKeySet();
 
-    public NametagService(ConfigPort config, PlatformPort platform, NametagRendererPort renderer, DatabasePort database) {
+    public NametagService(ConfigPort config, PlatformPort platform, NametagRendererPort renderer, DatabasePort database, SyncPort syncPort) {
         this.config = config;
         this.platform = platform;
         this.renderer = renderer;
         this.database = database;
+        this.syncPort = syncPort;
         this.selfViewers.addAll(database.getAllPlayersWithViewSelf());
+        
+        // Listen to cross-server Redis updates
+        if (syncPort != null) {
+            syncPort.subscribe((uuid, state) -> {
+                if (state) {
+                    selfViewers.add(uuid);
+                } else {
+                    selfViewers.remove(uuid);
+                }
+            });
+        }
     }
 
     public void updateAllNametags() {
@@ -127,6 +141,7 @@ public class NametagService {
             } else {
                 org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> database.setPlayerViewSelf(playerId, false));
             }
+            if (syncPort != null) syncPort.publishSelfViewUpdate(playerId, false);
             return false;
         } else {
             selfViewers.add(playerId);
@@ -135,6 +150,7 @@ public class NametagService {
             } else {
                 org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> database.setPlayerViewSelf(playerId, true));
             }
+            if (syncPort != null) syncPort.publishSelfViewUpdate(playerId, true);
             return true;
         }
     }

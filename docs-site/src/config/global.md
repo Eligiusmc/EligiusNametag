@@ -45,15 +45,28 @@ Ideal if you own multiple connected servers and want the `/enametag me` command 
 
 ```yaml
 database:
-  type: "MYSQL"
-  mysql:
-    host: "127.0.0.1"
-    port: 3306
-    database: "eligius_network"
-    username: "admin"
-    password: "super_secure_password"
+  type: "mysql"
+  host: "127.0.0.1"
+  port: 3306
+  database: "eligius_network"
+  username: "admin"
+  password: "super_secure_password"
 ```
 
 ::: warning ⚠️ IMPORTANT REGARDING MYSQL
 Ensure that the `eligius_network` database already exists on your MySQL/MariaDB server before turning on the plugin. The plugin will create the tables internally, but cannot create the root database for security reasons.
 :::
+
+---
+
+## 🔴 Redis Pub/Sub Synchronization
+
+If you are running a multi-server proxy network (BungeeCord, Velocity), MySQL polling is not enough for real-time visual updates. By enabling Redis, if a player hides their nametag in the Lobby, the change will instantly replicate to the Survival server in under 5 milliseconds.
+
+```yaml
+redis:
+  enabled: true
+  host: "127.0.0.1"
+  port: 6379
+  password: "my_secure_redis_password"
+```
