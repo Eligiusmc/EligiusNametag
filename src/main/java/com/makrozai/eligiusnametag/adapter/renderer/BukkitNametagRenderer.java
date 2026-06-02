@@ -22,6 +22,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
     
     private final Map<UUID, List<TextDisplay>> activeEntities = new ConcurrentHashMap<>();
     private final Map<UUID, Set<UUID>> lineSpawnedViewers = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> lineHiddenViewers = new ConcurrentHashMap<>();
     private final Map<UUID, Component> lineJsonCache = new ConcurrentHashMap<>();
 
     public BukkitNametagRenderer(Plugin plugin, double viewDistance, double lineSpacing) {
@@ -41,6 +42,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         displays.removeIf(display -> {
             if (!display.isValid() || display.isDead()) {
                 lineSpawnedViewers.remove(display.getUniqueId());
+                lineHiddenViewers.remove(display.getUniqueId());
                 lineJsonCache.remove(display.getUniqueId());
                 return true;
             }
@@ -71,6 +73,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             TextDisplay removed = displays.remove(displays.size() - 1);
             removed.remove();
             lineSpawnedViewers.remove(removed.getUniqueId());
+            lineHiddenViewers.remove(removed.getUniqueId());
             lineJsonCache.remove(removed.getUniqueId());
         }
 
@@ -116,6 +119,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
 
             // Update viewer visibility
             Set<UUID> currentViewers = lineSpawnedViewers.computeIfAbsent(displayId, k -> new HashSet<>());
+            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(displayId, k -> new HashSet<>());
             
             // Show to new valid viewers
             for (UUID viewerId : viewers) {
@@ -124,6 +128,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                     if (viewer != null && viewer.isOnline()) {
                         viewer.showEntity(plugin, display);
                         currentViewers.add(viewerId);
+                        hiddenViewers.remove(viewerId);
                     }
                 }
             }
@@ -136,6 +141,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                     Player currentViewer = Bukkit.getPlayer(currentViewerId);
                     if (currentViewer != null && currentViewer.isOnline()) {
                         currentViewer.hideEntity(plugin, display);
+                        hiddenViewers.add(currentViewerId);
                     }
                     it.remove();
                 }
@@ -150,14 +156,17 @@ public class BukkitNametagRenderer implements NametagRendererPort {
 
         for (TextDisplay display : displays) {
             Set<UUID> currentViewers = lineSpawnedViewers.get(display.getUniqueId());
-            if (currentViewers != null) {
-                for (UUID viewerId : viewers) {
-                    if (currentViewers.contains(viewerId)) {
-                        Player viewer = Bukkit.getPlayer(viewerId);
-                        if (viewer != null && viewer.isOnline()) {
-                            viewer.hideEntity(plugin, display);
+            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(display.getUniqueId(), k -> new HashSet<>());
+            
+            for (UUID viewerId : viewers) {
+                if (!hiddenViewers.contains(viewerId)) {
+                    Player viewer = Bukkit.getPlayer(viewerId);
+                    if (viewer != null && viewer.isOnline()) {
+                        viewer.hideEntity(plugin, display);
+                        hiddenViewers.add(viewerId);
+                        if (currentViewers != null) {
+                            currentViewers.remove(viewerId);
                         }
-                        currentViewers.remove(viewerId);
                     }
                 }
             }
@@ -173,6 +182,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                     display.remove();
                 }
                 lineSpawnedViewers.remove(display.getUniqueId());
+                lineHiddenViewers.remove(display.getUniqueId());
                 lineJsonCache.remove(display.getUniqueId());
             }
         }
@@ -187,12 +197,16 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         }
         activeEntities.clear();
         lineSpawnedViewers.clear();
+        lineHiddenViewers.clear();
         lineJsonCache.clear();
     }
 
     @Override
     public void clearViewer(UUID viewerId) {
         for (Set<UUID> viewers : lineSpawnedViewers.values()) {
+            viewers.remove(viewerId);
+        }
+        for (Set<UUID> viewers : lineHiddenViewers.values()) {
             viewers.remove(viewerId);
         }
     }

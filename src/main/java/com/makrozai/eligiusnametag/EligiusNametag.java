@@ -1,36 +1,42 @@
 package com.makrozai.eligiusnametag;
 
 import com.makrozai.eligiusnametag.adapter.config.YamlConfigAdapter;
+import com.makrozai.eligiusnametag.adapter.database.DatabaseAdapter;
+import com.makrozai.eligiusnametag.adapter.network.RedisAdapter;
 import com.makrozai.eligiusnametag.adapter.platform.PaperPlatformAdapter;
 import com.makrozai.eligiusnametag.adapter.renderer.BukkitNametagRenderer;
+import com.makrozai.eligiusnametag.domain.port.DatabasePort;
+import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
+import com.makrozai.eligiusnametag.domain.port.PlatformPort;
+import com.makrozai.eligiusnametag.domain.port.SyncPort;
 import com.makrozai.eligiusnametag.domain.service.NametagService;
+import com.makrozai.eligiusnametag.domain.service.UpdateChecker;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.EntitiesLoadEvent;
-import org.bukkit.event.world.EntitiesUnloadEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTameEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.makrozai.eligiusnametag.adapter.database.DatabaseAdapter;
-import com.makrozai.eligiusnametag.domain.service.UpdateChecker;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
-
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class EligiusNametag extends JavaPlugin implements Listener {
     private YamlConfigAdapter configAdapter;
-    private PaperPlatformAdapter platformAdapter;
-    private BukkitNametagRenderer rendererAdapter;
-    private DatabaseAdapter databaseAdapter;
+    private PlatformPort platform;
+    private DatabasePort database;
+    private SyncPort syncPort;
+    private NametagRendererPort renderer;
     private NametagService nametagService;
     private int taskId = -1;
 
@@ -43,33 +49,46 @@ public class EligiusNametag extends JavaPlugin implements Listener {
             isFolia = true;
         } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
         
-        String platform = isFolia ? "Folia" : "Paper";
+        String platformStr = isFolia ? "Folia" : "Paper";
         String version = getPluginMeta().getVersion();
         
         configAdapter = new YamlConfigAdapter(this);
         String storageType = "mysql".equalsIgnoreCase(configAdapter.getDatabaseType()) ? "MySQL" : "SQLite";
 
-        StartupLogger.printLogo(version, platform, storageType);
+        StartupLogger.printLogo(version, platformStr, storageType);
         
         if (getServer().getClass().getName().contains("Mock")) {
             StartupLogger.printStep("Running in MockBukkit environment.");
         }
         
         StartupLogger.printStep("Loading configuration...");
-        platformAdapter = new PaperPlatformAdapter();
-        rendererAdapter = new BukkitNametagRenderer(this, configAdapter.getViewDistance(), configAdapter.getLineSpacing());
+        this.platform = new PaperPlatformAdapter();
         
         StartupLogger.printStep("Loading storage provider... [" + storageType + "]");
-        databaseAdapter = new DatabaseAdapter(this, configAdapter);
-        if (!databaseAdapter.initialize()) {
+        this.database = new DatabaseAdapter(this, configAdapter);
+        if (!database.initialize()) {
             StartupLogger.printError("Failed to initialize database connection!");
             if ("mysql".equalsIgnoreCase(configAdapter.getDatabaseType())) {
                 StartupLogger.printError("Please check your MySQL credentials in config.yml.");
             }
         }
 
-        StartupLogger.printStep("Loading internal managers...");
-        nametagService = new NametagService(configAdapter, platformAdapter, rendererAdapter, databaseAdapter);
+        // Network Initialization
+        StartupLogger.printStep("Initializing network synchronization...");
+        syncPort = new RedisAdapter(this, configAdapter);
+        if (configAdapter.isRedisEnabled()) {
+            boolean redisConnected = syncPort.initialize();
+            if (redisConnected) {
+                getLogger().info("Redis Pub/Sub successfully initialized.");
+            } else {
+                getLogger().warning("Redis is enabled but failed to connect. Running in standalone mode.");
+            }
+        }
+        
+        // Service Initialization
+        StartupLogger.printStep("Initializing services...");
+        renderer = new BukkitNametagRenderer(this, configAdapter.getViewDistance(), configAdapter.getLineSpacing());
+        nametagService = new NametagService(configAdapter, platform, renderer, database, syncPort);
 
         // Register Command
         if (!getServer().getClass().getName().contains("Mock")) {
@@ -83,11 +102,10 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         
         StartupLogger.printStep("Performing initial data load...");
-        // Carga inicial de mascotas para no perderlas al hacer reload
         for (org.bukkit.World w : Bukkit.getWorlds()) {
             for (org.bukkit.entity.Tameable t : w.getEntitiesByClass(org.bukkit.entity.Tameable.class)) {
                 if (t.isTamed()) {
-                    platformAdapter.addTamedMob(t.getUniqueId());
+                    platform.addTamedMob(t.getUniqueId());
                 }
             }
         }
@@ -101,7 +119,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         StartupLogger.printStep("Initializing metrics...");
         Metrics metrics = new Metrics(this, 31756);
         metrics.addCustomChart(new SimplePie("database_type", () -> storageType));
-        metrics.addCustomChart(new SimplePie("platform", () -> platform));
+        metrics.addCustomChart(new SimplePie("platform", () -> platformStr));
         
         long endTime = System.currentTimeMillis();
         StartupLogger.printSuccess(endTime - startTime);
@@ -112,13 +130,16 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         if (nametagService != null) {
             nametagService.cleanup();
         }
-        if (databaseAdapter != null) {
-            databaseAdapter.close();
+        if (database != null) {
+            database.close();
+        }
+        if (syncPort != null) {
+            syncPort.close();
         }
         if (taskId != -1) {
             Bukkit.getScheduler().cancelTask(taskId);
         }
-        getLogger().info("EligiusNametag disabled.");
+        getLogger().info("Plugin successfully disabled");
     }
 
     private void startTask() {
@@ -150,8 +171,8 @@ public class EligiusNametag extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        rendererAdapter.destroyNametag(event.getPlayer().getUniqueId());
-        rendererAdapter.clearViewer(event.getPlayer().getUniqueId());
+        renderer.destroyNametag(event.getPlayer().getUniqueId());
+        renderer.clearViewer(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -179,12 +200,22 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        renderer.clearViewer(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        renderer.clearViewer(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
     public void onEntitiesLoad(EntitiesLoadEvent event) {
         for (org.bukkit.entity.Entity e : event.getEntities()) {
             if (e instanceof org.bukkit.entity.Tameable) {
                 org.bukkit.entity.Tameable t = (org.bukkit.entity.Tameable) e;
                 if (t.isTamed()) {
-                    platformAdapter.addTamedMob(t.getUniqueId());
+                    platform.addTamedMob(t.getUniqueId());
                 }
             }
         }
@@ -194,8 +225,8 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     public void onEntitiesUnload(EntitiesUnloadEvent event) {
         for (org.bukkit.entity.Entity e : event.getEntities()) {
             if (e instanceof org.bukkit.entity.Tameable) {
-                platformAdapter.removeTamedMob(e.getUniqueId());
-                rendererAdapter.destroyNametag(e.getUniqueId());
+                platform.removeTamedMob(e.getUniqueId());
+                renderer.destroyNametag(e.getUniqueId());
             }
         }
     }
@@ -203,13 +234,13 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         if (event.getEntity() instanceof org.bukkit.entity.Tameable) {
-            platformAdapter.removeTamedMob(event.getEntity().getUniqueId());
-            rendererAdapter.destroyNametag(event.getEntity().getUniqueId());
+            platform.removeTamedMob(event.getEntity().getUniqueId());
+            renderer.destroyNametag(event.getEntity().getUniqueId());
         }
     }
 
     @EventHandler
     public void onEntityTame(EntityTameEvent event) {
-        platformAdapter.addTamedMob(event.getEntity().getUniqueId());
+        platform.addTamedMob(event.getEntity().getUniqueId());
     }
 }

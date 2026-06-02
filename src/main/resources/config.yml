@@ -26,12 +26,30 @@ command_aliases:
   - "enametag"
   - "eligiusnametag"
 
-# Database configuration
+# ==========================================
+# 📊 DATABASE CONFIGURATION
+# ==========================================
+# Configure your preferred database here.
+# Supported types: sqlite, mysql
+#
+# SQLite is zero-setup and perfect for single servers.
+# MySQL is recommended for proxy networks.
 database:
-  type: "sqlite" # 'sqlite' for local file, 'mysql' for external database
-  mysql:
-    host: "localhost"
-    port: 3306
-    database: "eligiusnametag"
-    username: "root"
-    password: ""
+  type: "sqlite"
+  host: "localhost"
+  port: 3306
+  database: "eligius_nametag"
+  username: "root"
+  password: ""
+
+# ==========================================
+# 🌐 NETWORK SYNCHRONIZATION (REDIS)
+# ==========================================
+# Enable this ONLY if you are running a proxy network 
+# (Velocity/BungeeCord) and want instant synchronization 
+# across all servers when a player toggles their nametag.
+redis:
+  enabled: false
+  host: "localhost"
+  port: 6379
+  password: ""

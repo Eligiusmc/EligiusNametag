@@ -8,6 +8,8 @@ public interface PlatformPort {
     void endTick();
     List<UUID> getOnlinePlayers();
     List<UUID> getTamedMobs();
+    void addTamedMob(UUID uuid);
+    void removeTamedMob(UUID uuid);
     boolean canViewerSeeTarget(UUID viewerId, UUID targetId);
     boolean isSameWorld(UUID a, UUID b);
     boolean isGloballyHidden(UUID targetId);
