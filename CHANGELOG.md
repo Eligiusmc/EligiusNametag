@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.4.0...v1.5.0) (2026-06-02)
+
+
+### Features
+
+* implement native redis pub/sub and fix ghost nametags ([#26](https://github.com/Eligiusmc/EligiusNametag/issues/26), [#28](https://github.com/Eligiusmc/EligiusNametag/issues/28)) ([04e6bef](https://github.com/Eligiusmc/EligiusNametag/commit/04e6befe8f04ba48525176acc4330feb199ea525))
+
 ## [1.4.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.3.1...v1.4.0) (2026-06-02)
 
 
