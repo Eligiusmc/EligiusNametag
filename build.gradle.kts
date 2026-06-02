@@ -71,7 +71,12 @@ tasks.named<ProcessResources>("processResources") {
     }
 }
 
+tasks.named<Jar>("jar") {
+    archiveClassifier.set("plain")
+}
+
 tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveClassifier.set("")
     relocate("org.bstats", "com.makrozai.eligiusnametag.libs.bstats")
     relocate("redis.clients.jedis", "com.makrozai.eligiusnametag.libs.jedis")
     relocate("org.apache.commons.pool2", "com.makrozai.eligiusnametag.libs.commons.pool2")

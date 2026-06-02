@@ -43,11 +43,12 @@ jobs:
 
       - name: Build with Gradle
         if: ${{ steps.release.outputs.release_created }}
-        run: ./gradlew build
+        run: ./gradlew build shadowJar
 
       - name: Upload JAR to Release
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          rm build/libs/*-plain.jar || true
           gh release upload ${{ steps.release.outputs.tag_name }} build/libs/EligiusNametag*.jar --clobber
