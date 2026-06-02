@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.0...v1.5.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* force release generation for build artifact changes ([d6b84bd](https://github.com/Eligiusmc/EligiusNametag/commit/d6b84bd804530735ac4e24b656efd43fa9ab836a))
+
 ## [1.5.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.4.0...v1.5.0) (2026-06-02)
 
 
