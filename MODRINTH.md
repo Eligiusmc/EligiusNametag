@@ -19,7 +19,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 **What does this mean for you?**
 * 📉 **Zero Server Lag:** No physical entities taking up memory.
 * 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
-* 🚀 **Future-Proof & Universal:** Runs natively on **Spigot, Paper, and Folia 1.21+** out of the box.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Spigot, Paper, and Folia 1.21 - 26.1.2+** out of the box.
 
 ---
 

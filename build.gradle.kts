@@ -95,7 +95,7 @@ modrinth {
     versionType.set(channelEnv.lowercase())
     
     uploadFile.set(tasks.named("shadowJar"))
-    gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4")
+    gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4", "26.1.1", "26.1.2")
     loaders.addAll("spigot", "paper", "folia")
     syncBodyFrom.set(rootProject.file("MODRINTH.md").readText())
     
@@ -131,7 +131,7 @@ hangarPublish {
         platforms {
             paper {
                 jar.set(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveFile })
-                platformVersions.set(listOf("1.21", "1.21.1", "1.21.3", "1.21.4"))
+                platformVersions.set(listOf("1.21", "1.21.1", "1.21.3", "1.21.4", "26.1.1", "26.1.2"))
             }
         }
     }

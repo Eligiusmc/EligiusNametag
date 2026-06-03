@@ -1,7 +1,7 @@
 ---
 layout: home
 title: "EligiusNametag - Hologramas de alta eficiência para Paper"
-description: "O plugin de nametags holográficos mais eficiente para Spigot, Paper e Folia 1.21+."
+description: "O plugin de nametags holográficos mais eficiente para Spigot, Paper e Folia 1.21 - 26.1.2+."
 
 hero:
   name: "EligiusNametag"

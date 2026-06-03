@@ -21,11 +21,11 @@
 
 ## 🌟 Overview
 
-**EligiusNametag** is a next-generation nametag plugin built for Minecraft 1.21+ servers running Spigot, Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means:
+**EligiusNametag** is a next-generation nametag plugin built for Minecraft 1.21 - 26.1.2+ servers running Spigot, Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means:
 
 * 📉 **Zero Server Lag:** No physical entities taking up memory.
 * 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
-* 🚀 **Future-Proof & Universal:** Runs natively on **Spigot, Paper, and Folia 1.21+** out of the box.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Spigot, Paper, and Folia 1.21 - 26.1.2+** out of the box.
 
 ### ✨ Key Features
 
@@ -59,7 +59,7 @@ We love open-source contributions! If you want to dive into the codebase, fix bu
 
 ### Building from Source
 
-This project enforces **Java 21 LTS** and targets **Spigot, Paper, and Folia 1.21+**.
+This project enforces **Java 21 LTS** and targets **Spigot, Paper, and Folia 1.21 - 26.1.2+**.
 
 ```bash
 # Clone the repository
