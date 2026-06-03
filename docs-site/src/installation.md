@@ -1,6 +1,6 @@
 ---
 title: Installation & Requirements
-description: Learn how to install EligiusNametag on your Paper or Folia server.
+description: Learn how to install EligiusNametag on your Spigot, Spigot, Paper or Folia server.
 ---
 
 # Installation & Requirements
@@ -11,7 +11,7 @@ EligiusNametag is a modern and powerful plugin. By leveraging the latest feature
 
 | Requirement | Minimum Version | Reason |
 |-------------|-----------------|--------|
-| **Platform** | Paper 1.21 - 26.1.2+ or Folia 1.21 - 26.1.2+ | Strict use of `TEXT_DISPLAY` components and Brigadier commands. |
+| **Platform** | Spigot, Paper or Folia 1.21+ | Strict use of `TEXT_DISPLAY` components and Brigadier commands. |
 | **Java** | Java 21 LTS | Source code compiled in JDK 21 format. |
 
 ## 📦 Dependencies

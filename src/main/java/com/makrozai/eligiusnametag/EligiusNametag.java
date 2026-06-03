@@ -9,11 +9,9 @@ import com.makrozai.eligiusnametag.domain.port.DatabasePort;
 import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
 import com.makrozai.eligiusnametag.domain.port.SyncPort;
+import com.makrozai.eligiusnametag.domain.service.AnimationManager;
 import com.makrozai.eligiusnametag.domain.service.NametagService;
 import com.makrozai.eligiusnametag.domain.service.UpdateChecker;
-import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -28,7 +26,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EligiusNametag extends JavaPlugin implements Listener {
@@ -38,8 +35,10 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     private SyncPort syncPort;
     private NametagRendererPort renderer;
     private NametagService nametagService;
+    private AnimationManager animationManager;
     private int taskId = -1;
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onEnable() {
         long startTime = System.currentTimeMillis();
@@ -50,7 +49,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
         
         String platformStr = isFolia ? "Folia" : "Paper";
-        String version = getPluginMeta().getVersion();
+        String version = getDescription().getVersion();
         
         configAdapter = new YamlConfigAdapter(this);
         String storageType = "mysql".equalsIgnoreCase(configAdapter.getDatabaseType()) ? "MySQL" : "SQLite";
@@ -62,7 +61,9 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         }
         
         StartupLogger.printStep("Loading configuration...");
-        this.platform = new PaperPlatformAdapter();
+        animationManager = new AnimationManager(this);
+        animationManager.loadAnimations();
+        this.platform = new PaperPlatformAdapter(animationManager);
         
         StartupLogger.printStep("Loading storage provider... [" + storageType + "]");
         this.database = new DatabaseAdapter(this, configAdapter);
@@ -92,11 +93,13 @@ public class EligiusNametag extends JavaPlugin implements Listener {
 
         // Register Command
         if (!getServer().getClass().getName().contains("Mock")) {
-            LifecycleEventManager<Plugin> manager = this.getLifecycleManager();
-            manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-                final Commands commands = event.registrar();
-                EligiusNametagCommand.createCommand(this, nametagService, commands);
-            });
+            org.bukkit.command.PluginCommand cmd = getCommand("eligiusnametag");
+            if (cmd != null) {
+                EligiusNametagCommand commandExecutor = new EligiusNametagCommand(this, nametagService);
+                cmd.setExecutor(commandExecutor);
+                cmd.setTabCompleter(commandExecutor);
+                cmd.setAliases(configAdapter.getCommandAliases());
+            }
         }
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -148,12 +151,13 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            io.papermc.paper.threadedregions.scheduler.ScheduledTask foliaTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> {
+            taskId = com.makrozai.eligiusnametag.adapter.platform.FoliaSchedulerAdapter.startTask(this, () -> {
+                animationManager.tick();
                 nametagService.updateAllNametags();
-            }, 1L, ticks);
-            taskId = foliaTask.hashCode();
+            }, ticks);
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
             taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+                animationManager.tick();
                 nametagService.updateAllNametags();
             }, ticks, ticks);
         }
@@ -166,6 +170,9 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     public void reloadPlugin() {
         if (taskId != -1) Bukkit.getScheduler().cancelTask(taskId);
         configAdapter.reload();
+        if (animationManager != null) {
+            animationManager.loadAnimations();
+        }
         startTask();
     }
 
@@ -175,6 +182,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         renderer.clearViewer(event.getPlayer().getUniqueId());
     }
 
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (event.getPlayer().hasPermission("eligiusnametag.admin") && UpdateChecker.isUpdateAvailable()) {
@@ -186,7 +194,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
                 event.getPlayer().sendMessage(MiniMessage.miniMessage().deserialize(header));
                 
                 if (versions != null && !versions.isEmpty()) {
-                    versions = versions.replace("{current}", getPluginMeta().getVersion())
+                    versions = versions.replace("{current}", getDescription().getVersion())
                                        .replace("{new}", UpdateChecker.getLatestVersion());
                     event.getPlayer().sendMessage(MiniMessage.miniMessage().deserialize(versions));
                 }

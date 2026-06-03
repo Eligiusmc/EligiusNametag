@@ -10,4 +10,5 @@ public interface NametagRendererPort {
     void destroyNametag(UUID targetId);
     void clearViewer(UUID viewerId);
     void destroyAll();
+    int getActiveEntityCount();
 }

@@ -1,6 +1,6 @@
 ---
 title: Instalación y Requisitos
-description: Aprende cómo instalar EligiusNametag en tu servidor Paper o Folia.
+description: Aprende cómo instalar EligiusNametag en tu servidor Spigot, Paper o Folia.
 ---
 
 # Instalación y Requisitos
