@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.2...v1.6.0) (2026-06-03)
+
+
+### Features
+
+* **nametag:** add pure spigot compatibility and multiplatform support ([3b348cd](https://github.com/Eligiusmc/EligiusNametag/commit/3b348cd3c4ab75ae9ef9086c53fb8e60d9a4d659))
+
 ## [1.5.2](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.1...v1.5.2) (2026-06-03)
 
 
