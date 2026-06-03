@@ -52,3 +52,17 @@ jobs:
         run: |
           rm build/libs/*-plain.jar || true
           gh release upload ${{ steps.release.outputs.tag_name }} build/libs/EligiusNametag*.jar --clobber
+
+      - name: Publish to Modrinth
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
+          CHANNEL: Release
+        run: ./gradlew modrinth --stacktrace
+
+      - name: Publish to Hangar
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+          CHANNEL: Release
+        run: ./gradlew publishPluginPublicationToHangar --stacktrace
