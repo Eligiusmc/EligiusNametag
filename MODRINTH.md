@@ -64,4 +64,4 @@ We believe in accessible documentation. Our Official Wiki is fully translated in
 </div>
 
 ---
-**Requirements:** Paper or Folia (1.21 - 26.1.2+) running Java 21 LTS. No third-party APIs required!
+**Requirements:** Bukkit, Spigot, Paper, Purpur or Folia (1.21 - 26.1.2+) running Java 21 LTS. No third-party APIs required!
