@@ -3,9 +3,9 @@
 
   # EligiusNametag
 
-  *The ultimate, ultra-efficient holographic nametag plugin for Paper & Folia.*
+  *The ultimate, ultra-efficient holographic nametag plugin for Bukkit, Spigot, Paper, Purpur & Folia.*
 
-  [![Paper API](https://img.shields.io/badge/Paper-1.21--26.1.2+-333333?style=flat-square&logo=paper)](https://papermc.io/)
+  [![Paper & Spigot API](https://img.shields.io/badge/Bukkit_|_Spigot_|_Paper_|_Purpur-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
   [![Folia Compatible](https://img.shields.io/badge/Folia-Compatible-ff5e00?style=flat-square&logo=fastapi)](https://papermc.io/software/folia)
   [![Java 21](https://img.shields.io/badge/Java-21_LTS-007396?style=flat-square&logo=openjdk)](https://adoptium.net/)
   [![License](https://img.shields.io/github/license/Eligiusmc/EligiusNametag?style=flat-square&color=blue)](LICENSE)
@@ -21,17 +21,22 @@
 
 ## 🌟 Overview
 
-**EligiusNametag** is a next-generation nametag plugin built exclusively for Minecraft 1.21 - 26.1.2+ servers running Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means **zero lag**, infinite lines, and perfect visual synchronization without fragile third-party dependencies.
+**EligiusNametag** is a next-generation nametag plugin built for Minecraft 1.21 - 26.1.2+ servers running Bukkit, Spigot, Paper, Purpur or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means:
+
+* 📉 **Zero Server Lag:** No physical entities taking up memory.
+* 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+** out of the box.
 
 ### ✨ Key Features
 
 - ⚡ **True Folia Support:** Built from the ground up with asynchronous, thread-safe architecture to fully leverage Folia's multi-threading capabilities.
 - 💾 **Smart Data Persistence:** Local SQLite or remote MySQL powered by **HikariCP** for safe, high-performance database pooling across proxy networks.
 - 🔴 **Native Redis Pub/Sub:** Zero-polling real-time cross-server synchronization. Toggling your nametag on a lobby instantly updates the survival server in less than 5ms!
-- 🎨 **Modern MiniMessage Formatting:** Say goodbye to `&c`. Use `<gradient:red:blue>`, `<bold>`, or HEX colors like `<#ff00ff>` for breathtaking designs.
+- 🎨 **Modern MiniMessage & Gradients:** Say goodbye to legacy `&` colors. Enjoy full RGB gradient support! `<gradient:blue:aqua>Admin</gradient>`.
+- ✨ **Global Animation Engine:** Add moving frames with `<anim:rainbow>` or `<anim:pulse>` natively without lagging the server.
+- 📦 **ItemsAdder & Oraxen:** Display custom emojis and icons natively right inside the nametag.
 - 👑 **Vault Hierarchy Integration:** Automatically assigns nametag formats based on the user's primary Vault rank (e.g., admin, vip, default).
 - 🐾 **Holographic Pets:** Tamed wolves, cats, and parrots inherit their owner's rank formatting!
-- 🖼️ **ItemsAdder Ready:** Fully supports font-images and custom emojis like `:rank_dev:` rendering flawlessly above players' heads.
 - 🌐 **Global i18n:** In-game messages are completely customizable via language files with hot-swapping support.
 - 📊 **bStats Integration:** Anonymous usage metrics help guide the plugin's development. Opt-out anytime in your global bStats config.
 
@@ -54,7 +59,7 @@ We love open-source contributions! If you want to dive into the codebase, fix bu
 
 ### Building from Source
 
-This project enforces **Java 21 LTS** and targets **Paper 1.21 - 26.1.2+**.
+This project enforces **Java 21 LTS** and targets **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+**.
 
 ```bash
 # Clone the repository

@@ -24,6 +24,9 @@ dependencies {
         exclude(group = "org.bukkit")
         exclude(group = "org.spigotmc")
     }
+    implementation("net.kyori:adventure-api:4.17.0")
+    implementation("net.kyori:adventure-text-minimessage:4.17.0")
+    implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.bstats:bstats-bukkit:3.2.1")
     implementation("redis.clients:jedis:5.1.2")
@@ -58,11 +61,7 @@ tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
 
-tasks.processResources {
-    filesMatching("paper-plugin.yml") {
-        expand(project.properties)
-    }
-}
+
 
 val versionString: String = "${version}"
 
@@ -96,9 +95,14 @@ modrinth {
     versionType.set(channelEnv.lowercase())
     
     uploadFile.set(tasks.named("shadowJar"))
-    gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4")
-    loaders.addAll("paper", "folia")
+    gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4", "26.1.1", "26.1.2")
+    loaders.addAll("bukkit", "spigot", "paper", "purpur", "folia")
     syncBodyFrom.set(rootProject.file("MODRINTH.md").readText())
+    
+    val changelogEnv = System.getenv("CHANGELOG")
+    if (!changelogEnv.isNullOrBlank()) {
+        changelog.set(changelogEnv)
+    }
 }
 
 // --- Hangar Publishing Configuration ---
@@ -107,14 +111,19 @@ hangarPublish {
         version.set(versionString)
         id.set("EligiusNametag")
         val channelEnv = System.getenv("CHANNEL") ?: "Release"
-        channel.set(channelEnv.capitalize())
+        channel.set(channelEnv.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
         
         // Hangar requires a changelog
-        val changelogFile = rootProject.file("CHANGELOG.md")
-        if (changelogFile.exists()) {
-            changelog.set(changelogFile.readText())
+        val changelogEnv = System.getenv("CHANGELOG")
+        if (!changelogEnv.isNullOrBlank()) {
+            changelog.set(changelogEnv)
         } else {
-            changelog.set("New Release")
+            val changelogFile = rootProject.file("CHANGELOG.md")
+            if (changelogFile.exists()) {
+                changelog.set(changelogFile.readText())
+            } else {
+                changelog.set("New Release")
+            }
         }
         
         apiKey.set(System.getenv("HANGAR_API_TOKEN"))
@@ -122,7 +131,7 @@ hangarPublish {
         platforms {
             paper {
                 jar.set(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveFile })
-                platformVersions.set(listOf("1.21", "1.21.1", "1.21.3", "1.21.4"))
+                platformVersions.set(listOf("1.21", "1.21.1", "1.21.3", "1.21.4", "26.1.1", "26.1.2"))
             }
         }
     }

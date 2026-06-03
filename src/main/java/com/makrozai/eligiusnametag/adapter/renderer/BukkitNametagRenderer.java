@@ -31,6 +31,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         this.lineSpacing = lineSpacing;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void renderNametag(UUID targetId, List<Component> lines, List<UUID> viewers, float yOffset) {
         Entity target = Bukkit.getEntity(targetId);
@@ -113,7 +114,12 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             // Update text if changed
             Component lastComp = lineJsonCache.get(displayId);
             if (!lineComp.equals(lastComp)) {
-                display.text(lineComp);
+                try {
+                    display.text(lineComp);
+                } catch (NoSuchMethodError e) {
+                    String legacyStr = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build().serialize(lineComp);
+                    display.setText(legacyStr);
+                }
                 lineJsonCache.put(displayId, lineComp);
             }
 
@@ -209,5 +215,14 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         for (Set<UUID> viewers : lineHiddenViewers.values()) {
             viewers.remove(viewerId);
         }
+    }
+
+    @Override
+    public int getActiveEntityCount() {
+        int count = 0;
+        for (List<TextDisplay> displays : activeEntities.values()) {
+            count += displays.size();
+        }
+        return count;
     }
 }

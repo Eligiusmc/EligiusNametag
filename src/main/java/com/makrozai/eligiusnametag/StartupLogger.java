@@ -1,9 +1,16 @@
 package com.makrozai.eligiusnametag;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 
 public class StartupLogger {
+
+    private static void log(String miniMessageString) {
+        String legacy = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
+                .serialize(MiniMessage.miniMessage().deserialize(miniMessageString));
+        Bukkit.getConsoleSender().sendMessage(legacy);
+    }
 
     public static void printLogo(String version, String platform, String storage) {
         String[] lines = {
@@ -17,28 +24,28 @@ public class StartupLogger {
         };
 
         for (String line : lines) {
-            Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize(line));
+            log(line);
         }
     }
 
     public static void printStep(String step) {
-        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <white>" + step + "</white>"));
+        log("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <white>" + step + "</white>");
     }
 
     public static void printError(String error) {
-        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <red>[ERROR] " + error + "</red>"));
+        log("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <red>[ERROR] " + error + "</red>");
     }
 
     public static void printSuccess(long ms) {
-        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <green>Successfully enabled. (took " + ms + "ms)</green>"));
+        log("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <green>Successfully enabled. (took " + ms + "ms)</green>");
     }
 
     public static void printUpToDate(String version) {
-        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <green>✓ You are running the latest version (v" + version + ").</green>"));
+        log("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <green>✓ You are running the latest version (v" + version + ").</green>");
     }
 
     public static void printUpdateNotice(String newVersion, String url) {
-        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <yellow>⚠️ A new update (v" + newVersion + ") is available!</yellow>"));
-        Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <dark_gray>🔗 Download it here:</dark_gray> <aqua><underlined>" + url + "</underlined></aqua>"));
+        log("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <yellow>⚠️ A new update (v" + newVersion + ") is available!</yellow>");
+        log("<gray>[<gradient:#9b59b6:#8e44ad>EligiusNametag</gradient>]</gray> <dark_gray>🔗 Download it here:</dark_gray> <aqua><underlined>" + url + "</underlined></aqua>");
     }
 }

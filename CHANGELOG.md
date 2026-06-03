@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.5.2](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.1...v1.5.2) (2026-06-03)
+
+
+### Bug Fixes
+
+* auto-publish to modrinth and hangar ([2639e1c](https://github.com/Eligiusmc/EligiusNametag/commit/2639e1ce77d01a5124ad8da267c5ec5e392c18cc))
+
+## [1.5.1](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.0...v1.5.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* force release generation for build artifact changes ([d6b84bd](https://github.com/Eligiusmc/EligiusNametag/commit/d6b84bd804530735ac4e24b656efd43fa9ab836a))
+
+## [1.5.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.4.0...v1.5.0) (2026-06-02)
+
+
+### Features
+
+* implement native redis pub/sub and fix ghost nametags ([#26](https://github.com/Eligiusmc/EligiusNametag/issues/26), [#28](https://github.com/Eligiusmc/EligiusNametag/issues/28)) ([04e6bef](https://github.com/Eligiusmc/EligiusNametag/commit/04e6befe8f04ba48525176acc4330feb199ea525))
+
 ## [1.4.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.3.1...v1.4.0) (2026-06-02)
 
 
