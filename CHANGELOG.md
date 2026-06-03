@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.1...v1.5.2) (2026-06-03)
+
+
+### Bug Fixes
+
+* auto-publish to modrinth and hangar ([2639e1c](https://github.com/Eligiusmc/EligiusNametag/commit/2639e1ce77d01a5124ad8da267c5ec5e392c18cc))
+
 ## [1.5.1](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.0...v1.5.1) (2026-06-02)
 
 
