@@ -6,3 +6,8 @@ authors: [makrozai]
 softdepend: [ItemsAdder, PlaceholderAPI, Vault]
 libraries:
   - com.zaxxer:HikariCP:5.1.0
+
+commands:
+  eligiusnametag:
+    description: Main command for EligiusNametag
+    aliases: [enametag]

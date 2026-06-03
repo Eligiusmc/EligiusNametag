@@ -4,7 +4,7 @@
   # ⚡ EligiusNametag
   **The ultimate, zero-lag holographic nametag plugin for modern servers.**
 
-  [![Paper API](https://img.shields.io/badge/Paper-1.21--26.1.2+-333333?style=flat-square&logo=paper)](https://papermc.io/)
+  [![Paper & Spigot API](https://img.shields.io/badge/Bukkit_|_Spigot_|_Paper_|_Purpur-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
   [![Folia Compatible](https://img.shields.io/badge/Folia-Compatible-ff5e00?style=flat-square&logo=fastapi)](https://papermc.io/software/folia)
   [![Java 21](https://img.shields.io/badge/Java-21_LTS-007396?style=flat-square&logo=openjdk)](https://adoptium.net/)
 </div>
@@ -19,7 +19,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 **What does this mean for you?**
 * 📉 **Zero Server Lag:** No physical entities taking up memory.
 * 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
-* 🚀 **Future-Proof:** Runs natively on **1.21 up to 26.1.2+** out of the box.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+** out of the box.
 
 ---
 
@@ -28,6 +28,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 ### 🎨 Unlimited Creative Freedom
 * **Infinite Lines:** Add as many lines above or below the player's name as you want.
 * **MiniMessage & Gradients:** Say goodbye to legacy `&` colors. Enjoy full RGB gradient support! `<gradient:blue:aqua>Admin</gradient>`.
+* **Global Animation Engine:** Add moving frames with `<anim:rainbow>` or `<anim:pulse>` natively without lagging the server.
 * **ItemsAdder & Oraxen:** Display custom emojis and icons natively right inside the nametag.
 
 ### 👑 Hierarchy & Permissions
@@ -44,11 +45,10 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 
 ---
 
-## 🚀 What's New in v1.3.0
-* **Tactical Invisibility Engine:** Eliminated the native Minecraft "fly-in" visual interpolation bug! Now, even if you are flying with Elytras at lightspeed, your nametag will spawn instantly above your head without dragging from behind.
-* **Zero Ghost Entities:** Fixed a critical PaperMC memory leak with non-persistent `TextDisplays` by implementing explicit chunk unload garbage collection.
-* **Smart UI Feedback:** The `/enametag me` command now features Minecraft XP Orb audio cues.
-* **Robust Encoding:** Full UTF-8 support across 6 global languages out of the box, with an improved in-game update notifier.
+## 🚀 What's New in v1.4.0 (The Scale Update)
+* **Universal 1.21 Compatibility:** Re-engineered the command and rendering engine to support pure Vanilla Spigot alongside Bukkit, Spigot, Paper, Purpur & Folia.
+* **Global Animation Engine:** Added a zero-lag asynchronous ticker that reads animations from `animations/`. Add `<anim:rainbow>` to any rank without a TPS drop!
+* **Server Diagnostics:** Added `/enametag debug` to monitor TextDisplays active, MSPT latency, and server stats directly in a text file.
 
 ---
 
@@ -64,4 +64,4 @@ We believe in accessible documentation. Our Official Wiki is fully translated in
 </div>
 
 ---
-**Requirements:** Paper or Folia (1.21 - 26.1.2+) running Java 21 LTS. No third-party APIs required!
+**Requirements:** Bukkit, Spigot, Paper, Purpur or Folia (1.21 - 26.1.2+) running Java 21 LTS. No third-party APIs required!

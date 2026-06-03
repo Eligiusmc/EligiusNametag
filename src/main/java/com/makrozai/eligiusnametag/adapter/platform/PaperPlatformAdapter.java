@@ -14,8 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.makrozai.eligiusnametag.domain.service.AnimationManager;
+
 public class PaperPlatformAdapter implements PlatformPort {
     private Permission vaultPerms;
+    private final AnimationManager animationManager;
     private final java.util.Set<UUID> cachedTamedMobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
     
     // Fallback universal para 1.21.1 (GENERIC_MAX_HEALTH) y 1.21.2+ (MAX_HEALTH)
@@ -34,7 +37,8 @@ public class PaperPlatformAdapter implements PlatformPort {
         }
     }
 
-    public PaperPlatformAdapter() {
+    public PaperPlatformAdapter(AnimationManager animationManager) {
+        this.animationManager = animationManager;
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
             if (rsp != null) {
@@ -134,10 +138,11 @@ public class PaperPlatformAdapter implements PlatformPort {
         return player != null && player.hasPermission(permission);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasCustomName(UUID targetId) {
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
-        return entity != null && entity.customName() != null;
+        return entity != null && entity.getCustomName() != null;
     }
 
     @Override
@@ -159,7 +164,7 @@ public class PaperPlatformAdapter implements PlatformPort {
             Player p = (Player) target;
             op = p;
             parsed = parsed.replace("<PLAYER>", p.getName());
-            parsed = parsed.replace("<DISPLAYNAME>", p.displayName() != null ? p.displayName().toString() : p.getName());
+            parsed = parsed.replace("<DISPLAYNAME>", p.getDisplayName() != null ? p.getDisplayName() : p.getName());
             
             org.bukkit.attribute.AttributeInstance healthAttr = p.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
@@ -231,6 +236,25 @@ public class PaperPlatformAdapter implements PlatformPort {
                 parsed = sb.toString();
             }
         }
+        
+        if (animationManager != null) {
+            java.util.regex.Pattern animPattern = java.util.regex.Pattern.compile("<anim:([a-zA-Z0-9_\\-]+)>(.*?)</anim:\\1>");
+            java.util.regex.Matcher animMatcher = animPattern.matcher(parsed);
+            StringBuffer animSb = new StringBuffer();
+            boolean animFound = false;
+            while (animMatcher.find()) {
+                String animName = animMatcher.group(1);
+                String animText = animMatcher.group(2);
+                String resolvedAnim = animationManager.applyAnimation(animText, animName);
+                animMatcher.appendReplacement(animSb, resolvedAnim);
+                animFound = true;
+            }
+            if (animFound) {
+                animMatcher.appendTail(animSb);
+                parsed = animSb.toString();
+            }
+        }
+
         // Convert standard legacy colors to MiniMessage format just in case PlaceholderAPI returns them
         if (parsed.contains("&") || parsed.contains("§")) {
             parsed = parsed.replace("§", "&");

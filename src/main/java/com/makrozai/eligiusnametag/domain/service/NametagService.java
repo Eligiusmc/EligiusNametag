@@ -21,6 +21,7 @@ public class NametagService {
     private final DatabasePort database;
     private final SyncPort syncPort;
     private final Set<UUID> selfViewers = ConcurrentHashMap.newKeySet();
+    private long lastTickDuration = 0;
 
     public NametagService(ConfigPort config, PlatformPort platform, NametagRendererPort renderer, DatabasePort database, SyncPort syncPort) {
         this.config = config;
@@ -43,6 +44,7 @@ public class NametagService {
     }
 
     public void updateAllNametags() {
+        long startTick = System.currentTimeMillis();
         platform.prepareTick();
         
         List<UUID> onlinePlayers = platform.getOnlinePlayers();
@@ -75,6 +77,19 @@ public class NametagService {
         }
         
         platform.endTick();
+        lastTickDuration = System.currentTimeMillis() - startTick;
+    }
+
+    public long getLastTickDuration() {
+        return lastTickDuration;
+    }
+
+    public int getActiveEntityCount() {
+        return renderer.getActiveEntityCount();
+    }
+
+    public int getSelfViewersCount() {
+        return selfViewers.size();
     }
 
     private void updateTarget(UUID targetId, List<UUID> potentialViewers, boolean isPlayer) {
