@@ -4,7 +4,7 @@
   # ⚡ EligiusNametag
   **The ultimate, zero-lag holographic nametag plugin for modern servers.**
 
-  [![Paper & Spigot API](https://img.shields.io/badge/Spigot_|_Paper-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
+  [![Paper & Spigot API](https://img.shields.io/badge/Bukkit_|_Spigot_|_Paper_|_Purpur-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
   [![Folia Compatible](https://img.shields.io/badge/Folia-Compatible-ff5e00?style=flat-square&logo=fastapi)](https://papermc.io/software/folia)
   [![Java 21](https://img.shields.io/badge/Java-21_LTS-007396?style=flat-square&logo=openjdk)](https://adoptium.net/)
 </div>
@@ -19,7 +19,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 **What does this mean for you?**
 * 📉 **Zero Server Lag:** No physical entities taking up memory.
 * 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
-* 🚀 **Future-Proof & Universal:** Runs natively on **Spigot, Paper, and Folia 1.21 - 26.1.2+** out of the box.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+** out of the box.
 
 ---
 
@@ -46,7 +46,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 ---
 
 ## 🚀 What's New in v1.4.0 (The Scale Update)
-* **Universal 1.21 Compatibility:** Re-engineered the command and rendering engine to support pure Vanilla Spigot alongside Spigot, Paper & Folia.
+* **Universal 1.21 Compatibility:** Re-engineered the command and rendering engine to support pure Vanilla Spigot alongside Bukkit, Spigot, Paper, Purpur & Folia.
 * **Global Animation Engine:** Added a zero-lag asynchronous ticker that reads animations from `animations/`. Add `<anim:rainbow>` to any rank without a TPS drop!
 * **Server Diagnostics:** Added `/enametag debug` to monitor TextDisplays active, MSPT latency, and server stats directly in a text file.
 

@@ -96,7 +96,7 @@ modrinth {
     
     uploadFile.set(tasks.named("shadowJar"))
     gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4", "26.1.1", "26.1.2")
-    loaders.addAll("spigot", "paper", "folia")
+    loaders.addAll("bukkit", "spigot", "paper", "purpur", "folia")
     syncBodyFrom.set(rootProject.file("MODRINTH.md").readText())
     
     val changelogEnv = System.getenv("CHANGELOG")

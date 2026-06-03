@@ -3,9 +3,9 @@
 
   # EligiusNametag
 
-  *The ultimate, ultra-efficient holographic nametag plugin for Spigot, Paper & Folia.*
+  *The ultimate, ultra-efficient holographic nametag plugin for Bukkit, Spigot, Paper, Purpur & Folia.*
 
-  [![Paper & Spigot API](https://img.shields.io/badge/Spigot_|_Paper-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
+  [![Paper & Spigot API](https://img.shields.io/badge/Bukkit_|_Spigot_|_Paper_|_Purpur-1.21+-333333?style=flat-square&logo=paper)](https://papermc.io/)
   [![Folia Compatible](https://img.shields.io/badge/Folia-Compatible-ff5e00?style=flat-square&logo=fastapi)](https://papermc.io/software/folia)
   [![Java 21](https://img.shields.io/badge/Java-21_LTS-007396?style=flat-square&logo=openjdk)](https://adoptium.net/)
   [![License](https://img.shields.io/github/license/Eligiusmc/EligiusNametag?style=flat-square&color=blue)](LICENSE)
@@ -21,11 +21,11 @@
 
 ## 🌟 Overview
 
-**EligiusNametag** is a next-generation nametag plugin built for Minecraft 1.21 - 26.1.2+ servers running Spigot, Paper or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means:
+**EligiusNametag** is a next-generation nametag plugin built for Minecraft 1.21 - 26.1.2+ servers running Bukkit, Spigot, Paper, Purpur or Folia. Instead of relying on legacy physical entities or scoreboards that clutter your server, it uses pure `TextDisplays` handled by the Native Paper API engine. This means:
 
 * 📉 **Zero Server Lag:** No physical entities taking up memory.
 * 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
-* 🚀 **Future-Proof & Universal:** Runs natively on **Spigot, Paper, and Folia 1.21 - 26.1.2+** out of the box.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+** out of the box.
 
 ### ✨ Key Features
 
@@ -59,7 +59,7 @@ We love open-source contributions! If you want to dive into the codebase, fix bu
 
 ### Building from Source
 
-This project enforces **Java 21 LTS** and targets **Spigot, Paper, and Folia 1.21 - 26.1.2+**.
+This project enforces **Java 21 LTS** and targets **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+**.
 
 ```bash
 # Clone the repository
