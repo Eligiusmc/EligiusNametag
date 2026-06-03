@@ -3,6 +3,7 @@ plugins {
     `maven-publish`
     id("com.modrinth.minotaur") version "2.8.7"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 repositories {
@@ -98,4 +99,31 @@ modrinth {
     gameVersions.addAll("1.21", "1.21.1", "1.21.3", "1.21.4")
     loaders.addAll("paper", "folia")
     syncBodyFrom.set(rootProject.file("MODRINTH.md").readText())
+}
+
+// --- Hangar Publishing Configuration ---
+hangarPublish {
+    publications.register("plugin") {
+        version.set(versionString)
+        id.set("EligiusNametag")
+        val channelEnv = System.getenv("CHANNEL") ?: "Release"
+        channel.set(channelEnv.capitalize())
+        
+        // Hangar requires a changelog
+        val changelogFile = rootProject.file("CHANGELOG.md")
+        if (changelogFile.exists()) {
+            changelog.set(changelogFile.readText())
+        } else {
+            changelog.set("New Release")
+        }
+        
+        apiKey.set(System.getenv("HANGAR_API_TOKEN"))
+        
+        platforms {
+            paper {
+                jar.set(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveFile })
+                platformVersions.set(listOf("1.21", "1.21.1", "1.21.3", "1.21.4"))
+            }
+        }
+    }
 }
