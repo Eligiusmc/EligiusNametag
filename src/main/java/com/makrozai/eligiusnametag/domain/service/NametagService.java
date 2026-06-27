@@ -6,7 +6,6 @@ import com.makrozai.eligiusnametag.domain.port.PlatformPort;
 import com.makrozai.eligiusnametag.domain.port.SyncPort;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,12 +22,25 @@ public class NametagService {
     private final Set<UUID> selfViewers = ConcurrentHashMap.newKeySet();
     private long lastTickDuration = 0;
 
+    // Cached once at construction — Folia presence never changes at runtime.
+    private final boolean isFolia;
+    private final org.bukkit.plugin.Plugin plugin;
+
     public NametagService(ConfigPort config, PlatformPort platform, NametagRendererPort renderer, DatabasePort database, SyncPort syncPort) {
         this.config = config;
         this.platform = platform;
         this.renderer = renderer;
         this.database = database;
         this.syncPort = syncPort;
+
+        boolean foliaDetected = false;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            foliaDetected = true;
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
+        this.isFolia = foliaDetected;
+        this.plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag");
+
         this.selfViewers.addAll(database.getAllPlayersWithViewSelf());
         
         // Listen to cross-server Redis updates
@@ -46,15 +58,11 @@ public class NametagService {
     public void updateAllNametags() {
         long startTick = System.currentTimeMillis();
         platform.prepareTick();
-        
+
         List<UUID> onlinePlayers = platform.getOnlinePlayers();
         List<UUID> tamedMobs = platform.getTamedMobs();
 
-        boolean isFolia = false;
-        try { Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); isFolia = true; } catch (ClassNotFoundException e) {}
-
         if (isFolia) {
-            org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag");
             for (UUID targetId : onlinePlayers) {
                 org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
                 if (target != null) {
@@ -145,10 +153,6 @@ public class NametagService {
     }
 
     public boolean toggleSelfView(UUID playerId) {
-        org.bukkit.plugin.Plugin plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag");
-        boolean isFolia = false;
-        try { Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); isFolia = true; } catch (ClassNotFoundException e) {}
-
         if (selfViewers.contains(playerId)) {
             selfViewers.remove(playerId);
             if (isFolia) {
