@@ -5,8 +5,8 @@ import com.makrozai.eligiusnametag.adapter.database.DatabaseAdapter;
 import com.makrozai.eligiusnametag.adapter.network.RedisAdapter;
 import com.makrozai.eligiusnametag.adapter.platform.PaperPlatformAdapter;
 import com.makrozai.eligiusnametag.adapter.renderer.BukkitNametagRenderer;
+import com.makrozai.eligiusnametag.adapter.renderer.BukkitNametagRenderer;
 import com.makrozai.eligiusnametag.domain.port.DatabasePort;
-import com.makrozai.eligiusnametag.domain.port.NametagRendererPort;
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
 import com.makrozai.eligiusnametag.domain.port.SyncPort;
 import com.makrozai.eligiusnametag.domain.service.AnimationManager;
@@ -33,7 +33,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     private PlatformPort platform;
     private DatabasePort database;
     private SyncPort syncPort;
-    private NametagRendererPort renderer;
+    private BukkitNametagRenderer renderer;
     private NametagService nametagService;
     private AnimationManager animationManager;
     private int taskId = -1;
@@ -139,10 +139,19 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         if (syncPort != null) {
             syncPort.close();
         }
-        if (taskId != -1) {
+        cancelActiveTask();
+        getLogger().info("Plugin successfully disabled");
+    }
+
+    private void cancelActiveTask() {
+        if (taskId == -1) return;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            com.makrozai.eligiusnametag.adapter.platform.FoliaSchedulerAdapter.cancelCurrentTask();
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
             Bukkit.getScheduler().cancelTask(taskId);
         }
-        getLogger().info("Plugin successfully disabled");
+        taskId = -1;
     }
 
     private void startTask() {
@@ -168,10 +177,13 @@ public class EligiusNametag extends JavaPlugin implements Listener {
     }
     
     public void reloadPlugin() {
-        if (taskId != -1) Bukkit.getScheduler().cancelTask(taskId);
+        cancelActiveTask();
         configAdapter.reload();
         if (animationManager != null) {
             animationManager.loadAnimations();
+        }
+        if (renderer != null) {
+            renderer.reloadConfig(configAdapter.getViewDistance(), configAdapter.getLineSpacing());
         }
         startTask();
     }
