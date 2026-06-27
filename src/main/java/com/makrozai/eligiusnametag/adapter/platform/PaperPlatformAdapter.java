@@ -13,12 +13,18 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.makrozai.eligiusnametag.domain.service.AnimationManager;
 
 public class PaperPlatformAdapter implements PlatformPort {
+    private static final Pattern EMOJI_PATTERN = Pattern.compile(":([a-zA-Z0-9_\\-]+):");
+    private static final Pattern ANIM_PATTERN = Pattern.compile("<anim:([a-zA-Z0-9_\\-]+)>(.*?)</anim:\\1>");
+
     private Permission vaultPerms;
     private final AnimationManager animationManager;
+    private final boolean hasPapi;
     private final java.util.Set<UUID> cachedTamedMobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
     
     // Fallback universal para 1.21.1 (GENERIC_MAX_HEALTH) y 1.21.2+ (MAX_HEALTH)
@@ -39,6 +45,7 @@ public class PaperPlatformAdapter implements PlatformPort {
 
     public PaperPlatformAdapter(AnimationManager animationManager) {
         this.animationManager = animationManager;
+        this.hasPapi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
             if (rsp != null) {
@@ -159,19 +166,19 @@ public class PaperPlatformAdapter implements PlatformPort {
         org.bukkit.entity.Entity target = Bukkit.getEntity(targetId);
         String parsed = text;
         org.bukkit.OfflinePlayer op = null;
-        
+
         if (target instanceof Player) {
             Player p = (Player) target;
             op = p;
             parsed = parsed.replace("<PLAYER>", p.getName());
             parsed = parsed.replace("<DISPLAYNAME>", p.getDisplayName() != null ? p.getDisplayName() : p.getName());
-            
+
             org.bukkit.attribute.AttributeInstance healthAttr = p.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
             parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(p.getHealth())));
             parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
-            
-            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+
+            if (hasPapi) {
                 parsed = PlaceholderAPI.setPlaceholders(p, parsed);
             }
         } else if (target instanceof Tameable) {
@@ -189,7 +196,7 @@ public class PaperPlatformAdapter implements PlatformPort {
             parsed = parsed.replace("<OWNER>", ownerName);
             parsed = parsed.replace("<DISPLAYNAME>", mobName);
             parsed = parsed.replace("<CUSTOM_NAME>", t.getCustomName() != null ? t.getCustomName() : "");
-            
+
             String rawType = t.getType().name().toLowerCase().replace("_", " ");
             StringBuilder capType = new StringBuilder();
             for (String word : rawType.split(" ")) {
@@ -198,36 +205,35 @@ public class PaperPlatformAdapter implements PlatformPort {
                 }
             }
             parsed = parsed.replace("<TYPE>", capType.toString().trim());
-            
+
             if (target instanceof org.bukkit.entity.Ageable) {
                 boolean isBaby = !((org.bukkit.entity.Ageable) target).isAdult();
                 parsed = parsed.replace("<AGE>", isBaby ? "Baby" : "Adult");
             }
-            
+
             org.bukkit.attribute.AttributeInstance healthAttr = t.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
             parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(t.getHealth())));
             parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
-            
-            if (op != null && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+
+            if (op != null && hasPapi) {
                 parsed = PlaceholderAPI.setPlaceholders(op, parsed);
             }
         }
-        
-        if (op != null && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(":([a-zA-Z0-9_\\-]+):");
-            java.util.regex.Matcher matcher = pattern.matcher(parsed);
+
+        // Resolve ItemsAdder/Oraxen emoji placeholders (:emoji_name: → %img_emoji_name%).
+        // quoteReplacement prevents '$' or '\' in PAPI output from being misread as regex group references.
+        if (op != null && hasPapi) {
+            Matcher matcher = EMOJI_PATTERN.matcher(parsed);
             StringBuffer sb = new StringBuffer();
             boolean found = false;
-
             while (matcher.find()) {
                 String placeholder = "%img_" + matcher.group(1) + "%";
                 String resolved = PlaceholderAPI.setPlaceholders(op, placeholder);
-                
                 if (resolved.equals(placeholder)) {
-                    matcher.appendReplacement(sb, matcher.group(0));
+                    matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
                 } else {
-                    matcher.appendReplacement(sb, resolved);
+                    matcher.appendReplacement(sb, Matcher.quoteReplacement(resolved));
                 }
                 found = true;
             }
@@ -236,17 +242,16 @@ public class PaperPlatformAdapter implements PlatformPort {
                 parsed = sb.toString();
             }
         }
-        
+
         if (animationManager != null) {
-            java.util.regex.Pattern animPattern = java.util.regex.Pattern.compile("<anim:([a-zA-Z0-9_\\-]+)>(.*?)</anim:\\1>");
-            java.util.regex.Matcher animMatcher = animPattern.matcher(parsed);
+            Matcher animMatcher = ANIM_PATTERN.matcher(parsed);
             StringBuffer animSb = new StringBuffer();
             boolean animFound = false;
             while (animMatcher.find()) {
                 String animName = animMatcher.group(1);
                 String animText = animMatcher.group(2);
                 String resolvedAnim = animationManager.applyAnimation(animText, animName);
-                animMatcher.appendReplacement(animSb, resolvedAnim);
+                animMatcher.appendReplacement(animSb, Matcher.quoteReplacement(resolvedAnim));
                 animFound = true;
             }
             if (animFound) {
@@ -266,7 +271,7 @@ public class PaperPlatformAdapter implements PlatformPort {
                            .replace("&f", "<white>").replace("&l", "<bold>").replace("&m", "<strikethrough>")
                            .replace("&n", "<underlined>").replace("&o", "<italic>").replace("&r", "<reset>");
         }
-        
+
         return net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(parsed);
     }
 
