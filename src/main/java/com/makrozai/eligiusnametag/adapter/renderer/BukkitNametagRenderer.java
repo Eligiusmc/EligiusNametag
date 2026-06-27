@@ -19,7 +19,8 @@ public class BukkitNametagRenderer implements NametagRendererPort {
     private final Plugin plugin;
     private double viewDistance;
     private double lineSpacing;
-    
+    private final boolean hasEntityScheduler;
+
     private final Map<UUID, List<TextDisplay>> activeEntities = new ConcurrentHashMap<>();
     private final Map<UUID, Set<UUID>> lineSpawnedViewers = new ConcurrentHashMap<>();
     private final Map<UUID, Set<UUID>> lineHiddenViewers = new ConcurrentHashMap<>();
@@ -29,6 +30,12 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         this.plugin = plugin;
         this.viewDistance = viewDistance;
         this.lineSpacing = lineSpacing;
+        boolean schedulerAvailable = false;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+            schedulerAvailable = true;
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
+        this.hasEntityScheduler = schedulerAvailable;
     }
 
     @SuppressWarnings("deprecation")
@@ -90,12 +97,20 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             }
             
             // Delayed visibility to prevent fly-in animation.
-            // Uses entity scheduler so it works on both Paper and Folia (Bukkit.getScheduler() throws on Folia).
-            display.getScheduler().runDelayed(plugin, task -> {
-                if (display.isValid() && !display.isDead()) {
-                    display.setTextOpacity((byte) -1);
-                }
-            }, null, 2L);
+            // EntityScheduler exists on Paper/Folia; Spigot falls back to global scheduler.
+            if (hasEntityScheduler) {
+                display.getScheduler().runDelayed(plugin, task -> {
+                    if (display.isValid() && !display.isDead()) {
+                        display.setTextOpacity((byte) -1);
+                    }
+                }, null, 2L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (display.isValid() && !display.isDead()) {
+                        display.setTextOpacity((byte) -1);
+                    }
+                }, 2L);
+            }
 
             // Set translation (yOffset)
             float calculatedYOffset = yOffset + ((lines.size() - 1 - i) * (float) lineSpacing);

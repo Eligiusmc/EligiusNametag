@@ -47,7 +47,7 @@ public class EligiusNametagCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sendMessage(sender, Component.text("EligiusNametag v" + plugin.getPluginMeta().getVersion(), NamedTextColor.GREEN));
+            sendMessage(sender, Component.text("EligiusNametag v" + plugin.getDescription().getVersion(), NamedTextColor.GREEN));
             return true;
         }
 
@@ -169,7 +169,7 @@ public class EligiusNametagCommand implements CommandExecutor, TabCompleter {
                     out.println();
                     
                     out.println("--- Plugin Metrics ---");
-                    out.println("Version: " + plugin.getPluginMeta().getVersion());
+                    out.println("Version: " + plugin.getDescription().getVersion());
                     out.println("Active TextDisplays: " + service.getActiveEntityCount());
                     out.println("Tracking Loop Latency: " + service.getLastTickDuration() + "ms");
                     out.println("Players with ViewSelf: " + service.getSelfViewersCount());
@@ -190,7 +190,7 @@ public class EligiusNametagCommand implements CommandExecutor, TabCompleter {
                     out.println();
                     out.println("--- Installed Plugins ---");
                     Arrays.stream(Bukkit.getPluginManager().getPlugins())
-                        .forEach(p -> out.println("- " + p.getName() + " v" + p.getPluginMeta().getVersion()));
+                        .forEach(p -> out.println("- " + p.getName() + " v" + p.getDescription().getVersion()));
                 } catch (Exception e) {
                     plugin.getLogger().severe("Failed to generate debug report: " + e.getMessage());
                     sendMessage(sender, Component.text("Failed to generate debug report. Check console.", NamedTextColor.RED));
