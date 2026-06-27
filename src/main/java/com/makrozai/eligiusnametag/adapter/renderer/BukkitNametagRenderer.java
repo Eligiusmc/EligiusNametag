@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitNametagRenderer implements NametagRendererPort {
     private final Plugin plugin;
-    private final double viewDistance;
-    private final double lineSpacing;
+    private double viewDistance;
+    private double lineSpacing;
     
     private final Map<UUID, List<TextDisplay>> activeEntities = new ConcurrentHashMap<>();
     private final Map<UUID, Set<UUID>> lineSpawnedViewers = new ConcurrentHashMap<>();
@@ -89,12 +89,13 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                 target.addPassenger(display);
             }
             
-            // Delayed visibility to prevent fly-in animation
-            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            // Delayed visibility to prevent fly-in animation.
+            // Uses entity scheduler so it works on both Paper and Folia (Bukkit.getScheduler() throws on Folia).
+            display.getScheduler().runDelayed(plugin, task -> {
                 if (display.isValid() && !display.isDead()) {
                     display.setTextOpacity((byte) -1);
                 }
-            }, 2L);
+            }, null, 2L);
 
             // Set translation (yOffset)
             float calculatedYOffset = yOffset + ((lines.size() - 1 - i) * (float) lineSpacing);
@@ -124,11 +125,15 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             }
 
             // Update viewer visibility
-            Set<UUID> currentViewers = lineSpawnedViewers.computeIfAbsent(displayId, k -> new HashSet<>());
-            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(displayId, k -> new HashSet<>());
-            
+            // ConcurrentHashMap.newKeySet() is used so concurrent access from Folia region threads is safe.
+            Set<UUID> currentViewers = lineSpawnedViewers.computeIfAbsent(displayId, k -> ConcurrentHashMap.newKeySet());
+            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(displayId, k -> ConcurrentHashMap.newKeySet());
+
+            // Convert to Set for O(1) contains() — avoids O(n²) in the hot loop.
+            Set<UUID> viewerSet = new java.util.HashSet<>(viewers);
+
             // Show to new valid viewers
-            for (UUID viewerId : viewers) {
+            for (UUID viewerId : viewerSet) {
                 if (!currentViewers.contains(viewerId)) {
                     Player viewer = Bukkit.getPlayer(viewerId);
                     if (viewer != null && viewer.isOnline()) {
@@ -143,7 +148,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             Iterator<UUID> it = currentViewers.iterator();
             while (it.hasNext()) {
                 UUID currentViewerId = it.next();
-                if (!viewers.contains(currentViewerId)) {
+                if (!viewerSet.contains(currentViewerId)) {
                     Player currentViewer = Bukkit.getPlayer(currentViewerId);
                     if (currentViewer != null && currentViewer.isOnline()) {
                         currentViewer.hideEntity(plugin, display);
@@ -162,7 +167,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
 
         for (TextDisplay display : displays) {
             Set<UUID> currentViewers = lineSpawnedViewers.get(display.getUniqueId());
-            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(display.getUniqueId(), k -> new HashSet<>());
+            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(display.getUniqueId(), k -> ConcurrentHashMap.newKeySet());
             
             for (UUID viewerId : viewers) {
                 if (!hiddenViewers.contains(viewerId)) {
@@ -224,5 +229,10 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             count += displays.size();
         }
         return count;
+    }
+
+    public void reloadConfig(double viewDistance, double lineSpacing) {
+        this.viewDistance = viewDistance;
+        this.lineSpacing = lineSpacing;
     }
 }
