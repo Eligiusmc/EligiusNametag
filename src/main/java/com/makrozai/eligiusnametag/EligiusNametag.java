@@ -5,7 +5,6 @@ import com.makrozai.eligiusnametag.adapter.database.DatabaseAdapter;
 import com.makrozai.eligiusnametag.adapter.network.RedisAdapter;
 import com.makrozai.eligiusnametag.adapter.platform.PaperPlatformAdapter;
 import com.makrozai.eligiusnametag.adapter.renderer.BukkitNametagRenderer;
-import com.makrozai.eligiusnametag.adapter.renderer.BukkitNametagRenderer;
 import com.makrozai.eligiusnametag.domain.port.DatabasePort;
 import com.makrozai.eligiusnametag.domain.port.PlatformPort;
 import com.makrozai.eligiusnametag.domain.port.SyncPort;

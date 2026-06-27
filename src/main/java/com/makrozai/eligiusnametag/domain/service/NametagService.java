@@ -39,7 +39,8 @@ public class NametagService {
             foliaDetected = true;
         } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
         this.isFolia = foliaDetected;
-        this.plugin = org.bukkit.Bukkit.getPluginManager().getPlugin("EligiusNametag");
+        org.bukkit.plugin.PluginManager pm = (org.bukkit.Bukkit.getServer() != null) ? org.bukkit.Bukkit.getPluginManager() : null;
+        this.plugin = (pm != null) ? pm.getPlugin("EligiusNametag") : null;
 
         this.selfViewers.addAll(database.getAllPlayersWithViewSelf());
         
