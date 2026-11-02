@@ -17,12 +17,15 @@ import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
@@ -88,7 +91,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         
         // Service Initialization
         StartupLogger.printStep("Initializing services...");
-        renderer = new BukkitNametagRenderer(this, configAdapter.getViewDistance(), configAdapter.getLineSpacing());
+        renderer = new BukkitNametagRenderer(this, configAdapter.getLineSpacing());
         nametagService = new NametagService(configAdapter, platform, renderer, database, syncPort);
 
         // Register Command
@@ -209,12 +212,37 @@ public class EligiusNametag extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        renderer.destroyNametag(event.getPlayer().getUniqueId());
         renderer.clearViewer(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        renderer.destroyNametag(event.getPlayer().getUniqueId());
         renderer.clearViewer(event.getPlayer().getUniqueId());
+    }
+
+    /**
+     * Fixes #46 / #47: a nametag TextDisplay is mounted as a passenger of the player,
+     * turning the player into a "vehicle". CraftBukkit refuses to teleport a vehicle
+     * (cross-world returns false; pre-1.21.10 same-world is also blocked), which is why
+     * Multiverse-Core and other teleport plugins silently failed.
+     *
+     * We eject the displays right before the teleport resolves (MONITOR runs last, still
+     * synchronously before CraftBukkit performs the move) so the player has no passenger.
+     * The renderer re-mounts on the next tick; a 1-tick follow-up remount inside
+     * ejectPassengers() minimises any floating ghost at the origin.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        renderer.ejectPassengers(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityTeleport(EntityTeleportEvent event) {
+        if (event.getEntity() instanceof org.bukkit.entity.Tameable) {
+            renderer.ejectPassengers(event.getEntity().getUniqueId());
+        }
     }
 
     @EventHandler
