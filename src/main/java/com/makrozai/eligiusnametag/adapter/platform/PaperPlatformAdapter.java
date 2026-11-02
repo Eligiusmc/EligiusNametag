@@ -84,7 +84,11 @@ public class PaperPlatformAdapter implements PlatformPort {
         List<UUID> list = new ArrayList<>();
         for (UUID uuid : cachedTamedMobs) {
             org.bukkit.entity.Entity e = Bukkit.getEntity(uuid);
-            if (e instanceof Tameable && ((Tameable) e).isTamed() && !e.isDead() && e.isValid()) {
+            // Track tamed OR named (pets.yml contract). Evicting named-untamed here
+            // silently dropped camels/horses that only carry a Name Tag.
+            if (e instanceof Tameable t
+                    && (t.isTamed() || e.getCustomName() != null)
+                    && !e.isDead() && e.isValid()) {
                 list.add(uuid);
             } else {
                 cachedTamedMobs.remove(uuid);
