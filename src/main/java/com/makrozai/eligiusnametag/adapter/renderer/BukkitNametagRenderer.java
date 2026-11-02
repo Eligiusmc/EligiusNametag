@@ -36,6 +36,16 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         Entity target = Bukkit.getEntity(targetId);
         if (target == null) return;
 
+        // Safety net: while a player rides this entity the seat belongs to the rider.
+        // Spawning/remounting a display here would kick the player or fail silently.
+        // Destroy so the next render after dismount starts clean (hidden-while-ridden).
+        for (Entity passenger : target.getPassengers()) {
+            if (passenger instanceof Player) {
+                destroyNametag(targetId);
+                return;
+            }
+        }
+
         List<TextDisplay> displays = activeEntities.computeIfAbsent(targetId, k -> new ArrayList<>());
 
         // 0. Remove any dead, invalid or cross-world displays
@@ -249,6 +259,11 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         target.getScheduler().run(plugin, task -> {
             Entity t = Bukkit.getEntity(targetId);
             if (t == null) return;
+            // Never steal the rider's seat: if a player mounted meanwhile, leave it alone
+            // (EntityMountEvent/render destroy the tag; respawn happens after dismount).
+            for (Entity p : t.getPassengers()) {
+                if (p instanceof Player) return;
+            }
             List<TextDisplay> current = activeEntities.get(targetId);
             if (current == null) return;
             for (TextDisplay display : current) {
