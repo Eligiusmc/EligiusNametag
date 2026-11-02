@@ -19,7 +19,7 @@ Most nametag plugins rely on legacy scoreboards (which conflict with your sideba
 **What does this mean for you?**
 * 📉 **Zero Server Lag:** No physical entities taking up memory.
 * 🛡️ **Zero Dependencies:** No fragile ProtocolLib packet injections that break every update.
-* 🚀 **Future-Proof & Universal:** Runs natively on **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.1.2+** out of the box.
+* 🚀 **Future-Proof & Universal:** Runs natively on **Bukkit, Spigot, Paper, Purpur, and Folia 1.21 - 26.3+** out of the box.
 
 ---
 
@@ -64,4 +64,4 @@ We believe in accessible documentation. Our Official Wiki is fully translated in
 </div>
 
 ---
-**Requirements:** Bukkit, Spigot, Paper, Purpur or Folia (1.21 - 26.1.2+) running Java 21 LTS. No third-party APIs required!
+**Requirements:** Bukkit, Spigot, Paper, Purpur or Folia (1.21 - 26.3+) running Java 21 LTS (Java 25 required for MC 26.1+). No third-party APIs required!

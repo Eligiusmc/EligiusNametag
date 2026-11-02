@@ -11,3 +11,11 @@ commands:
   eligiusnametag:
     description: Main command for EligiusNametag
     aliases: [enametag]
+
+permissions:
+  eligiusnametag.admin:
+    description: Allows reload, lang, pets and debug subcommands
+    default: op
+  eligiusnametag.viewself:
+    description: Allows /enametag me to toggle your own nametag
+    default: true

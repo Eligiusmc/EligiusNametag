@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Transformation;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -17,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitNametagRenderer implements NametagRendererPort {
     private final Plugin plugin;
-    private final double viewDistance;
     private final double lineSpacing;
     
     private final Map<UUID, List<TextDisplay>> activeEntities = new ConcurrentHashMap<>();
@@ -25,9 +25,8 @@ public class BukkitNametagRenderer implements NametagRendererPort {
     private final Map<UUID, Set<UUID>> lineHiddenViewers = new ConcurrentHashMap<>();
     private final Map<UUID, Component> lineJsonCache = new ConcurrentHashMap<>();
 
-    public BukkitNametagRenderer(Plugin plugin, double viewDistance, double lineSpacing) {
+    public BukkitNametagRenderer(Plugin plugin, double lineSpacing) {
         this.plugin = plugin;
-        this.viewDistance = viewDistance;
         this.lineSpacing = lineSpacing;
     }
 
@@ -37,11 +36,27 @@ public class BukkitNametagRenderer implements NametagRendererPort {
         Entity target = Bukkit.getEntity(targetId);
         if (target == null) return;
 
+        // Safety net: while a player rides this entity the seat belongs to the rider.
+        // Spawning/remounting a display here would kick the player or fail silently.
+        // Destroy so the next render after dismount starts clean (hidden-while-ridden).
+        for (Entity passenger : target.getPassengers()) {
+            if (passenger instanceof Player) {
+                destroyNametag(targetId);
+                return;
+            }
+        }
+
         List<TextDisplay> displays = activeEntities.computeIfAbsent(targetId, k -> new ArrayList<>());
 
-        // 0. Remove any dead or invalid displays (Fixes memory leaks on chunk unload)
+        // 0. Remove any dead, invalid or cross-world displays
+        // (Fixes memory leaks on chunk unload and ghost tags left behind on world change,
+        //  since remounting a passenger across worlds silently fails and orphans the display)
         displays.removeIf(display -> {
-            if (!display.isValid() || display.isDead()) {
+            boolean wrongWorld = display.getWorld() != target.getWorld();
+            if (!display.isValid() || display.isDead() || wrongWorld) {
+                if (wrongWorld && display.isValid() && !display.isDead()) {
+                    display.remove();
+                }
                 lineSpawnedViewers.remove(display.getUniqueId());
                 lineHiddenViewers.remove(display.getUniqueId());
                 lineJsonCache.remove(display.getUniqueId());
@@ -52,21 +67,48 @@ public class BukkitNametagRenderer implements NametagRendererPort {
 
         // 1. Spawn missing lines
         while (displays.size() < lines.size()) {
+            final int lineIndex = displays.size();
+            final float spawnYOffset = yOffset + ((lines.size() - 1 - lineIndex) * (float) lineSpacing);
+            final Component initialText = lines.get(lineIndex);
             Location spawnLoc = target.getLocation().add(0, target.getBoundingBox().getHeight(), 0);
             TextDisplay display = target.getWorld().spawn(spawnLoc, TextDisplay.class, entity -> {
                 entity.setPersistent(false);
                 entity.setVisibleByDefault(true);
                 entity.setBillboard(Display.Billboard.CENTER);
-                entity.setViewRange((float) viewDistance);
+                // view_range is a render-distance MULTIPLIER (1.0 = default), not blocks.
+                // Real distance gating is enforced server-side via show/hideEntity by NametagService.
+                entity.setViewRange(1.0f);
                 entity.setShadowRadius(0f);
                 entity.setShadowStrength(0f);
                 entity.setTeleportDuration(0);
                 entity.setInterpolationDuration(0);
+                // Apply the line offset INSIDE the spawn consumer so the initial entity metadata
+                // already contains the transformation. Setting it after spawn makes Bedrock clients
+                // (GeyserMC) render all lines stacked at the same position until a relog. (Issue #45)
+                entity.setTransformation(new Transformation(
+                    new Vector3f(0f, spawnYOffset, 0f),
+                    new Quaternionf(),
+                    new Vector3f(1f, 1f, 1f),
+                    new Quaternionf()
+                ));
                 entity.setTextOpacity((byte) 0);
-                // Ensure text is visible through blocks just like virtual ones usually are if configured?
-                // Depending on requirements.
+                try {
+                    entity.text(initialText);
+                } catch (NoSuchMethodError e) {
+                    entity.setText(serializeLegacy(initialText));
+                }
             });
             displays.add(display);
+            lineJsonCache.put(display.getUniqueId(), initialText);
+
+            // Delayed visibility (spawn-only) to prevent the fly-in animation.
+            // Entity scheduler works on both Paper and Folia (Bukkit.getScheduler() throws on Folia).
+            final TextDisplay spawned = display;
+            spawned.getScheduler().runDelayed(plugin, task -> {
+                if (spawned.isValid() && !spawned.isDead()) {
+                    spawned.setTextOpacity((byte) -1);
+                }
+            }, null, 2L);
         }
 
         // 2. Destroy extra lines
@@ -88,13 +130,6 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             if (display.getVehicle() == null || !display.getVehicle().getUniqueId().equals(target.getUniqueId())) {
                 target.addPassenger(display);
             }
-            
-            // Delayed visibility to prevent fly-in animation
-            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (display.isValid() && !display.isDead()) {
-                    display.setTextOpacity((byte) -1);
-                }
-            }, 2L);
 
             // Set translation (yOffset)
             float calculatedYOffset = yOffset + ((lines.size() - 1 - i) * (float) lineSpacing);
@@ -117,18 +152,21 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                 try {
                     display.text(lineComp);
                 } catch (NoSuchMethodError e) {
-                    String legacyStr = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build().serialize(lineComp);
-                    display.setText(legacyStr);
+                    display.setText(serializeLegacy(lineComp));
                 }
                 lineJsonCache.put(displayId, lineComp);
             }
 
             // Update viewer visibility
-            Set<UUID> currentViewers = lineSpawnedViewers.computeIfAbsent(displayId, k -> new HashSet<>());
-            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(displayId, k -> new HashSet<>());
-            
+            // ConcurrentHashMap.newKeySet() keeps Folia region threads from hitting ConcurrentModificationException.
+            Set<UUID> currentViewers = lineSpawnedViewers.computeIfAbsent(displayId, k -> ConcurrentHashMap.newKeySet());
+            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(displayId, k -> ConcurrentHashMap.newKeySet());
+
+            // O(1) contains() in the hot loop below (avoids O(n²) on large viewer lists).
+            Set<UUID> viewerSet = new HashSet<>(viewers);
+
             // Show to new valid viewers
-            for (UUID viewerId : viewers) {
+            for (UUID viewerId : viewerSet) {
                 if (!currentViewers.contains(viewerId)) {
                     Player viewer = Bukkit.getPlayer(viewerId);
                     if (viewer != null && viewer.isOnline()) {
@@ -143,7 +181,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             Iterator<UUID> it = currentViewers.iterator();
             while (it.hasNext()) {
                 UUID currentViewerId = it.next();
-                if (!viewers.contains(currentViewerId)) {
+                if (!viewerSet.contains(currentViewerId)) {
                     Player currentViewer = Bukkit.getPlayer(currentViewerId);
                     if (currentViewer != null && currentViewer.isOnline()) {
                         currentViewer.hideEntity(plugin, display);
@@ -162,7 +200,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
 
         for (TextDisplay display : displays) {
             Set<UUID> currentViewers = lineSpawnedViewers.get(display.getUniqueId());
-            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(display.getUniqueId(), k -> new HashSet<>());
+            Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(display.getUniqueId(), k -> ConcurrentHashMap.newKeySet());
             
             for (UUID viewerId : viewers) {
                 if (!hiddenViewers.contains(viewerId)) {
@@ -192,6 +230,48 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                 lineJsonCache.remove(display.getUniqueId());
             }
         }
+    }
+
+    /**
+     * Unmounts this target's TextDisplays without destroying them.
+     * CraftBukkit refuses to teleport an entity that has passengers (the player becomes
+     * a "vehicle"), which blocked Multiverse and other TP plugins (#46 / #47).
+     * Called right before the teleport resolves; the next render pass re-mounts, and a
+     * 1-tick follow-up remount minimises the floating ghost at the origin.
+     */
+    @Override
+    public void ejectPassengers(UUID targetId) {
+        List<TextDisplay> displays = activeEntities.get(targetId);
+        if (displays == null || displays.isEmpty()) return;
+
+        Entity target = Bukkit.getEntity(targetId);
+        if (target == null) return;
+
+        for (TextDisplay display : displays) {
+            if (display.isValid() && !display.isDead()
+                    && display.getVehicle() != null
+                    && display.getVehicle().getUniqueId().equals(targetId)) {
+                target.removePassenger(display);
+            }
+        }
+
+        // Teleport has not moved the player yet at event time; remount on the next tick.
+        target.getScheduler().run(plugin, task -> {
+            Entity t = Bukkit.getEntity(targetId);
+            if (t == null) return;
+            // Never steal the rider's seat: if a player mounted meanwhile, leave it alone
+            // (EntityMountEvent/render destroy the tag; respawn happens after dismount).
+            for (Entity p : t.getPassengers()) {
+                if (p instanceof Player) return;
+            }
+            List<TextDisplay> current = activeEntities.get(targetId);
+            if (current == null) return;
+            for (TextDisplay display : current) {
+                if (display.isValid() && !display.isDead() && display.getVehicle() == null) {
+                    t.addPassenger(display);
+                }
+            }
+        }, () -> { /* entity retired (quit/unload) — render loop handles cleanup */ });
     }
 
     @Override
@@ -224,5 +304,13 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             count += displays.size();
         }
         return count;
+    }
+
+    private static String serializeLegacy(Component component) {
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.builder()
+                .hexColors()
+                .useUnusualXRepeatedCharacterHexFormat()
+                .build()
+                .serialize(component);
     }
 }

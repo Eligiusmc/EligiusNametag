@@ -46,9 +46,13 @@ public class NametagService {
     public void updateAllNametags() {
         long startTick = System.currentTimeMillis();
         platform.prepareTick();
-        
+
         List<UUID> onlinePlayers = platform.getOnlinePlayers();
         List<UUID> tamedMobs = platform.getTamedMobs();
+
+        // View-distance gate is config-driven and computed once per tick (issue #45).
+        int viewDistance = config.getViewDistance();
+        double maxDistanceSquared = (double) viewDistance * viewDistance;
 
         boolean isFolia = false;
         try { Class.forName("io.papermc.paper.threadedregions.RegionizedServer"); isFolia = true; } catch (ClassNotFoundException e) {}
@@ -58,24 +62,24 @@ public class NametagService {
             for (UUID targetId : onlinePlayers) {
                 org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
                 if (target != null) {
-                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, true), null, 1L);
+                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, true, maxDistanceSquared), null, 1L);
                 }
             }
             for (UUID targetId : tamedMobs) {
                 org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
                 if (target != null) {
-                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, false), null, 1L);
+                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, false, maxDistanceSquared), null, 1L);
                 }
             }
         } else {
             for (UUID targetId : onlinePlayers) {
-                updateTarget(targetId, onlinePlayers, true);
+                updateTarget(targetId, onlinePlayers, true, maxDistanceSquared);
             }
             for (UUID targetId : tamedMobs) {
-                updateTarget(targetId, onlinePlayers, false);
+                updateTarget(targetId, onlinePlayers, false, maxDistanceSquared);
             }
         }
-        
+
         platform.endTick();
         lastTickDuration = System.currentTimeMillis() - startTick;
     }
@@ -92,9 +96,9 @@ public class NametagService {
         return selfViewers.size();
     }
 
-    private void updateTarget(UUID targetId, List<UUID> potentialViewers, boolean isPlayer) {
+    private void updateTarget(UUID targetId, List<UUID> potentialViewers, boolean isPlayer, double maxDistanceSquared) {
         boolean isHidden = platform.isGloballyHidden(targetId);
-        
+
         if (!isPlayer) {
             if (!config.isTamedMobsEnabled() || (!config.isTamedMobsShowUnnamed() && !platform.hasCustomName(targetId))) {
                 isHidden = true;
@@ -111,8 +115,11 @@ public class NametagService {
                     continue;
                 }
             }
-            
-            if (!isHidden && platform.isSameWorld(targetId, viewerId) && platform.canViewerSeeTarget(viewerId, targetId)) {
+
+            if (!isHidden
+                    && platform.isSameWorld(targetId, viewerId)
+                    && platform.getDistanceSquared(targetId, viewerId) <= maxDistanceSquared
+                    && platform.canViewerSeeTarget(viewerId, targetId)) {
                 validViewers.add(viewerId);
             } else {
                 invalidViewers.add(viewerId);

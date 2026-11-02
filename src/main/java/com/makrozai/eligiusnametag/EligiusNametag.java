@@ -17,15 +17,21 @@ import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EligiusNametag extends JavaPlugin implements Listener {
@@ -88,7 +94,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         
         // Service Initialization
         StartupLogger.printStep("Initializing services...");
-        renderer = new BukkitNametagRenderer(this, configAdapter.getViewDistance(), configAdapter.getLineSpacing());
+        renderer = new BukkitNametagRenderer(this, configAdapter.getLineSpacing());
         nametagService = new NametagService(configAdapter, platform, renderer, database, syncPort);
 
         // Register Command
@@ -107,7 +113,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         StartupLogger.printStep("Performing initial data load...");
         for (org.bukkit.World w : Bukkit.getWorlds()) {
             for (org.bukkit.entity.Tameable t : w.getEntitiesByClass(org.bukkit.entity.Tameable.class)) {
-                if (t.isTamed()) {
+                if (shouldTrackPet(t)) {
                     platform.addTamedMob(t.getUniqueId());
                 }
             }
@@ -209,12 +215,118 @@ public class EligiusNametag extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        renderer.destroyNametag(event.getPlayer().getUniqueId());
         renderer.clearViewer(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        renderer.destroyNametag(event.getPlayer().getUniqueId());
         renderer.clearViewer(event.getPlayer().getUniqueId());
+    }
+
+    /**
+     * Fixes #46 / #47: a nametag TextDisplay is mounted as a passenger of the player,
+     * turning the player into a "vehicle". CraftBukkit refuses to teleport a vehicle
+     * (cross-world returns false; pre-1.21.10 same-world is also blocked), which is why
+     * Multiverse-Core and other teleport plugins silently failed.
+     *
+     * We eject the displays right before the teleport resolves (MONITOR runs last, still
+     * synchronously before CraftBukkit performs the move) so the player has no passenger.
+     * The renderer re-mounts on the next tick; a 1-tick follow-up remount inside
+     * ejectPassengers() minimises any floating ghost at the origin.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        renderer.ejectPassengers(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityTeleport(EntityTeleportEvent event) {
+        if (event.getEntity() instanceof org.bukkit.entity.Tameable) {
+            renderer.ejectPassengers(event.getEntity().getUniqueId());
+        }
+    }
+
+    /**
+     * Most rideable mobs accept only ONE passenger. Our TextDisplay occupies that slot,
+     * so the vanilla mount silently fails (right-click does nothing). Free the slot
+     * before vanilla resolves the interaction; do not cancel the event.
+     *
+     * Eject only for rideable types â€” right-clicking a wolf/cat with food must not
+     * yank its nametag for a tick.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        org.bukkit.entity.Entity clicked = event.getRightClicked();
+        if (isMountableRide(clicked)) {
+            renderer.ejectPassengers(clicked.getUniqueId());
+        }
+        // Spigot fallback: PlayerNameEntityEvent is Paper-only. The Name Tag is
+        // applied during vanilla interaction, so re-check one tick later and admit
+        // any newly-named Tameable into the render cache.
+        if (clicked instanceof org.bukkit.entity.Tameable) {
+            final java.util.UUID clickedId = clicked.getUniqueId();
+            java.util.function.Consumer<org.bukkit.entity.Entity> admit = e -> {
+                if (e instanceof org.bukkit.entity.Tameable t && shouldTrackPet(t)) {
+                    platform.addTamedMob(t.getUniqueId());
+                }
+            };
+            try {
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+                // Folia: Bukkit scheduler is unsupported — use the entity's own scheduler.
+                clicked.getScheduler().run(this, task -> {
+                    org.bukkit.entity.Entity e = Bukkit.getEntity(clickedId);
+                    if (e != null) admit.accept(e);
+                }, () -> {});
+            } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                getServer().getScheduler().runTask(this, () -> {
+                    org.bukkit.entity.Entity ent = Bukkit.getEntity(clickedId);
+                    if (ent != null) admit.accept(ent);
+                });
+            }
+        }
+    }
+
+    /**
+     * Player actually mounted: hide the nametag for the duration of the ride
+     * (decision: hidden-while-ridden). The render loop re-spawns on the next tick
+     * after dismount once no player passenger remains.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityMount(EntityMountEvent event) {
+        if (event.getEntity() instanceof org.bukkit.entity.Player) {
+            renderer.destroyNametag(event.getMount().getUniqueId());
+        }
+    }
+
+    /** Rideable types where a single-passenger slot conflict blocks mounting. */
+    static boolean isMountableRide(org.bukkit.entity.Entity entity) {
+        return entity instanceof org.bukkit.entity.AbstractHorse
+                || entity instanceof org.bukkit.entity.Llama
+                || entity instanceof org.bukkit.entity.Pig
+                || entity instanceof org.bukkit.entity.Strider;
+    }
+
+    /**
+     * Pets.yml documents "false = only mobs with a Name Tag item get holograms":
+     * the contract is name-based (tamed OR named), not tame-only. Untamed rideables
+     * like camels that only need a saddle+label must enter the render cache too.
+     */
+    static boolean shouldTrackPet(org.bukkit.entity.Tameable t) {
+        return t.isTamed() || t.getCustomName() != null;
+    }
+
+    /**
+     * Paper: fires when a Name Tag is applied. Spigot has no such event â€” the
+     * interact fallback below covers renaming on those platforms.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerNameEntity(io.papermc.paper.event.player.PlayerNameEntityEvent event) {
+        if (event.getEntity() instanceof org.bukkit.entity.Tameable t) {
+            platform.addTamedMob(t.getUniqueId());
+        }
     }
 
     @EventHandler
@@ -222,7 +334,7 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         for (org.bukkit.entity.Entity e : event.getEntities()) {
             if (e instanceof org.bukkit.entity.Tameable) {
                 org.bukkit.entity.Tameable t = (org.bukkit.entity.Tameable) e;
-                if (t.isTamed()) {
+                if (shouldTrackPet(t)) {
                     platform.addTamedMob(t.getUniqueId());
                 }
             }
