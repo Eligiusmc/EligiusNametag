@@ -111,6 +111,12 @@ public class EligiusNametagCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 String lang = args[1];
+                // Admin-gated but still validated: keep the value a bare language code
+                // so new File(langDir, lang + ".yml") can never traverse out of lang/.
+                if (!lang.matches("[a-z]{2,5}")) {
+                    sendMessage(sender, Component.text("Invalid language code (a-z, 2-5 chars).", NamedTextColor.RED));
+                    return true;
+                }
                 if (!plugin.getConfigAdapter().hasLanguage(lang)) {
                     String errorMsg = plugin.getConfigAdapter().getMessage("lang_not_found");
                     if (errorMsg == null || errorMsg.isEmpty()) errorMsg = "<red>Language file not found.";
