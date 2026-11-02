@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.6.1](https://github.com/Eligiusmc/EligiusNametag/compare/v1.6.0...v1.6.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **core:** eject nametag passengers before teleport to unblock vehicle TP ([c4dc4d4](https://github.com/Eligiusmc/EligiusNametag/commit/c4dc4d43b27ca0639d890c57e78467750135a1be))
+* **core:** eject TextDisplay passengers to unblock teleport and mounting ([73eb962](https://github.com/Eligiusmc/EligiusNametag/commit/73eb962d5e3e74dc0ebe50313b5de370715c2b35))
+* **nametag:** enforce config view distance server-side ([793d0e1](https://github.com/Eligiusmc/EligiusNametag/commit/793d0e17bc09b83778ae5e2dd12d00c850c87705)), closes [#45](https://github.com/Eligiusmc/EligiusNametag/issues/45)
+* **nametag:** enforce config view distance server-side and stop evicting named pets ([db853ab](https://github.com/Eligiusmc/EligiusNametag/commit/db853ab8df10a941441a7fb5ae73a7525716d7b2))
+* **security:** validate lang code and declare plugin permissions ([ace9920](https://github.com/Eligiusmc/EligiusNametag/commit/ace9920315ba7a5bb71f3adcf90c6f2bf5c2fd67))
+
 ## [1.6.0](https://github.com/Eligiusmc/EligiusNametag/compare/v1.5.2...v1.6.0) (2026-06-03)
 
 
