@@ -1,12 +1,12 @@
 ---
 layout: home
 title: "EligiusNametag - Hocheffiziente Hologramme für Paper"
-description: "Das ultimative, hocheffiziente holographische Nametag-Plugin für Bukkit, Spigot, Paper, Purpur und Folia 1.21 - 26.1.2+."
+description: "Das ultimative, hocheffiziente holographische Nametag-Plugin für Bukkit, Spigot, Paper, Purpur und Folia 1.21 - 26.3+."
 
 hero:
   name: "EligiusNametag"
   text: "Die Zukunft der Nametags"
-  tagline: "Hocheffiziente Hologramme für Paper 1.21 - 26.1.2+ mit Folia-Unterstützung und dezentraler Datenbank."
+  tagline: "Hocheffiziente Hologramme für Paper 1.21 - 26.3+ mit Folia-Unterstützung und dezentraler Datenbank."
   image:
     src: /assets/angry.png
     alt: Eligius Logo

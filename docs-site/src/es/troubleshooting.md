@@ -14,9 +14,9 @@ description: Problemas comunes y soluciones al usar EligiusNametag.
 - Esto ha sido **solucionado en versiones recientes**. Asegúrate de estar corriendo la última versión `v1.x.x` o superior. Si usas **MySQL**, verifica que la IP y las credenciales en `config.yml` sean las correctas. De lo contrario, usa `SQLITE` local.
 
 ### 3. Advertencias de ViaVersion en la Consola
-Si usas ViaVersion para permitir que jugadores con la 1.20 entren a tu servidor 1.21 - 26.1.2+, podrías ver mensajes sobre *Metadata* y *Protocol Versions*.
+Si usas ViaVersion para permitir que jugadores con la 1.20 entren a tu servidor 1.21 - 26.3+, podrías ver mensajes sobre *Metadata* y *Protocol Versions*.
 - **Causa:** El cliente antiguo (ej. 1.20.2) no tiene el código nativo para procesar bien entidades grandes de `TEXT_DISPLAY`.
-- **Solución:** Recomendamos encarecidamente que exijas versiones 1.21 - 26.1.2+ para la visualización perfecta de hologramas, o ignores la advertencia si el jugador no presenta crasheos visuales.
+- **Solución:** Recomendamos encarecidamente que exijas versiones 1.21 - 26.3+ para la visualización perfecta de hologramas, o ignores la advertencia si el jugador no presenta crasheos visuales.
 
 ### 4. /enametag lang no actualiza el mensaje de ayuda
 Al usar `/enametag lang en`, el plugin lee de `lang/en.yml`. Si notas que alguna traducción está vacía o un comando se comporta raro, puedes borrar la carpeta `lang/` en tu directorio de plugins para que EligiusNametag la re-genere limpiamente con los últimos estándares.

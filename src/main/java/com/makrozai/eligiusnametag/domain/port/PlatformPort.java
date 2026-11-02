@@ -12,6 +12,7 @@ public interface PlatformPort {
     void removeTamedMob(UUID uuid);
     boolean canViewerSeeTarget(UUID viewerId, UUID targetId);
     boolean isSameWorld(UUID a, UUID b);
+    double getDistanceSquared(UUID a, UUID b);
     boolean isGloballyHidden(UUID targetId);
     boolean hasCustomName(UUID targetId);
     void disableVanillaNametag(UUID targetId);

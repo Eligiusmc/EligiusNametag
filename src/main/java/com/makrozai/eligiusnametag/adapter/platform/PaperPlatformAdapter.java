@@ -84,7 +84,11 @@ public class PaperPlatformAdapter implements PlatformPort {
         List<UUID> list = new ArrayList<>();
         for (UUID uuid : cachedTamedMobs) {
             org.bukkit.entity.Entity e = Bukkit.getEntity(uuid);
-            if (e instanceof Tameable && ((Tameable) e).isTamed() && !e.isDead() && e.isValid()) {
+            // Track tamed OR named (pets.yml contract). Evicting named-untamed here
+            // silently dropped camels/horses that only carry a Name Tag.
+            if (e instanceof Tameable t
+                    && (t.isTamed() || e.getCustomName() != null)
+                    && !e.isDead() && e.isValid()) {
                 list.add(uuid);
             } else {
                 cachedTamedMobs.remove(uuid);
@@ -105,14 +109,9 @@ public class PaperPlatformAdapter implements PlatformPort {
             return viewer.canSee(target);
         }
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
-        if (entity != null) {
-            // Utilizar una comprobación de distancia segura en lugar de getTrackedBy()
-            // 64 bloques de distancia es el límite estándar de tracking.
-            if (entity.getWorld().equals(viewer.getWorld())) {
-                return entity.getLocation().distanceSquared(viewer.getLocation()) <= (64.0 * 64.0);
-            }
-        }
-        return false;
+        // Distance gating lives in the domain layer (NametagService, config-driven).
+        // Here we only resolve visibility semantics.
+        return entity != null && entity.getWorld().equals(viewer.getWorld());
     }
 
     @Override
@@ -121,6 +120,15 @@ public class PaperPlatformAdapter implements PlatformPort {
         org.bukkit.entity.Entity entityB = Bukkit.getEntity(b);
         if (entityA == null || entityB == null) return false;
         return entityA.getWorld().equals(entityB.getWorld());
+    }
+
+    @Override
+    public double getDistanceSquared(UUID a, UUID b) {
+        org.bukkit.entity.Entity entityA = Bukkit.getEntity(a);
+        org.bukkit.entity.Entity entityB = Bukkit.getEntity(b);
+        if (entityA == null || entityB == null) return Double.MAX_VALUE;
+        if (!entityA.getWorld().equals(entityB.getWorld())) return Double.MAX_VALUE;
+        return entityA.getLocation().distanceSquared(entityB.getLocation());
     }
 
     @Override

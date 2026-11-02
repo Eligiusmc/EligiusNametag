@@ -8,6 +8,7 @@ public interface NametagRendererPort {
     void renderNametag(UUID targetId, List<Component> lines, List<UUID> viewers, float yOffset);
     void hideNametag(UUID targetId, List<UUID> viewers);
     void destroyNametag(UUID targetId);
+    void ejectPassengers(UUID targetId);
     void clearViewer(UUID viewerId);
     void destroyAll();
     int getActiveEntityCount();

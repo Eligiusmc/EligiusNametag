@@ -11,7 +11,7 @@ EligiusNametag ist ein modernes und leistungsstarkes Plugin. Da es die neuesten 
 
 | Anforderung | Mindestversion | Grund |
 |-------------|----------------|-------|
-| **Plattform** | Paper 1.21 - 26.1.2+ oder Folia 1.21 - 26.1.2+ | Strikte Verwendung von `TEXT_DISPLAY` Komponenten und Brigadier-Befehlen. |
+| **Plattform** | Paper 1.21 - 26.3+ oder Folia 1.21 - 26.3+ | Strikte Verwendung von `TEXT_DISPLAY` Komponenten und Brigadier-Befehlen. |
 | **Java** | Java 21 LTS | Quellcode im JDK 21-Format kompiliert. |
 
 ## 📦 Abhängigkeiten
