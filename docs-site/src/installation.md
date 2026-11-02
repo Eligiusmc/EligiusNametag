@@ -11,7 +11,7 @@ EligiusNametag is a modern and powerful plugin. By leveraging the latest feature
 
 | Requirement | Minimum Version | Reason |
 |-------------|-----------------|--------|
-| **Platform** | Bukkit, Spigot, Paper, Purpur or Folia 1.21 - 26.1.2+ | Strict use of `TEXT_DISPLAY` components and Brigadier commands. |
+| **Platform** | Bukkit, Spigot, Paper, Purpur or Folia 1.21 - 26.3+ | Strict use of `TEXT_DISPLAY` components and Brigadier commands. |
 | **Java** | Java 21 LTS | Source code compiled in JDK 21 format. |
 
 ## 📦 Dependencies
