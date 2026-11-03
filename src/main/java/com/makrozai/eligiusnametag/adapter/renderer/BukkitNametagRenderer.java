@@ -18,8 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitNametagRenderer implements NametagRendererPort {
     private final Plugin plugin;
-    private final double lineSpacing;
-    
+    private double lineSpacing;
+    private final boolean hasEntityScheduler;
+
     private final Map<UUID, List<TextDisplay>> activeEntities = new ConcurrentHashMap<>();
     private final Map<UUID, Set<UUID>> lineSpawnedViewers = new ConcurrentHashMap<>();
     private final Map<UUID, Set<UUID>> lineHiddenViewers = new ConcurrentHashMap<>();
@@ -28,6 +29,12 @@ public class BukkitNametagRenderer implements NametagRendererPort {
     public BukkitNametagRenderer(Plugin plugin, double lineSpacing) {
         this.plugin = plugin;
         this.lineSpacing = lineSpacing;
+        boolean schedulerAvailable = false;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+            schedulerAvailable = true;
+        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {}
+        this.hasEntityScheduler = schedulerAvailable;
     }
 
     @SuppressWarnings("deprecation")
@@ -102,13 +109,21 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             lineJsonCache.put(display.getUniqueId(), initialText);
 
             // Delayed visibility (spawn-only) to prevent the fly-in animation.
-            // Entity scheduler works on both Paper and Folia (Bukkit.getScheduler() throws on Folia).
+            // Entity scheduler works on Paper/Folia; Spigot falls back to the global scheduler.
             final TextDisplay spawned = display;
-            spawned.getScheduler().runDelayed(plugin, task -> {
-                if (spawned.isValid() && !spawned.isDead()) {
-                    spawned.setTextOpacity((byte) -1);
-                }
-            }, null, 2L);
+            if (hasEntityScheduler) {
+                spawned.getScheduler().runDelayed(plugin, task -> {
+                    if (spawned.isValid() && !spawned.isDead()) {
+                        spawned.setTextOpacity((byte) -1);
+                    }
+                }, null, 2L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (spawned.isValid() && !spawned.isDead()) {
+                        spawned.setTextOpacity((byte) -1);
+                    }
+                }, 2L);
+            }
         }
 
         // 2. Destroy extra lines
@@ -304,6 +319,10 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             count += displays.size();
         }
         return count;
+    }
+
+    public void reloadConfig(double lineSpacing) {
+        this.lineSpacing = lineSpacing;
     }
 
     private static String serializeLegacy(Component component) {

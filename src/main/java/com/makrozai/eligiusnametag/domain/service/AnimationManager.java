@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AnimationManager {
     private final JavaPlugin plugin;
     private final Map<String, Animation> animations = new ConcurrentHashMap<>();
-    private int globalTick = 0;
+    private long globalTick = 0;
 
     public AnimationManager(JavaPlugin plugin) {
         this.plugin = plugin;
