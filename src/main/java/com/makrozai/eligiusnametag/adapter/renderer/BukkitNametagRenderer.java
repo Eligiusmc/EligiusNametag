@@ -17,6 +17,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitNametagRenderer implements NametagRendererPort {
+    // Each template line is its own TextDisplay with a fixed y-offset, so the
+    // client must never auto-wrap it at the 200px default (a wrapped block
+    // grows upward and overlaps the line above). Explicit \n still works.
+    private static final int NO_WRAP_LINE_WIDTH = 200_000;
+
     private final Plugin plugin;
     private double lineSpacing;
     private final boolean hasEntityScheduler;
@@ -89,6 +94,7 @@ public class BukkitNametagRenderer implements NametagRendererPort {
                 entity.setShadowStrength(0f);
                 entity.setTeleportDuration(0);
                 entity.setInterpolationDuration(0);
+                entity.setLineWidth(NO_WRAP_LINE_WIDTH);
                 // Apply the line offset INSIDE the spawn consumer so the initial entity metadata
                 // already contains the transformation. Setting it after spawn makes Bedrock clients
                 // (GeyserMC) render all lines stacked at the same position until a relog. (Issue #45)
