@@ -132,7 +132,11 @@ public class RedisAdapter implements SyncPort {
                         plugin.getLogger().warning("Redis subscription lost. Reconnecting in 3 seconds...");
                         try {
                             Thread.sleep(3000);
-                        } catch (InterruptedException ignored) {}
+                        } catch (InterruptedException ie) {
+                            // Restore interrupt status so the thread pool can detect shutdown.
+                            Thread.currentThread().interrupt();
+                            active = false;
+                        }
                     }
                 }
             }

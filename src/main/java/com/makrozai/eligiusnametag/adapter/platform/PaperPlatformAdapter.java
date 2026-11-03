@@ -13,13 +13,25 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.makrozai.eligiusnametag.domain.service.AnimationManager;
 
 public class PaperPlatformAdapter implements PlatformPort {
-    private Permission vaultPerms;
+    private static final Pattern EMOJI_PATTERN = Pattern.compile(":([a-zA-Z0-9_\\-]+):");
+    private static final Pattern ANIM_PATTERN = Pattern.compile("<anim:([a-zA-Z0-9_\\-]+)>(.*?)</anim:\\1>");
+    private static final long GROUP_CACHE_TTL_MS = 5000;
+
+    private record CachedGroup(String group, long expiresAt) {}
+
+    // Package-private so tests can inject a mock Vault provider.
+    Permission vaultPerms;
     private final AnimationManager animationManager;
+    private final boolean hasPapi;
     private final java.util.Set<UUID> cachedTamedMobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private final java.util.Map<UUID, CachedGroup> groupCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.Map<UUID, CachedGroup> ownerGroupCache = new java.util.concurrent.ConcurrentHashMap<>();
     
     // Fallback universal para 1.21.1 (GENERIC_MAX_HEALTH) y 1.21.2+ (MAX_HEALTH)
     private static org.bukkit.attribute.Attribute CACHED_MAX_HEALTH_ATTRIBUTE;
@@ -39,6 +51,7 @@ public class PaperPlatformAdapter implements PlatformPort {
 
     public PaperPlatformAdapter(AnimationManager animationManager) {
         this.animationManager = animationManager;
+        this.hasPapi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
             if (rsp != null) {
@@ -63,6 +76,22 @@ public class PaperPlatformAdapter implements PlatformPort {
             list.add(p.getUniqueId());
         }
         return list;
+    }
+
+    @Override
+    public List<ViewerSnapshot> snapshotViewers() {
+        List<ViewerSnapshot> list = new ArrayList<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            list.add(new ViewerSnapshot(p.getUniqueId(), p.getWorld().getName(), p.getX(), p.getY(), p.getZ()));
+        }
+        return list;
+    }
+
+    @Override
+    public TargetSnapshot resolveTarget(UUID id) {
+        org.bukkit.entity.Entity e = Bukkit.getEntity(id);
+        if (e == null) return null;
+        return new TargetSnapshot(id, e.getWorld().getName(), e.getX(), e.getY(), e.getZ());
     }
 
     @Override
@@ -167,19 +196,19 @@ public class PaperPlatformAdapter implements PlatformPort {
         org.bukkit.entity.Entity target = Bukkit.getEntity(targetId);
         String parsed = text;
         org.bukkit.OfflinePlayer op = null;
-        
+
         if (target instanceof Player) {
             Player p = (Player) target;
             op = p;
             parsed = parsed.replace("<PLAYER>", p.getName());
             parsed = parsed.replace("<DISPLAYNAME>", p.getDisplayName() != null ? p.getDisplayName() : p.getName());
-            
+
             org.bukkit.attribute.AttributeInstance healthAttr = p.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
             parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(p.getHealth())));
             parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
-            
-            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+
+            if (hasPapi) {
                 parsed = PlaceholderAPI.setPlaceholders(p, parsed);
             }
         } else if (target instanceof Tameable) {
@@ -197,7 +226,7 @@ public class PaperPlatformAdapter implements PlatformPort {
             parsed = parsed.replace("<OWNER>", ownerName);
             parsed = parsed.replace("<DISPLAYNAME>", mobName);
             parsed = parsed.replace("<CUSTOM_NAME>", t.getCustomName() != null ? t.getCustomName() : "");
-            
+
             String rawType = t.getType().name().toLowerCase().replace("_", " ");
             StringBuilder capType = new StringBuilder();
             for (String word : rawType.split(" ")) {
@@ -206,36 +235,35 @@ public class PaperPlatformAdapter implements PlatformPort {
                 }
             }
             parsed = parsed.replace("<TYPE>", capType.toString().trim());
-            
+
             if (target instanceof org.bukkit.entity.Ageable) {
                 boolean isBaby = !((org.bukkit.entity.Ageable) target).isAdult();
                 parsed = parsed.replace("<AGE>", isBaby ? "Baby" : "Adult");
             }
-            
+
             org.bukkit.attribute.AttributeInstance healthAttr = t.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
             double maxHealth = healthAttr != null ? healthAttr.getValue() : 20.0;
             parsed = parsed.replace("<HEALTH>", String.valueOf(Math.round(t.getHealth())));
             parsed = parsed.replace("<MAX_HEALTH>", String.valueOf(Math.round(maxHealth)));
-            
-            if (op != null && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+
+            if (op != null && hasPapi) {
                 parsed = PlaceholderAPI.setPlaceholders(op, parsed);
             }
         }
-        
-        if (op != null && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(":([a-zA-Z0-9_\\-]+):");
-            java.util.regex.Matcher matcher = pattern.matcher(parsed);
+
+        // Resolve ItemsAdder/Oraxen emoji placeholders (:emoji_name: → %img_emoji_name%).
+        // quoteReplacement prevents '$' or '\' in PAPI output from being misread as regex group references.
+        if (op != null && hasPapi) {
+            Matcher matcher = EMOJI_PATTERN.matcher(parsed);
             StringBuffer sb = new StringBuffer();
             boolean found = false;
-
             while (matcher.find()) {
                 String placeholder = "%img_" + matcher.group(1) + "%";
                 String resolved = PlaceholderAPI.setPlaceholders(op, placeholder);
-                
                 if (resolved.equals(placeholder)) {
-                    matcher.appendReplacement(sb, matcher.group(0));
+                    matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
                 } else {
-                    matcher.appendReplacement(sb, resolved);
+                    matcher.appendReplacement(sb, Matcher.quoteReplacement(resolved));
                 }
                 found = true;
             }
@@ -244,17 +272,16 @@ public class PaperPlatformAdapter implements PlatformPort {
                 parsed = sb.toString();
             }
         }
-        
+
         if (animationManager != null) {
-            java.util.regex.Pattern animPattern = java.util.regex.Pattern.compile("<anim:([a-zA-Z0-9_\\-]+)>(.*?)</anim:\\1>");
-            java.util.regex.Matcher animMatcher = animPattern.matcher(parsed);
+            Matcher animMatcher = ANIM_PATTERN.matcher(parsed);
             StringBuffer animSb = new StringBuffer();
             boolean animFound = false;
             while (animMatcher.find()) {
                 String animName = animMatcher.group(1);
                 String animText = animMatcher.group(2);
                 String resolvedAnim = animationManager.applyAnimation(animText, animName);
-                animMatcher.appendReplacement(animSb, resolvedAnim);
+                animMatcher.appendReplacement(animSb, Matcher.quoteReplacement(resolvedAnim));
                 animFound = true;
             }
             if (animFound) {
@@ -274,38 +301,79 @@ public class PaperPlatformAdapter implements PlatformPort {
                            .replace("&f", "<white>").replace("&l", "<bold>").replace("&m", "<strikethrough>")
                            .replace("&n", "<underlined>").replace("&o", "<italic>").replace("&r", "<reset>");
         }
-        
+
         return net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(parsed);
     }
 
     @Override
     public String getPrimaryGroup(UUID targetId) {
+        CachedGroup cached = groupCache.get(targetId);
+        long now = System.currentTimeMillis();
+        if (cached != null && now < cached.expiresAt()) {
+            return cached.group();
+        }
+        String group = null;
         Player player = Bukkit.getPlayer(targetId);
         if (player != null && vaultPerms != null && vaultPerms.hasGroupSupport()) {
             try {
-                return vaultPerms.getPrimaryGroup(player);
+                group = vaultPerms.getPrimaryGroup(player);
             } catch (Exception ignored) {}
         }
-        return null;
+        groupCache.put(targetId, new CachedGroup(group, now + GROUP_CACHE_TTL_MS));
+        return group;
     }
 
     @Override
     public String getOwnerPrimaryGroup(UUID targetId) {
+        CachedGroup cached = ownerGroupCache.get(targetId);
+        long now = System.currentTimeMillis();
+        if (cached != null && now < cached.expiresAt()) {
+            return cached.group();
+        }
+        String group = null;
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
         if (entity instanceof Tameable) {
             Tameable t = (Tameable) entity;
             if (t.getOwner() != null && t.getOwner().getUniqueId() != null) {
                 org.bukkit.OfflinePlayer op = Bukkit.getOfflinePlayer(t.getOwner().getUniqueId());
                 if (op.isOnline()) {
-                    return getPrimaryGroup(op.getUniqueId());
+                    group = getPrimaryGroup(op.getUniqueId());
                 } else if (vaultPerms != null && vaultPerms.hasGroupSupport()) {
                     // Try getting primary group for offline player (some Vault implementations support it, otherwise fallback null)
                     try {
-                        return vaultPerms.getPrimaryGroup(null, op);
+                        group = vaultPerms.getPrimaryGroup(null, op);
                     } catch (Exception ignored) {}
                 }
             }
         }
-        return null;
+        ownerGroupCache.put(targetId, new CachedGroup(group, now + GROUP_CACHE_TTL_MS));
+        return group;
+    }
+
+    @Override
+    public long getStateHash(UUID targetId) {
+        org.bukkit.entity.Entity e = Bukkit.getEntity(targetId);
+        if (e == null) return 0L;
+        int health = (int) Math.round(e instanceof org.bukkit.entity.LivingEntity le ? le.getHealth() : 0.0);
+        if (e instanceof Player p) {
+            org.bukkit.attribute.AttributeInstance attr = p.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
+            int maxHealth = attr != null ? (int) Math.round(attr.getValue()) : 20;
+            return java.util.Objects.hash(p.getName(), p.getDisplayName(), health, maxHealth);
+        }
+        if (e instanceof Tameable t) {
+            org.bukkit.attribute.AttributeInstance attr = e instanceof org.bukkit.entity.LivingEntity le
+                    ? le.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE) : null;
+            int maxHealth = attr != null ? (int) Math.round(attr.getValue()) : 20;
+            String ownerName = t.getOwner() != null ? t.getOwner().getName() : null;
+            boolean baby = !(e instanceof org.bukkit.entity.Ageable a) || !a.isAdult();
+            return java.util.Objects.hash(
+                    e.getCustomName(), ownerName, e.getType().name(), baby, health, maxHealth);
+        }
+        return java.util.Objects.hash(e.getType().name(), health);
+    }
+
+    @Override
+    public long getAnimationEpoch() {
+        return animationManager != null ? animationManager.getFrameEpoch() : 0L;
     }
 }

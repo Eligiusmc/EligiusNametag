@@ -40,7 +40,10 @@ jobs:
         echo "Extracted version: $VERSION"
 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build shadowJar
+
+    - name: Remove plain jar
+      run: rm -f build/libs/*-plain.jar
 
     - name: Create Beta Release on GitHub
       uses: softprops/action-gh-release@v2

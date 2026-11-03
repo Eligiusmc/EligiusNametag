@@ -141,6 +141,11 @@ public class YamlConfigAdapter implements ConfigPort {
     }
 
     @Override
+    public int getCacheTicks() {
+        return config.getInt("performance.cache_ticks", 10);
+    }
+
+    @Override
     public java.util.List<String> getCommandAliases() {
         if (config.contains("command_aliases")) {
             return config.getStringList("command_aliases");

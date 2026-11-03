@@ -12,6 +12,8 @@ public interface ConfigPort {
     double getLineSpacing();
     double getYOffset();
     double getInterval();
+    /** Update ticks a parsed nametag line stays cached; 0 disables the parse cache. */
+    int getCacheTicks();
     java.util.List<String> getCommandAliases();
     String getMessage(String key);
     void reload();

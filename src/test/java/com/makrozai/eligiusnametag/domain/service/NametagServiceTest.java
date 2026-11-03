@@ -25,6 +25,8 @@ import static org.mockito.Mockito.when;
 
 public class NametagServiceTest {
 
+    private static final String WORLD = "world";
+
     private ConfigPort configPort;
     private PlatformPort platformPort;
     private NametagRendererPort rendererPort;
@@ -43,17 +45,27 @@ public class NametagServiceTest {
         when(configPort.getViewDistance()).thenReturn(64);
         when(configPort.isTamedMobsEnabled()).thenReturn(true);
         when(configPort.isTamedMobsShowUnnamed()).thenReturn(true);
-        when(platformPort.getDistanceSquared(any(), any())).thenReturn(0.0);
-        when(platformPort.isSameWorld(any(), any())).thenReturn(true);
-        when(platformPort.canViewerSeeTarget(any(), any())).thenReturn(true);
+        when(platformPort.snapshotViewers()).thenReturn(Collections.emptyList());
+        when(platformPort.resolveTarget(any())).thenReturn(null);
         when(platformPort.isGloballyHidden(any())).thenReturn(false);
         when(platformPort.getPrimaryGroup(any())).thenReturn("default");
         when(configPort.getPlayerNametagTemplate(anyString())).thenReturn(Arrays.asList("Test"));
         when(configPort.getYOffset()).thenReturn(0.35);
+        when(platformPort.canViewerSeeTarget(any(), any())).thenReturn(true);
         when(platformPort.parsePlaceholders(any(), anyString()))
                 .thenReturn(net.kyori.adventure.text.Component.text("Test"));
 
         nametagService = new NametagService(configPort, platformPort, rendererPort, databasePort, null);
+    }
+
+    private static PlatformPort.ViewerSnapshot viewer(UUID id, String world, double x, double y, double z) {
+        return new PlatformPort.ViewerSnapshot(id, world, x, y, z);
+    }
+
+    private void stubTargets(PlatformPort.TargetSnapshot... targets) {
+        for (PlatformPort.TargetSnapshot t : targets) {
+            when(platformPort.resolveTarget(t.id())).thenReturn(t);
+        }
     }
 
     @Test
@@ -61,9 +73,13 @@ public class NametagServiceTest {
         UUID player1 = UUID.randomUUID();
         UUID player2 = UUID.randomUUID();
 
-        when(platformPort.getOnlinePlayers()).thenReturn(Arrays.asList(player1, player2));
+        PlatformPort.ViewerSnapshot v1 = viewer(player1, WORLD, 0, 0, 0);
+        PlatformPort.ViewerSnapshot v2 = viewer(player2, WORLD, 0, 0, 0);
+        when(platformPort.snapshotViewers()).thenReturn(Arrays.asList(v1, v2));
+        stubTargets(
+                new PlatformPort.TargetSnapshot(player1, WORLD, 0, 0, 0),
+                new PlatformPort.TargetSnapshot(player2, WORLD, 0, 0, 0));
         when(platformPort.isGloballyHidden(player1)).thenReturn(true);
-        when(platformPort.isGloballyHidden(player2)).thenReturn(false);
 
         nametagService.updateAllNametags();
 
@@ -82,14 +98,14 @@ public class NametagServiceTest {
         UUID farViewer = UUID.randomUUID();
 
         when(configPort.getViewDistance()).thenReturn(64);
-        when(platformPort.getOnlinePlayers()).thenReturn(Arrays.asList(target, nearViewer, farViewer));
-        // Symmetric stubs: distance(a,b) must match both call orders.
-        when(platformPort.getDistanceSquared(target, nearViewer)).thenReturn(10.0 * 10.0);
-        when(platformPort.getDistanceSquared(nearViewer, target)).thenReturn(10.0 * 10.0);
-        when(platformPort.getDistanceSquared(target, farViewer)).thenReturn(100.0 * 100.0);
-        when(platformPort.getDistanceSquared(farViewer, target)).thenReturn(100.0 * 100.0);
-        when(platformPort.getDistanceSquared(nearViewer, farViewer)).thenReturn(100.0 * 100.0);
-        when(platformPort.getDistanceSquared(farViewer, nearViewer)).thenReturn(100.0 * 100.0);
+        PlatformPort.ViewerSnapshot vTarget = viewer(target, WORLD, 0, 0, 0);
+        PlatformPort.ViewerSnapshot vNear = viewer(nearViewer, WORLD, 10, 0, 0);
+        PlatformPort.ViewerSnapshot vFar = viewer(farViewer, WORLD, 100, 0, 0);
+        when(platformPort.snapshotViewers()).thenReturn(Arrays.asList(vTarget, vNear, vFar));
+        stubTargets(
+                new PlatformPort.TargetSnapshot(target, WORLD, 0, 0, 0),
+                new PlatformPort.TargetSnapshot(nearViewer, WORLD, 10, 0, 0),
+                new PlatformPort.TargetSnapshot(farViewer, WORLD, 100, 0, 0));
 
         nametagService.updateAllNametags();
 
@@ -110,9 +126,12 @@ public class NametagServiceTest {
         UUID viewer = UUID.randomUUID();
 
         when(configPort.getViewDistance()).thenReturn(64);
-        when(platformPort.getOnlinePlayers()).thenReturn(Arrays.asList(target, viewer));
-        when(platformPort.getDistanceSquared(target, viewer)).thenReturn(32.0 * 32.0);
-        when(platformPort.getDistanceSquared(viewer, target)).thenReturn(32.0 * 32.0);
+        when(platformPort.snapshotViewers()).thenReturn(Arrays.asList(
+                viewer(target, WORLD, 0, 0, 0),
+                viewer(viewer, WORLD, 32, 0, 0)));
+        stubTargets(
+                new PlatformPort.TargetSnapshot(target, WORLD, 0, 0, 0),
+                new PlatformPort.TargetSnapshot(viewer, WORLD, 32, 0, 0));
 
         nametagService.updateAllNametags();
 
@@ -130,9 +149,12 @@ public class NametagServiceTest {
         UUID viewer = UUID.randomUUID();
 
         when(configPort.getViewDistance()).thenReturn(64);
-        when(platformPort.getOnlinePlayers()).thenReturn(Arrays.asList(target, viewer));
-        when(platformPort.getDistanceSquared(target, viewer)).thenReturn(64.0 * 64.0);
-        when(platformPort.getDistanceSquared(viewer, target)).thenReturn(64.0 * 64.0);
+        when(platformPort.snapshotViewers()).thenReturn(Arrays.asList(
+                viewer(target, WORLD, 0, 0, 0),
+                viewer(viewer, WORLD, 64, 0, 0)));
+        stubTargets(
+                new PlatformPort.TargetSnapshot(target, WORLD, 0, 0, 0),
+                new PlatformPort.TargetSnapshot(viewer, WORLD, 64, 0, 0));
 
         nametagService.updateAllNametags();
 
@@ -142,12 +164,14 @@ public class NametagServiceTest {
 
     @Test
     public void testDistanceUnavailable_HidesTarget() {
-        // Missing entity / other world → adapter returns Double.MAX_VALUE → must hide.
+        // Missing entity → resolveTarget returns null → must hide, never render.
         UUID target = UUID.randomUUID();
         UUID viewer = UUID.randomUUID();
 
-        when(platformPort.getOnlinePlayers()).thenReturn(Arrays.asList(target, viewer));
-        when(platformPort.getDistanceSquared(any(), any())).thenReturn(Double.MAX_VALUE);
+        when(platformPort.snapshotViewers()).thenReturn(Arrays.asList(
+                viewer(target, WORLD, 0, 0, 0),
+                viewer(viewer, WORLD, 0, 0, 0)));
+        when(platformPort.resolveTarget(any())).thenReturn(null);
 
         nametagService.updateAllNametags();
 
@@ -161,11 +185,12 @@ public class NametagServiceTest {
         UUID target = UUID.randomUUID();
         UUID viewer = UUID.randomUUID();
 
-        when(platformPort.getOnlinePlayers()).thenReturn(Arrays.asList(target, viewer));
-        when(platformPort.isSameWorld(target, viewer)).thenReturn(false);
-        when(platformPort.isSameWorld(viewer, target)).thenReturn(false);
-        when(platformPort.getDistanceSquared(target, viewer)).thenReturn(0.0);
-        when(platformPort.getDistanceSquared(viewer, target)).thenReturn(0.0);
+        when(platformPort.snapshotViewers()).thenReturn(Arrays.asList(
+                viewer(target, WORLD, 0, 0, 0),
+                viewer(viewer, "world_nether", 0, 0, 0)));
+        stubTargets(
+                new PlatformPort.TargetSnapshot(target, WORLD, 0, 0, 0),
+                new PlatformPort.TargetSnapshot(viewer, "world_nether", 0, 0, 0));
 
         nametagService.updateAllNametags();
 

@@ -15,11 +15,22 @@ line_spacing: 0.275
 # Base height offset above the entity's head (updates live on reload)
 y_offset: 0.35
 
+# ==========================================
+# ⚡ PERFORMANCE
+# ==========================================
+# Ticks to keep a parsed nametag line cached before re-running the
+# placeholder pipeline (PlaceholderAPI, MiniMessage, animations).
+# 10 ticks = 0.5s — matches the default interval, so behaviour is unchanged.
+# Lower values = fresher dynamic placeholders, higher = less CPU.
+# Set to 0 to disable line caching entirely.
+performance:
+  cache_ticks: 10
+
 # Global plugin prefix for all messages
 prefix: "<dark_gray>[<gradient:blue:aqua>Enametag</gradient>]</dark_gray> "
 
 # Language file to use (e.g., 'es' for lang/es.yml, 'en' for lang/en.yml)
-language: "es"
+language: "en"
 
 # Command aliases (all point to the same command tree)
 command_aliases:
