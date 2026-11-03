@@ -1,8 +1,10 @@
-name: Release & Publish Packages (Release & Alpha Branches)
+name: Release & Publish Packages (Alpha Branches)
 
+# Only the alpha branch publishes here. Stable releases are handled
+# entirely by release-please.yml (build + jar upload + Modrinth + Hangar);
+# a `release: published` trigger was removed because it would double-publish
+# with the wrong channel (this repo's default branch is `master`, not `main`).
 on:
-  release:
-    types: [published]
   push:
     branches:
       - alpha
@@ -14,7 +16,7 @@ jobs:
     env:
       GPR_USER: ${{ secrets.GPR_USER }}
       GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
-      CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+      CHANNEL: ${{ github.ref_name == 'master' && 'Release' || 'Alpha' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -72,7 +74,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
-      CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+      CHANNEL: ${{ github.ref_name == 'master' && 'Release' || 'Alpha' }}
       GPR_USER: ${{ secrets.GPR_USER }}
       GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
     steps:
@@ -99,7 +101,7 @@ jobs:
       - name: Publish to Hangar
         env:
           HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
-          CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+          CHANNEL: ${{ github.ref_name == 'master' && 'Release' || 'Alpha' }}
         run: |
           # Uploads the plugin to Hangar platform
           ./gradlew publishPluginPublicationToHangar --stacktrace
@@ -109,7 +111,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
-      CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+      CHANNEL: ${{ github.ref_name == 'master' && 'Release' || 'Alpha' }}
       GPR_USER: ${{ secrets.GPR_USER }}
       GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
     steps:
@@ -136,7 +138,7 @@ jobs:
       - name: Publish to Modrinth
         env:
           MODRINTH_API_TOKEN: ${{ secrets.MODRINTH_API_TOKEN }}
-          CHANNEL: ${{ github.ref_name == 'main' && 'Release' || 'Alpha' }}
+          CHANNEL: ${{ github.ref_name == 'master' && 'Release' || 'Alpha' }}
         run: |
           # Publishes to Modrinth (ensure your build.gradle is configured for this)
           ./gradlew modrinth --stacktrace
