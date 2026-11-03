@@ -13,6 +13,7 @@ public class AnimationManager {
     private final JavaPlugin plugin;
     private final Map<String, Animation> animations = new ConcurrentHashMap<>();
     private long globalTick = 0;
+    private long frameEpoch = 0;
 
     public AnimationManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -21,6 +22,7 @@ public class AnimationManager {
     public void loadAnimations() {
         animations.clear();
         globalTick = 0;
+        frameEpoch = 0;
         
         File animFolder = new File(plugin.getDataFolder(), "animations");
         if (!animFolder.exists()) {
@@ -73,11 +75,21 @@ public class AnimationManager {
 
     public void tick() {
         globalTick++;
+        boolean advanced = false;
         for (Animation anim : animations.values()) {
             if (globalTick % anim.interval == 0) {
                 anim.currentFrameIndex = (anim.currentFrameIndex + 1) % anim.frames.size();
+                advanced = true;
             }
         }
+        if (advanced) {
+            frameEpoch++;
+        }
+    }
+
+    /** Changes only when an animation frame actually advances — safe as a parse-cache key part. */
+    public long getFrameEpoch() {
+        return frameEpoch;
     }
 
     public String applyAnimation(String text, String animationName) {

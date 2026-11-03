@@ -6,7 +6,9 @@ import com.makrozai.eligiusnametag.domain.port.PlatformPort;
 import com.makrozai.eligiusnametag.domain.port.SyncPort;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.makrozai.eligiusnametag.domain.port.DatabasePort;
 
 public class NametagService {
+    /** Cache key part independent of volatile state; one entry per (line, group) per target. */
+    private record LineCacheKey(String rawLine, String group) {}
+
+    private record CachedLine(
+            net.kyori.adventure.text.Component component,
+            long stateHash,
+            long animEpoch,
+            long cachedAtMs) {}
+
     private final ConfigPort config;
     private final PlatformPort platform;
     private final NametagRendererPort renderer;
@@ -21,6 +32,12 @@ public class NametagService {
     private final SyncPort syncPort;
     private final Set<UUID> selfViewers = ConcurrentHashMap.newKeySet();
     private long lastTickDuration = 0;
+
+    // Parsed-line cache (P0-2): keyed per target → (raw line, group).
+    // Valid while state hash + animation epoch match and within the TTL
+    // derived from performance.cache_ticks (1 tick = 50ms). Entries for
+    // targets that leave the active set are swept each tick (leak guard).
+    private final Map<UUID, Map<LineCacheKey, CachedLine>> parseCache = new ConcurrentHashMap<>();
 
     // Cached once at construction — Folia presence never changes at runtime.
     private final boolean isFolia;
@@ -70,6 +87,7 @@ public class NametagService {
         int viewDistance = config.getViewDistance();
         double maxDistanceSquared = (double) viewDistance * viewDistance;
 
+        sweepParseCache(viewers, tamedMobs);
         if (isFolia) {
             for (PlatformPort.ViewerSnapshot viewer : viewers) {
                 org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(viewer.id());
@@ -154,9 +172,11 @@ public class NametagService {
             if (template == null || template.isEmpty()) {
                 renderer.hideNametag(targetId, validViewers);
             } else {
-                List<net.kyori.adventure.text.Component> lines = new ArrayList<>();
+                int cacheTicks = config.getCacheTicks();
+                long stateHash = cacheTicks > 0 ? platform.getStateHash(targetId) : 0L;
+                List<net.kyori.adventure.text.Component> lines = new ArrayList<>(template.size());
                 for (String line : template) {
-                    lines.add(platform.parsePlaceholders(targetId, line));
+                    lines.add(parseLine(targetId, line, group, cacheTicks, stateHash));
                 }
                 platform.disableVanillaNametag(targetId);
                 float yOffset = (float) config.getYOffset();
@@ -176,8 +196,59 @@ public class NametagService {
         return dx * dx + dy * dy + dz * dz;
     }
 
+    /**
+     * Returns a cached parsed line when the cheap state hash and animation epoch
+     * still match and the TTL (performance.cache_ticks × 50ms) has not expired;
+     * otherwise runs the full placeholder pipeline and stores the result.
+     * PAPI {@code %…%} lines are cached too but their staleness is bounded by
+     * the TTL (audit option 3): at the default 10 ticks behaviour is unchanged.
+     */
+    private net.kyori.adventure.text.Component parseLine(
+            UUID targetId, String rawLine, String group, int cacheTicks, long stateHash) {
+        if (cacheTicks <= 0) {
+            return platform.parsePlaceholders(targetId, rawLine);
+        }
+
+        // Only <anim:> lines depend on the frame epoch; other lines would be
+        // needlessly invalidated every animation tick.
+        long animEpoch = rawLine.contains("<anim:") ? platform.getAnimationEpoch() : 0L;
+        long now = System.currentTimeMillis();
+        long ttlMs = cacheTicks * 50L;
+
+        Map<LineCacheKey, CachedLine> targetCache =
+                parseCache.computeIfAbsent(targetId, k -> new ConcurrentHashMap<>());
+        LineCacheKey key = new LineCacheKey(rawLine, group);
+        CachedLine hit = targetCache.get(key);
+        if (hit != null
+                && hit.stateHash() == stateHash
+                && hit.animEpoch() == animEpoch
+                && now - hit.cachedAtMs() < ttlMs) {
+            return hit.component();
+        }
+
+        net.kyori.adventure.text.Component parsed = platform.parsePlaceholders(targetId, rawLine);
+        targetCache.put(key, new CachedLine(parsed, stateHash, animEpoch, now));
+        return parsed;
+    }
+
+    /** Drop cache entries for targets that are no longer rendered (leak guard). */
+    private void sweepParseCache(List<PlatformPort.ViewerSnapshot> viewers, List<UUID> tamedMobs) {
+        if (parseCache.isEmpty()) return;
+        Set<UUID> active = new HashSet<>(tamedMobs);
+        for (PlatformPort.ViewerSnapshot v : viewers) {
+            active.add(v.id());
+        }
+        parseCache.keySet().removeIf(id -> !active.contains(id));
+    }
+
+    /** Full invalidation — called on /enametag reload so templates re-parse immediately. */
+    public void clearCaches() {
+        parseCache.clear();
+    }
+
     public void cleanup() {
         renderer.destroyAll();
+        parseCache.clear();
     }
 
     public boolean toggleSelfView(UUID playerId) {

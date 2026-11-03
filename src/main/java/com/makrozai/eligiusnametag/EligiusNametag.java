@@ -190,6 +190,9 @@ public class EligiusNametag extends JavaPlugin implements Listener {
         if (renderer != null) {
             renderer.reloadConfig(configAdapter.getLineSpacing());
         }
+        if (nametagService != null) {
+            nametagService.clearCaches();
+        }
         startTask();
     }
 

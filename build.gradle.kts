@@ -37,6 +37,10 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
     testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.24.2")
+    testImplementation("com.github.MilkBowl:VaultAPI:1.7") {
+        exclude(group = "org.bukkit")
+        exclude(group = "org.spigotmc")
+    }
 }
 
 group = "com.makrozai"

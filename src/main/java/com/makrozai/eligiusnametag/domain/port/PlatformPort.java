@@ -32,4 +32,8 @@ public interface PlatformPort {
     String getPrimaryGroup(UUID targetId);
     String getOwnerPrimaryGroup(UUID targetId);
     boolean hasPermission(UUID targetId, String permission);
+    /** Cheap hash of volatile target state (health, names, owner, baby) used as parse-cache key part. */
+    long getStateHash(UUID targetId);
+    /** Advances only when an animation frame changes; used as parse-cache key part for &lt;anim:&gt; lines. */
+    long getAnimationEpoch();
 }

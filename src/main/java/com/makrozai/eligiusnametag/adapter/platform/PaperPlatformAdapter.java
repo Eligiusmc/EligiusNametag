@@ -21,11 +21,17 @@ import com.makrozai.eligiusnametag.domain.service.AnimationManager;
 public class PaperPlatformAdapter implements PlatformPort {
     private static final Pattern EMOJI_PATTERN = Pattern.compile(":([a-zA-Z0-9_\\-]+):");
     private static final Pattern ANIM_PATTERN = Pattern.compile("<anim:([a-zA-Z0-9_\\-]+)>(.*?)</anim:\\1>");
+    private static final long GROUP_CACHE_TTL_MS = 5000;
 
-    private Permission vaultPerms;
+    private record CachedGroup(String group, long expiresAt) {}
+
+    // Package-private so tests can inject a mock Vault provider.
+    Permission vaultPerms;
     private final AnimationManager animationManager;
     private final boolean hasPapi;
     private final java.util.Set<UUID> cachedTamedMobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private final java.util.Map<UUID, CachedGroup> groupCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.Map<UUID, CachedGroup> ownerGroupCache = new java.util.concurrent.ConcurrentHashMap<>();
     
     // Fallback universal para 1.21.1 (GENERIC_MAX_HEALTH) y 1.21.2+ (MAX_HEALTH)
     private static org.bukkit.attribute.Attribute CACHED_MAX_HEALTH_ATTRIBUTE;
@@ -301,32 +307,73 @@ public class PaperPlatformAdapter implements PlatformPort {
 
     @Override
     public String getPrimaryGroup(UUID targetId) {
+        CachedGroup cached = groupCache.get(targetId);
+        long now = System.currentTimeMillis();
+        if (cached != null && now < cached.expiresAt()) {
+            return cached.group();
+        }
+        String group = null;
         Player player = Bukkit.getPlayer(targetId);
         if (player != null && vaultPerms != null && vaultPerms.hasGroupSupport()) {
             try {
-                return vaultPerms.getPrimaryGroup(player);
+                group = vaultPerms.getPrimaryGroup(player);
             } catch (Exception ignored) {}
         }
-        return null;
+        groupCache.put(targetId, new CachedGroup(group, now + GROUP_CACHE_TTL_MS));
+        return group;
     }
 
     @Override
     public String getOwnerPrimaryGroup(UUID targetId) {
+        CachedGroup cached = ownerGroupCache.get(targetId);
+        long now = System.currentTimeMillis();
+        if (cached != null && now < cached.expiresAt()) {
+            return cached.group();
+        }
+        String group = null;
         org.bukkit.entity.Entity entity = Bukkit.getEntity(targetId);
         if (entity instanceof Tameable) {
             Tameable t = (Tameable) entity;
             if (t.getOwner() != null && t.getOwner().getUniqueId() != null) {
                 org.bukkit.OfflinePlayer op = Bukkit.getOfflinePlayer(t.getOwner().getUniqueId());
                 if (op.isOnline()) {
-                    return getPrimaryGroup(op.getUniqueId());
+                    group = getPrimaryGroup(op.getUniqueId());
                 } else if (vaultPerms != null && vaultPerms.hasGroupSupport()) {
                     // Try getting primary group for offline player (some Vault implementations support it, otherwise fallback null)
                     try {
-                        return vaultPerms.getPrimaryGroup(null, op);
+                        group = vaultPerms.getPrimaryGroup(null, op);
                     } catch (Exception ignored) {}
                 }
             }
         }
-        return null;
+        ownerGroupCache.put(targetId, new CachedGroup(group, now + GROUP_CACHE_TTL_MS));
+        return group;
+    }
+
+    @Override
+    public long getStateHash(UUID targetId) {
+        org.bukkit.entity.Entity e = Bukkit.getEntity(targetId);
+        if (e == null) return 0L;
+        int health = (int) Math.round(e instanceof org.bukkit.entity.LivingEntity le ? le.getHealth() : 0.0);
+        if (e instanceof Player p) {
+            org.bukkit.attribute.AttributeInstance attr = p.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE);
+            int maxHealth = attr != null ? (int) Math.round(attr.getValue()) : 20;
+            return java.util.Objects.hash(p.getName(), p.getDisplayName(), health, maxHealth);
+        }
+        if (e instanceof Tameable t) {
+            org.bukkit.attribute.AttributeInstance attr = e instanceof org.bukkit.entity.LivingEntity le
+                    ? le.getAttribute(CACHED_MAX_HEALTH_ATTRIBUTE) : null;
+            int maxHealth = attr != null ? (int) Math.round(attr.getValue()) : 20;
+            String ownerName = t.getOwner() != null ? t.getOwner().getName() : null;
+            boolean baby = !(e instanceof org.bukkit.entity.Ageable a) || !a.isAdult();
+            return java.util.Objects.hash(
+                    e.getCustomName(), ownerName, e.getType().name(), baby, health, maxHealth);
+        }
+        return java.util.Objects.hash(e.getType().name(), health);
+    }
+
+    @Override
+    public long getAnimationEpoch() {
+        return animationManager != null ? animationManager.getFrameEpoch() : 0L;
     }
 }
