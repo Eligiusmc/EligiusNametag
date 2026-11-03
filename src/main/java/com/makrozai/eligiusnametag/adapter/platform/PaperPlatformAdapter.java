@@ -73,6 +73,22 @@ public class PaperPlatformAdapter implements PlatformPort {
     }
 
     @Override
+    public List<ViewerSnapshot> snapshotViewers() {
+        List<ViewerSnapshot> list = new ArrayList<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            list.add(new ViewerSnapshot(p.getUniqueId(), p.getWorld().getName(), p.getX(), p.getY(), p.getZ()));
+        }
+        return list;
+    }
+
+    @Override
+    public TargetSnapshot resolveTarget(UUID id) {
+        org.bukkit.entity.Entity e = Bukkit.getEntity(id);
+        if (e == null) return null;
+        return new TargetSnapshot(id, e.getWorld().getName(), e.getX(), e.getY(), e.getZ());
+    }
+
+    @Override
     public void prepareTick() { }
 
     @Override

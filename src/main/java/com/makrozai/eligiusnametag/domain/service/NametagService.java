@@ -60,7 +60,10 @@ public class NametagService {
         long startTick = System.currentTimeMillis();
         platform.prepareTick();
 
-        List<UUID> onlinePlayers = platform.getOnlinePlayers();
+        // One viewer pass per tick: world + coordinates for every online player,
+        // so the per-target loop below does pure double math instead of
+        // Bukkit.getEntity/getLocation + Location allocations per pair (P0-3/P1-1).
+        List<PlatformPort.ViewerSnapshot> viewers = platform.snapshotViewers();
         List<UUID> tamedMobs = platform.getTamedMobs();
 
         // View-distance gate is config-driven and computed once per tick (issue #45).
@@ -68,24 +71,24 @@ public class NametagService {
         double maxDistanceSquared = (double) viewDistance * viewDistance;
 
         if (isFolia) {
-            for (UUID targetId : onlinePlayers) {
-                org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
+            for (PlatformPort.ViewerSnapshot viewer : viewers) {
+                org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(viewer.id());
                 if (target != null) {
-                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, true, maxDistanceSquared), null, 1L);
+                    target.getScheduler().execute(plugin, () -> updateTarget(viewer.id(), viewers, true, maxDistanceSquared), null, 1L);
                 }
             }
             for (UUID targetId : tamedMobs) {
                 org.bukkit.entity.Entity target = org.bukkit.Bukkit.getEntity(targetId);
                 if (target != null) {
-                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, onlinePlayers, false, maxDistanceSquared), null, 1L);
+                    target.getScheduler().execute(plugin, () -> updateTarget(targetId, viewers, false, maxDistanceSquared), null, 1L);
                 }
             }
         } else {
-            for (UUID targetId : onlinePlayers) {
-                updateTarget(targetId, onlinePlayers, true, maxDistanceSquared);
+            for (PlatformPort.ViewerSnapshot viewer : viewers) {
+                updateTarget(viewer.id(), viewers, true, maxDistanceSquared);
             }
             for (UUID targetId : tamedMobs) {
-                updateTarget(targetId, onlinePlayers, false, maxDistanceSquared);
+                updateTarget(targetId, viewers, false, maxDistanceSquared);
             }
         }
 
@@ -105,7 +108,7 @@ public class NametagService {
         return selfViewers.size();
     }
 
-    private void updateTarget(UUID targetId, List<UUID> potentialViewers, boolean isPlayer, double maxDistanceSquared) {
+    private void updateTarget(UUID targetId, List<PlatformPort.ViewerSnapshot> viewers, boolean isPlayer, double maxDistanceSquared) {
         boolean isHidden = platform.isGloballyHidden(targetId);
 
         if (!isPlayer) {
@@ -114,10 +117,14 @@ public class NametagService {
             }
         }
 
+        // Resolve the target once per update instead of once per viewer pair.
+        PlatformPort.TargetSnapshot target = platform.resolveTarget(targetId);
+
         List<UUID> validViewers = new ArrayList<>();
         List<UUID> invalidViewers = new ArrayList<>();
 
-        for (UUID viewerId : potentialViewers) {
+        for (PlatformPort.ViewerSnapshot viewer : viewers) {
+            UUID viewerId = viewer.id();
             if (viewerId.equals(targetId)) {
                 if (!isPlayer || !selfViewers.contains(viewerId) || !platform.hasPermission(viewerId, "eligiusnametag.viewself")) {
                     invalidViewers.add(viewerId);
@@ -125,10 +132,16 @@ public class NametagService {
                 }
             }
 
-            if (!isHidden
-                    && platform.isSameWorld(targetId, viewerId)
-                    && platform.getDistanceSquared(targetId, viewerId) <= maxDistanceSquared
-                    && platform.canViewerSeeTarget(viewerId, targetId)) {
+            // Predicate order preserved from the pre-snapshot loop:
+            // !isHidden → same world → dist² ≤ max² → canSee.
+            // Mob targets skip canViewerSeeTarget: its only checks (entity alive,
+            // same world) are already guaranteed by resolveTarget + world equality.
+            // Player targets still need it for vanilla canSee (spectator/invisibility).
+            if (target != null
+                    && !isHidden
+                    && viewer.world().equals(target.world())
+                    && distanceSquared(viewer, target) <= maxDistanceSquared
+                    && (!isPlayer || platform.canViewerSeeTarget(viewerId, targetId))) {
                 validViewers.add(viewerId);
             } else {
                 invalidViewers.add(viewerId);
@@ -154,6 +167,13 @@ public class NametagService {
         if (!invalidViewers.isEmpty()) {
             renderer.hideNametag(targetId, invalidViewers);
         }
+    }
+
+    private static double distanceSquared(PlatformPort.ViewerSnapshot viewer, PlatformPort.TargetSnapshot target) {
+        double dx = viewer.x() - target.x();
+        double dy = viewer.y() - target.y();
+        double dz = viewer.z() - target.z();
+        return dx * dx + dy * dy + dz * dz;
     }
 
     public void cleanup() {

@@ -73,6 +73,8 @@ Templates use `<anim:name>text</anim:name>` tags. `AnimationManager` loads `.yml
 - **`develop`** — integration branch, base for all PRs
 - **`feature/<name>`** — branch from `develop`, merge back to `develop`
 
+**NO PUSH until the user explicitly says so.** Work is committed locally on the feature branch; `git push` (and PR creation) only happens after the user confirms all work and verification are complete.
+
 **Conventional Commits are mandatory** — `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`. These drive automated semantic versioning via Release Please. A `BREAKING CHANGE:` footer bumps the major version.
 
 Promotion from `develop` to `master` is done via the **"Promote Develop to Master"** GitHub Action, not a manual PR.
