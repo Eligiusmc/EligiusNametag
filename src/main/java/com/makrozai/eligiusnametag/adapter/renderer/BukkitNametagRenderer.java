@@ -135,6 +135,9 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             lineJsonCache.remove(removed.getUniqueId());
         }
 
+        // O(1) contains() in the per-line hot loop below (avoids O(n²) on large viewer lists).
+        Set<UUID> viewerSet = new HashSet<>(viewers);
+
         // 3. Update displays
         for (int i = 0; i < lines.size(); i++) {
             TextDisplay display = displays.get(i);
@@ -176,9 +179,6 @@ public class BukkitNametagRenderer implements NametagRendererPort {
             // ConcurrentHashMap.newKeySet() keeps Folia region threads from hitting ConcurrentModificationException.
             Set<UUID> currentViewers = lineSpawnedViewers.computeIfAbsent(displayId, k -> ConcurrentHashMap.newKeySet());
             Set<UUID> hiddenViewers = lineHiddenViewers.computeIfAbsent(displayId, k -> ConcurrentHashMap.newKeySet());
-
-            // O(1) contains() in the hot loop below (avoids O(n²) on large viewer lists).
-            Set<UUID> viewerSet = new HashSet<>(viewers);
 
             // Show to new valid viewers
             for (UUID viewerId : viewerSet) {
