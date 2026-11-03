@@ -410,10 +410,23 @@ refresh line numbers if moved. Do not re-derive findings that are already docume
 
 | Finding | Status (audit date 2026-11-02) |
 |---------|-------------------------------|
-| P0-1 … P0-5 | **Open** |
-| P1-1 … P1-5 | **Open** |
-| P2-1 … P2-7 | **Open** (P2-6 partially fixed on other branch `feature/fix-critical-bugs`, not merged) |
-| GitHub perf issues | None open (#22/#23 are features) |
+| P0-1 (static patterns) | **FIXED** — pre-existing on develop, verified in re-audit (branch `feature/perf-optimization`) |
+| P0-2 (parsed-line cache) | **FIXED in `feature/perf-optimization`** (Batch C commit `87c745f`) — `NametagService.parseLine` + `performance.cache_ticks` |
+| P0-3 (per-tick snapshots) | **FIXED in `feature/perf-optimization`** (Batch B commit `ae760ed`) — `PlatformPort.snapshotViewers`/`resolveTarget` |
+| P0-4 (cached Folia detection) | **FIXED** — merged from `feature/fix-critical-bugs` (`024281e`) into `feature/perf-optimization` |
+| P0-5 (group TTL cache) | **FIXED in `feature/perf-optimization`** (Batch C commit `87c745f`) — 5s TTL in `PaperPlatformAdapter` |
+| P1-1 (no `getLocation()` in distance) | **FIXED in `feature/perf-optimization`** (Batch B) — pure double math on snapshots |
+| P1-2 (single PAPI presence check) | **FIXED** — pre-existing `hasPapi` field on develop, verified |
+| P1-3 (hoist `viewerSet`) | **FIXED in `feature/perf-optimization`** (Batch A commit `79e01f1`) |
+| P1-4 (plugin ref per tick) | **FIXED** — merged from `feature/fix-critical-bugs` (plugin cached at construction) |
+| P1-5 (hysteresis) | **FIXED in `feature/perf-optimization`** (Batch D commit `cd10b2a`) — 2-block margin |
+| P2-1 … P2-5, P2-7 | **Open** (deferred Batch E / non-urgent) |
+| P2-6 (Folia cancel-task on reload) | **FIXED** — merged from `feature/fix-critical-bugs` (`f79bdff` → `cancelActiveTask`) |
+| GitHub perf issues | None open (#46 fixed on this branch lineage, #22/#23 are features) |
+
+**Branch:** all batches A–D executed on a single branch `feature/perf-optimization` (per user instruction), based on `develop` + `origin/master` + merged `origin/feature/fix-critical-bugs`.
+
+**Verification (2026-11-02):** `./gradlew clean build` green — 35 tests, 0 failures (was 23 before; +12 new: ParseCacheTest 6, GroupCacheTest 2, HysteresisTest 4).
 
 When a batch merges, update this table: `FIXED in <PR> (date)`.
 
