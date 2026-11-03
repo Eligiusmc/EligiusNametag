@@ -28,6 +28,23 @@ command_aliases:
 
 ---
 
+## ⚡ Desempenho
+
+Controla com que frequência o plugin reanalisa os placeholders da nametag (PlaceholderAPI, MiniMessage, animações).
+
+```yaml
+# Ticks que uma linha de nametag analisada permanece em cache antes de
+# executar novamente o pipeline de placeholders. 10 ticks = 0.5s
+# (corresponde ao intervalo padrão).
+# Defina como 0 para desativar completamente o cache de linhas.
+performance:
+  cache_ticks: 10
+```
+
+Valores mais altos reduzem o uso de CPU em servidores ocupados, mas placeholders dinâmicos (saúde, PAPI) são atualizados um pouco mais devagar. Mudanças de saúde e nome sempre são atualizadas imediatamente, independentemente deste valor.
+
+---
+
 ## 💾 Conexão com Banco de Dados (HikariCP)
 
 Ao contrário de plugins básicos que salvam preferências em arquivos de texto, o EligiusNametag permite um fluxo simultâneo perfeito usando o padrão da indústria `HikariCP` para evitar quedas de desempenho (Lag Spikes) durante salvamentos massivos em grandes redes Folia.
